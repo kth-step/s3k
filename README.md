@@ -21,79 +21,12 @@ Simply Secure Separation Kernel (S3K) is a real-time separation kernel for embed
 
 - **Real-time properties.** Real-time properties makes the kernel suitable for some RT applications. Exact properties TBD.
 
-## Basic API
+## Documentation
 
-### System calls (Basic)
-
-- `void s3k_get_pid()` - Get the process's PID.
-- `uint64_t s3k_read_reg(register_number)` - Read a virtual register.
-- `void s3k_write_reg(register_number, value)` - Write to a virtual register.
-- `void s3k_yield()` - Yield the remainder of the time slice (TODO: rename the function?).
-- `cap_t s3k_read_cap(i)` - Read capability from slot `i`.
-- `uint64_t s3k_move_cap(i, j)` - Move a capability in slot `i` to slot `j`.
-- `uint64_t s3k_delete_cap(i)` -  Delete capability in slot `i`.
-- `uint64_t s3k_revoke_cap(i) - Delete all children of capability in slot `i`.
-- `uint64_t s3k_derive_cap(i, j, cap) - Derive capability `cap` from capability in slot `i` and place in slot `j`.
-
-### System calls (Capability invocation)
-The following system calls are pseudo system calls implemented on `s3k_invoke_cap(i, a1, a2, a3, a4, a5, a6, a7)`.
-
-**Supervisor Invocations,** the `i` of the following system calls should point at a supervisor capability.
-- `uint64_t s3k_supervisor_suspend(i, pid)` - Suspend process `pid`.
-- `uint64_t s3k_supervisor_resume(i, pid)` - Resume process `pid`.
-- `uint64_t s3k_supervisor_get_state(i, pid)` - Get state of process `pid`.
-- `uint64_t s3k_supervisor_read_reg(i, pid, register_number)` - Reads a virtual register of process `pid`. (Req. process `pid` suspended).
-- `uint64_t s3k_supervisor_write_reg(i, pid, register_number, value)` - Write to virtual register of process `pid`. (Req. process `pid` suspended).
-- `uint64_t s3k_supervisor_read_cap(i, pid, j)` - Read capability `j` of process `pid`. (Req. process `pid` suspended).
-- `uint64_t s3k_supervisor_give_cap(i, pid, j, k)` - Give capability `j` to process `pid`, placing it in slot `k`. (Req. process `pid` suspended).
-- `uint64_t s3k_supervisor_take_cap(i, pid, j, k)` - Take capability `j` from process `pid`, placing it in slot `k`. (Req. process `pid` suspended).
-
-### Virtual registers
-TODO: Fix constants for virtual registers.
-
-## User guide
-
-Prerequisites:
-- python3 with pyyaml
-- riscv-gnu-toolchain : compiled with unknown-elf or similar (i.e., not linux)
-    + Download from SiFive, 
-    + Install with your package manager, or
-    + Install from source https://github.com/riscv-collab/riscv-gnu-toolchain
-        + Suggested config: `./configure --prefix=/opt/riscv --enable-multilib`
-
-The following commands will compile the kernel, `s3k.elf`, with a dummy payload:
-```bash
-git clone git@github.com:kth-step/separation-kernel.git
-cd separation-kernel
-make CC=riscv64-unknown-elf-gcc # or CC=riscv64-elf-gcc for AUR
-```
-
-Custom payload, kernel config and platform:
-+ Copy `config.h` and configure.
-+ Configure the variables in your config file. 
-+ Copy `bsp/virt.h` or `bsp/sifive_u.h` and configure it for your platform.
-+ `make CC=riscv64-unknown-elf-gcc CONFIG=path/to/my/config.h PLATFORM=path/to/my/platform.h [PAYLOAD=path/to/my/payload]`
-
-Check https://github.com/kth-step/separation-kernel-examples (WIP) for sample application.
-
-## Coding style
-
-- Functions variables should use `snake_case`.
-- Function names should be prefixed with the file name, e.g., `proc_init()` if the function resides in `file.c`
-- Structs, enum, and union must be defined with `snake_case` and have a typedef in the form `snake_case_t`.
-- C files should be formatted using `clang-format` (`make format`), style file (`.clang-format`) is provided.
-
-## Progress
-
-- [x] Implement the foundation of the scheduler.
-- [x] Implement message passing so we can send basic messages with no capabilities.
-- [x] Implement message passing so we can send time slices, allowing us to dynamically change the scheduling.
-- [x] Implement the supervisor capability allowing process 0 to manage other process's capabilities.
-- [x] Implement memory protection (memory slice, memory frame).
-- [x] Implement exception handling.
-- [ ] Separate kernel and user binaries.  Implement a basic bootloader in process 0 for loading the user binaries.
-- [ ] Design and build applications, benchmarks and tests.
-- [ ] Start on formal verification.
+- [S3K - API](doc/API.md)
+- [S3K - INSTALL](doc/INSTALL.md)
+- [S3K - PLAN](doc/PLAN.md)
+- [S3K - Proof-of-Concept](https://github.com/kth-step/s3k-poc)
 
 ## Related Projects 
 - [OpenMZ](https://github.com/castor-software/openmz) - A lightweight open-source implementation of MultiZone Security.
@@ -104,24 +37,3 @@ Check https://github.com/kth-step/separation-kernel-examples (WIP) for sample ap
 - [MultiZone Security](https://hex-five.com) - A lightweight TEE for RISC-V.
 - [STH](https://bitbucket.org/sicssec/sth/src/master/) - SICS Thin Hypervisor, a research kernel part of the PROSPER project.
 
-## Copyright (MIT License)
-
-Copyright 2021 Henrik Karlsson <henrik10@kth.se>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
