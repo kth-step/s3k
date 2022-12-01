@@ -1,7 +1,7 @@
 # See LICENSE file for copyright and license details.
 .POSIX:
 
-PROGRAM ?=separation-kernel
+PROGRAM ?=s3k
 
 SRC=src
 INC=inc
@@ -10,6 +10,7 @@ SCRIPTS=scripts
 
 ELF=$(PROGRAM).elf
 BIN=$(PROGRAM).bin
+DA=$(PROGRAM).da
 API=api
 
 LDS        ?=config.lds
@@ -41,7 +42,7 @@ CFLAGS+=-T$(LDS)
 .PHONY: all target clean size da cloc format elf bin da api
 .SECONDARY:
 
-all: $(ELF)
+all: $(ELF) $(BIN) $(DA)
 
 elf: $(ELF)
 bin: $(BIN)
@@ -75,10 +76,7 @@ $(ELF): $(LDS) $(SRCS) $(HDRS) $(PAYLOAD)
 $(BIN): $(ELF)
 	$(OBJCOPY) -O binary $< $@
 
-$(BUILD)/%.da: $(BUILD)/%.o
-	$(OBJDUMP) -d $< > $@
-
-$(BUILD)/%.da: $(BUILD)/%.elf
+%.da: %.elf
 	$(OBJDUMP) -d $< > $@
 
 # API
