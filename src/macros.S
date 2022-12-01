@@ -1,6 +1,6 @@
 // See LICENSE file for copyright and license details.
 
-#include "asm_consts.h"
+#include "platform.h"
 
 .macro zero_state
         li      x1,0
@@ -49,10 +49,4 @@
         addi    t1,t1,-MIN_HARTID
         slli    t1,t1,LOG_STACK_SIZE
         sub     sp,sp,t1
-.endm
-
-.macro save_context
-.endm
-
-.macro restore_context
 .endm

@@ -3,12 +3,11 @@
 #include "proc.h"
 #include "cap_node.h"
 
-#define DEFINE_OFFSET(name, struct, member) asm volatile("#define " #name " %0" ::"i"(offsetof(struct, member)));
-#define DEFINE_ENUM(name) asm volatile("#define " #name " %0" ::"i"(name));
+#define DEFINE_OFFSET(name, struct, member) __asm__ volatile ("#define " #name " %0" ::"i"(offsetof(struct, member)));
+#define DEFINE_ENUM(name) __asm__ volatile ("#define " #name " %0" ::"i"(name));
 
 void foo(void)
 {
-    asm volatile("#pragma once");
     DEFINE_OFFSET(REGS_PC, regs_t, pc);
     DEFINE_OFFSET(REGS_RA, regs_t, ra);
     DEFINE_OFFSET(REGS_SP, regs_t, sp);

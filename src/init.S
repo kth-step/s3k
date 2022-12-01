@@ -1,6 +1,7 @@
 # See LICENSE file for copyright and license details.
 
 #include "macros.S"
+#include "platform.h"
 
 .globl _start
 

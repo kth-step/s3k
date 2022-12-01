@@ -2,6 +2,7 @@
 #include "info.h"
 
 #include "kprint.h"
+#include "platform.h"
 
 void print_info(void)
 {

@@ -7,6 +7,7 @@
 #include "csr.h"
 #include "kprint.h"
 #include "lock.h"
+#include "platform.h"
 #include "proc_state.h"
 #include "time.h"
 #include "trap.h"

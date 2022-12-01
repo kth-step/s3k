@@ -3,6 +3,7 @@
 
 #include "csr.h"
 #include "kprint.h"
+#include "platform.h"
 
 #define ARRAY_SIZE(x) ((sizeof(x) / sizeof(x[0])))
 

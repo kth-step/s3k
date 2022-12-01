@@ -17,11 +17,12 @@ LDS        ?=config.lds
 CONFIG_H   ?=config.h
 BSP        ?=bsp/virt
 
-SRCS=$(wildcard $(SRC)/*.c) $(wildcard $(SRC)/*.S)
-HDRS=$(wildcard $(INC)/*.h) $(CAP_H) $(ASM_CONSTS_H) $(CONFIG_H) $(PLATFORM_H)
+SRCS=$(wildcard src/*.[cS]) $(wildcard *.S)
+GHDRS=inc/cap.g.h inc/offsets.g.h 
+HDRS=$(wildcard inc/*.h) $(CONFIG_H) $(PLATFORM_H)
 
-CAP_H=$(INC)/cap.h
-ASM_CONSTS_H=$(INC)/asm_consts.h
+CAP_H=cap.g.h
+ASM_CONSTS_H=asm_consts.g.h
 
 # Tools
 RISCV_PREFIX ?=riscv64-unknown-elf
@@ -36,55 +37,43 @@ CFLAGS+=-std=c18
 CFLAGS+=-Wall
 CFLAGS+=-gdwarf-2 -O3
 CFLAGS+=-nostdlib -static -ffreestanding
-CFLAGS+=-I$(INC) -I$(BSP) -include $(BSP).h -include $(CONFIG_H) 
+CFLAGS+=-Iinc -I$(BSP) -include $(CONFIG_H) 
 CFLAGS+=-T$(LDS)
 
-.PHONY: all target clean size da cloc format elf bin da api
+.PHONY: all api clean
 .SECONDARY:
 
 all: $(ELF) $(BIN) $(DA)
 
-elf: $(ELF)
-bin: $(BIN)
-da: $(DA)
-
-
 clean:
-	rm -f $(CAP_H) $(ASM_CONST_H) $(ELF) $(BIN) $(DA)
-
-size:
-	$(SIZE) $(ELF)
-
-cloc:
-	cloc $(HDRS) $(SRCS)
-
-format:
-	clang-format -i $(wildcard inc/*.h) $(wildcard src/*.c) $(wildcard api/*.h)
+	rm -f inc/*.g.h api/*.g.h $(ELF) $(BIN) $(DA)
 
 # Generated headers
-$(CAP_H): $(GEN)/cap.yml
-	$(SCRIPTS)/gen_cap $< $@
+inc/cap.g.h: gen/cap.yml
+	gen/gen_cap $< $@
 
-$(ASM_CONSTS_H): $(GEN)/asm_consts.c $(INC)/proc.h $(INC)/cap_node.h $(INC)/consts.h
-	$(CC) -include $(CONFIG_H) -I$(INC) -I$(BSP) -S -o $@ $< 
+inc/offsets.g.h: gen/offsets.c inc/proc.h inc/consts.h
+	$(CC) $(CFLAGS) -S -o $@ $< 
 	sed -i -e '/#define/!d' -e 's/.\+#define/#define/' $@
 
 # Kernel
-$(ELF): $(LDS) $(SRCS) $(HDRS) $(PAYLOAD)
-	$(CC) $(CFLAGS) -o $@ $(SRCS) -DPAYLOAD=\"$(PAYLOAD)\"
+$(ELF): $(LDS) $(SRCS) $(HDRS) $(GHDRS) $(PAYLOAD)
+	$(CC) $(CFLAGS) -o $@ $(SRCS)
 
 $(BIN): $(ELF)
 	$(OBJCOPY) -O binary $< $@
 
-%.da: %.elf
+$(DA): $(ELF)
 	$(OBJDUMP) -d $< > $@
 
 # API
-api: $(API)/s3k_consts.h $(API)/s3k_cap.h
+api: api/s3k.h
 
-$(API)/s3k_cap.h: $(INC)/cap.h
-	cp $< $@
-	sed -i '/kassert/d' $@
+api/s3k.h: api/s3k_cap.g.h api/s3k_consts.g.h
+	touch $@
 
-$(API)/s3k_consts.h: $(INC)/consts.h
+api/s3k_cap.g.h: inc/cap.g.h
+	sed '/kassert/d' $< > $@
+
+api/s3k_consts.g.h: inc/consts.h
 	cp $< $@
