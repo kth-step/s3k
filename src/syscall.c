@@ -123,9 +123,8 @@ proc_t* syscall_revoke_cap(proc_t* current, uint64_t cidx)
         cap_node_t* node = proc_get_cap_node(current, cidx);
         cap_t cap = node->cap;
 
-        if (!cap_node_is_deleted(node)) {
+        if (cap_node_is_deleted(node))
                 return proc_set_code(current, S3K_EMPTY);
-        }
         while (!cap_node_is_deleted(node)) {
                 cap_node_t* next_node = node->next;
                 cap_t next_cap = next_node->cap;
@@ -138,7 +137,8 @@ proc_t* syscall_revoke_cap(proc_t* current, uint64_t cidx)
         }
 
         preemption_disable();
-        node->cap = revoke_update_cap(cap);
+        cap = revoke_update_cap(cap);
+        node->cap = cap;
         cap_update_hook(current, node, cap);
         return proc_set_code(current, S3K_OK);
 }
