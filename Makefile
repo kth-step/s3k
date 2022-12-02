@@ -6,11 +6,7 @@ PROGRAM ?=s3k
 SRC=src
 INC=inc
 GEN=gen
-SCRIPTS=scripts
 
-ELF=$(PROGRAM).elf
-BIN=$(PROGRAM).bin
-DA=$(PROGRAM).da
 API=api
 
 LDS        ?=config.lds
@@ -25,12 +21,9 @@ CAP_H=cap.g.h
 ASM_CONSTS_H=asm_consts.g.h
 
 # Tools
-RISCV_PREFIX ?=riscv64-unknown-elf
-CC=$(RISCV_PREFIX)-gcc
-LD=$(RISCV_PREFIX)-ld
-SIZE=$(RISCV_PREFIX)-size
-OBJCOPY=$(RISCV_PREFIX)-objcopy
-OBJDUMP=$(RISCV_PREFIX)-objdump
+RISCV_PREFIX ?=riscv64-unknown-elf-
+CC=$(RISCV_PREFIX)gcc
+LD=$(RISCV_PREFIX)ld
 
 CFLAGS=-march=rv64imac -mabi=lp64 -mcmodel=medany
 CFLAGS+=-std=c18
@@ -43,10 +36,10 @@ CFLAGS+=-T$(LDS)
 .PHONY: all api clean
 .SECONDARY:
 
-all: $(ELF) $(BIN) $(DA)
+all: build/s3k.elf
 
 clean:
-	rm -f inc/*.g.h api/*.g.h $(ELF) $(BIN) $(DA)
+	rm -f inc/*.g.h api/*.g.h build/s3k.elf
 
 # Generated headers
 inc/cap.g.h: gen/cap.yml
@@ -57,20 +50,12 @@ inc/offsets.g.h: gen/offsets.c inc/proc.h inc/consts.h
 	sed -i -e '/#define/!d' -e 's/.\+#define/#define/' $@
 
 # Kernel
-$(ELF): $(LDS) $(SRCS) $(HDRS) $(GHDRS) $(PAYLOAD)
+%.elf: $(LDS) $(SRCS) $(HDRS) $(GHDRS) $(PAYLOAD)
+	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -o $@ $(SRCS)
 
-$(BIN): $(ELF)
-	$(OBJCOPY) -O binary $< $@
-
-$(DA): $(ELF)
-	$(OBJDUMP) -d $< > $@
-
 # API
-api: api/s3k.h
-
-api/s3k.h: api/s3k_cap.g.h api/s3k_consts.g.h
-	touch $@
+api: api/s3k_cap.g.h api/s3k_consts.g.h
 
 api/s3k_cap.g.h: inc/cap.g.h
 	sed '/kassert/d' $< > $@

@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "s3k_cap.h"
-#include "s3k_consts.h"
+#include "s3k_cap.g.h"
+#include "s3k_consts.g.h"
 
 static inline uint64_t _S3K_SYSCALL1(uint64_t sysnr)
 {
