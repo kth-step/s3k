@@ -38,79 +38,77 @@ static inline bool sup_valid_pid(cap_t cap, uint64_t pid)
         return cap_supervisor_get_free(cap) <= pid && pid < cap_supervisor_get_end(cap);
 }
 
-static inline proc_t* proc_set_code(proc_t* proc, s3k_code_t code)
-{
-        proc->regs.a0 = code;
-        return proc;
-}
-
 /*** SYSTEM CALLS ***/
-proc_t* syscall_get_pid(proc_t* current)
+uint64_t syscall_get_pid(void)
 {
-        current->regs.a1 = current->pid;
-        return proc_set_code(current, S3K_OK);
+        current->regs.a0 = current->pid;
+        return S3K_OK;
 }
 
-proc_t* syscall_get_reg(proc_t* current, uint64_t reg)
+uint64_t syscall_get_reg(uint64_t reg)
 {
-        if (reg < N_REGISTERS)
-                current->regs.a1 = proc_get_reg(current, reg);
-        return proc_set_code(current, reg < N_REGISTERS ? S3K_OK : S3K_ERROR);
+        if (reg < N_REGISTERS) {
+                current->regs.a0 = proc_get_reg(current, reg);
+                return S3K_OK;
+        }
+        return S3K_ERROR;
 }
 
-proc_t* syscall_set_reg(proc_t* current, uint64_t reg, uint64_t val)
+uint64_t syscall_set_reg(uint64_t reg, uint64_t val)
 {
-        if (reg < N_REGISTERS)
-                current->regs.a1 = proc_set_reg(current, reg, val);
-        return proc_set_code(current, reg < N_REGISTERS ? S3K_OK : S3K_ERROR);
+        if (reg < N_REGISTERS) {
+                current->regs.a0 = proc_set_reg(current, reg, val);
+                return S3K_OK;
+        }
+        return S3K_ERROR;
 }
 
-proc_t* syscall_yield(proc_t* current)
+void syscall_yield(void)
 {
         uint64_t hartid = read_csr(mhartid);
         current->regs.timeout = read_timeout(hartid);
-        return sched_yield(current);
+        sched_yield();
 }
 
-proc_t* syscall_read_cap(proc_t* current, uint64_t cidx)
+uint64_t syscall_read_cap(uint64_t cidx)
 {
         kassert(current != NULL);
         cap_node_t* node = proc_get_cap_node(current, cidx);
         cap_t cap = cap_node_get_cap(node);
 
-        current->regs.a1 = cap.word0;
-        current->regs.a2 = cap.word1;
-        return proc_set_code(current, S3K_OK);
+        current->regs.a0 = cap.word0;
+        current->regs.a1 = cap.word1;
+        return S3K_OK;
 }
 
-proc_t* syscall_move_cap(proc_t* current, uint64_t src_cidx, uint64_t dest_cidx)
+uint64_t syscall_move_cap(uint64_t src_cidx, uint64_t dest_cidx)
 {
         kassert(current != NULL);
         cap_node_t* src_node = proc_get_cap_node(current, src_cidx);
         cap_t cap = cap_node_get_cap(src_node);
         cap_node_t* dest_node = proc_get_cap_node(current, dest_cidx);
-        if (cap_node_is_deleted(src_node)) {
-                return proc_set_code(current, S3K_EMPTY);
-        }
-        if (!cap_node_is_deleted(dest_node)) {
-                return proc_set_code(current, S3K_OCCUPIED);
-        }
-        return proc_set_code(current, cap_node_move(cap, src_node, dest_node) ? S3K_OK : S3K_EMPTY);
+        if (cap_node_is_deleted(src_node))
+                return S3K_EMPTY;
+        if (!cap_node_is_deleted(dest_node))
+                return S3K_OCCUPIED;
+        if (cap_node_move(cap, src_node, dest_node))
+                return S3K_OK;
+        return S3K_EMPTY;
 }
 
-proc_t* syscall_delete_cap(proc_t* current, uint64_t cidx)
+uint64_t syscall_delete_cap(uint64_t cidx)
 {
         kassert(current != NULL);
         cap_node_t* node = proc_get_cap_node(current, cidx);
         cap_t cap = cap_node_get_cap(node);
-        if (cap_node_is_deleted(node)) {
-                return proc_set_code(current, S3K_EMPTY);
-        }
+
         cap_update_hook(NULL, node, cap);
-        return proc_set_code(current, cap_node_delete(node) ? S3K_OK : S3K_EMPTY);
+        if (cap_node_delete(node))
+                return S3K_OK;
+        return S3K_EMPTY;
 }
 
-proc_t* syscall_revoke_cap(proc_t* current, uint64_t cidx)
+uint64_t syscall_revoke_cap(uint64_t cidx)
 {
         kassert(current != NULL);
         /* Return S3K_PREEMPTED if preemted */
@@ -124,7 +122,7 @@ proc_t* syscall_revoke_cap(proc_t* current, uint64_t cidx)
         cap_t cap = node->cap;
 
         if (cap_node_is_deleted(node))
-                return proc_set_code(current, S3K_EMPTY);
+                return S3K_EMPTY;
         while (!cap_node_is_deleted(node)) {
                 cap_node_t* next_node = node->next;
                 cap_t next_cap = next_node->cap;
@@ -140,15 +138,15 @@ proc_t* syscall_revoke_cap(proc_t* current, uint64_t cidx)
         cap = revoke_update_cap(cap);
         node->cap = cap;
         cap_update_hook(current, node, cap);
-        return proc_set_code(current, S3K_OK);
+        return S3K_OK;
 }
 
-proc_t* syscall_derive_cap(proc_t* current, uint64_t src_cidx, uint64_t dest_cidx, uint64_t word0, uint64_t word1)
+uint64_t syscall_derive_cap(uint64_t src_cidx, uint64_t dest_cidx, uint64_t word0, uint64_t word1)
 {
         kassert(current != NULL);
 
         /* If we get preempted, error code is S3K_PREEMPTED */
-        proc_set_code(current, S3K_PREEMPTED);
+        current->regs.a0 = S3K_PREEMPTED;
 
         /* !!! ENABLE PREEMPTION !!! */
         preemption_enable();
@@ -159,123 +157,131 @@ proc_t* syscall_derive_cap(proc_t* current, uint64_t src_cidx, uint64_t dest_cid
         cap_t new_cap = (cap_t){word0, word1};
 
         /* Check if we can derive the capability */
-        if (cap_node_is_deleted(src_node)) {
-                return proc_set_code(current, S3K_EMPTY);
-        }
-        if (!cap_node_is_deleted(dest_node)) {
-                return proc_set_code(current, S3K_OCCUPIED);
-        }
-        if (!cap_can_derive(src_cap, new_cap)) {
-                return proc_set_code(current, S3K_ILLEGAL_DERIVATION);
-        }
+        if (cap_node_is_deleted(src_node))
+                return S3K_EMPTY;
+        if (!cap_node_is_deleted(dest_node))
+                return S3K_OCCUPIED;
+        if (!cap_can_derive(src_cap, new_cap))
+                return S3K_ILLEGAL_DERIVATION;
         /* !!! DISABLE PREEMPTION !!! */
         preemption_disable();
         src_node->cap = derive_update_cap(src_cap, new_cap);
         cap_update_hook(current, src_node, new_cap);
-        return proc_set_code(current, cap_node_insert(new_cap, dest_node, src_node) ? S3K_OK : S3K_EMPTY);
+        if (cap_node_insert(new_cap, dest_node, src_node))
+                return S3K_OK;
+        return S3K_EMPTY;
 }
 
-proc_t* syscall_sup_suspend(proc_t* current, uint64_t cidx, uint64_t pid)
+uint64_t syscall_sup_suspend(uint64_t cidx, uint64_t pid)
 {
         cap_node_t* node = proc_get_cap_node(current, cidx);
         cap_t cap = cap_node_get_cap(node);
         proc_t* supervisee = &processes[pid];
         if (!cap_is_type(cap, CAP_TYPE_SUPERVISOR))
-                return proc_set_code(current, S3K_INVALID_CAPABILITY);
+                return S3K_INVALID_CAPABILITY;
         if (!sup_valid_pid(cap, pid))
-                return proc_set_code(current, S3K_INVALID_SUPERVISEE);
-        return proc_set_code(current, proc_supervisor_suspend(supervisee) ? S3K_OK : S3K_ERROR);
+                return S3K_INVALID_SUPERVISEE;
+        if (proc_supervisor_suspend(supervisee))
+                return S3K_OK;
+        return S3K_ERROR;
 }
 
-proc_t* syscall_sup_resume(proc_t* current, uint64_t cidx, uint64_t pid)
+uint64_t syscall_sup_resume(uint64_t cidx, uint64_t pid)
 {
         cap_node_t* node = proc_get_cap_node(current, cidx);
         cap_t cap = cap_node_get_cap(node);
         proc_t* supervisee = &processes[pid];
         if (!cap_is_type(cap, CAP_TYPE_SUPERVISOR))
-                return proc_set_code(current, S3K_INVALID_CAPABILITY);
+                return S3K_INVALID_CAPABILITY;
         if (!sup_valid_pid(cap, pid))
-                return proc_set_code(current, S3K_INVALID_SUPERVISEE);
-        return proc_set_code(current, proc_supervisor_resume(supervisee) ? S3K_OK : S3K_ERROR);
+                return S3K_INVALID_SUPERVISEE;
+        if (proc_supervisor_resume(supervisee))
+                return S3K_OK;
+        return S3K_ERROR;
 }
 
-proc_t* syscall_sup_get_state(proc_t* current, uint64_t cidx, uint64_t pid)
+uint64_t syscall_sup_get_state(uint64_t cidx, uint64_t pid)
 {
         cap_node_t* node = proc_get_cap_node(current, cidx);
         cap_t cap = cap_node_get_cap(node);
         proc_t* supervisee = &processes[pid];
         if (!cap_is_type(cap, CAP_TYPE_SUPERVISOR))
-                return proc_set_code(current, S3K_INVALID_CAPABILITY);
+                return S3K_INVALID_CAPABILITY;
         if (!sup_valid_pid(cap, pid))
-                return proc_set_code(current, S3K_INVALID_SUPERVISEE);
-        current->regs.a1 = supervisee->state;
-        return proc_set_code(current, S3K_OK);
+                return S3K_INVALID_SUPERVISEE;
+        current->regs.a0 = supervisee->state;
+        return S3K_OK;
 }
 
-proc_t* syscall_sup_get_reg(proc_t* current, uint64_t cidx, uint64_t pid, uint64_t reg)
+uint64_t syscall_sup_get_reg(uint64_t cidx, uint64_t pid, uint64_t reg)
 {
         cap_node_t* node = proc_get_cap_node(current, cidx);
         cap_t cap = cap_node_get_cap(node);
         proc_t* supervisee = &processes[pid];
         if (!cap_is_type(cap, CAP_TYPE_SUPERVISOR))
-                return proc_set_code(current, S3K_INVALID_CAPABILITY);
+                return S3K_INVALID_CAPABILITY;
         if (!sup_valid_pid(cap, pid))
-                return proc_set_code(current, S3K_INVALID_SUPERVISEE);
+                return S3K_INVALID_SUPERVISEE;
 
-        if (reg < N_REGISTERS)
-                current->regs.a1 = proc_get_reg(supervisee, reg);
-        return proc_set_code(current, reg < N_REGISTERS ? S3K_OK : S3K_ERROR);
+        if (reg < N_REGISTERS) {
+                current->regs.a0 = proc_get_reg(supervisee, reg);
+                return S3K_OK;
+        }
+        return S3K_ERROR;
 }
 
-proc_t* syscall_sup_set_reg(proc_t* current, uint64_t cidx, uint64_t pid, uint64_t reg, uint64_t val)
+uint64_t syscall_sup_set_reg(uint64_t cidx, uint64_t pid, uint64_t reg, uint64_t val)
 {
         cap_node_t* node = proc_get_cap_node(current, cidx);
         cap_t cap = cap_node_get_cap(node);
         proc_t* supervisee = &processes[pid];
         if (!cap_is_type(cap, CAP_TYPE_SUPERVISOR))
-                return proc_set_code(current, S3K_INVALID_CAPABILITY);
+                return S3K_INVALID_CAPABILITY;
         if (!sup_valid_pid(cap, pid))
-                return proc_set_code(current, S3K_INVALID_SUPERVISEE);
+                return S3K_INVALID_SUPERVISEE;
         if (!proc_supervisor_acquire(supervisee))
-                return proc_set_code(current, S3K_SUPERVISEE_BUSY);
-        if (reg < N_REGISTERS)
-                current->regs.a1 = proc_set_reg(supervisee, reg, val);
+                return S3K_SUPERVISEE_BUSY;
+        if (reg < N_REGISTERS) {
+                current->regs.a0 = proc_set_reg(supervisee, reg, val);
+                proc_supervisor_release(supervisee);
+                return S3K_OK;
+        }
         proc_supervisor_release(supervisee);
-        return proc_set_code(current, reg < N_REGISTERS ? S3K_OK : S3K_ERROR);
+        return S3K_ERROR;
 }
 
-proc_t* syscall_sup_read_cap(proc_t* current, uint64_t cidx, uint64_t pid, uint64_t read_cidx)
+uint64_t syscall_sup_read_cap(uint64_t cidx, uint64_t pid, uint64_t read_cidx)
 {
         cap_node_t* node = proc_get_cap_node(current, cidx);
         cap_t cap = cap_node_get_cap(node);
         proc_t* supervisee = &processes[pid];
         if (!cap_is_type(cap, CAP_TYPE_SUPERVISOR))
-                return proc_set_code(current, S3K_INVALID_CAPABILITY);
+                return S3K_INVALID_CAPABILITY;
         if (!sup_valid_pid(cap, pid))
-                return proc_set_code(current, S3K_INVALID_SUPERVISEE);
+                return S3K_INVALID_SUPERVISEE;
         if (!proc_supervisor_acquire(supervisee))
-                return proc_set_code(current, S3K_SUPERVISEE_BUSY);
+                return S3K_SUPERVISEE_BUSY;
 
         cap_t read_cap = cap_node_get_cap(proc_get_cap_node(supervisee, read_cidx));
-        current->regs.a1 = read_cap.word0;
-        current->regs.a2 = read_cap.word1;
+        current->regs.a0 = read_cap.word0;
+        current->regs.a1 = read_cap.word1;
 
         proc_supervisor_release(supervisee);
 
-        return proc_set_code(current, S3K_OK);
+        return S3K_OK;
 }
 
-proc_t* syscall_sup_move_cap(proc_t* current, uint64_t cidx, uint64_t pid, uint64_t take, uint64_t src, uint64_t dest)
+uint64_t syscall_sup_move_cap(uint64_t cidx, uint64_t pid, uint64_t take, uint64_t src, uint64_t dest)
 {
         cap_node_t* node = proc_get_cap_node(current, cidx);
         cap_t cap = cap_node_get_cap(node);
         proc_t* supervisee = &processes[pid];
         if (!cap_is_type(cap, CAP_TYPE_SUPERVISOR))
-                return proc_set_code(current, S3K_INVALID_CAPABILITY);
+                return S3K_INVALID_CAPABILITY;
         if (!sup_valid_pid(cap, pid))
-                return proc_set_code(current, S3K_INVALID_SUPERVISEE);
+                return S3K_INVALID_SUPERVISEE;
         if (!proc_supervisor_acquire(supervisee))
-                return proc_set_code(current, S3K_SUPERVISEE_BUSY);
+                return S3K_SUPERVISEE_BUSY;
 
         s3k_code_t code;
         if (take)
@@ -283,7 +289,7 @@ proc_t* syscall_sup_move_cap(proc_t* current, uint64_t cidx, uint64_t pid, uint6
         else
                 code = interprocess_move(current, src, supervisee, dest);
         proc_supervisor_release(supervisee);
-        return proc_set_code(current, code);
+        return code;
 }
 
 /*** INTERNAL FUNCTIONS ***/

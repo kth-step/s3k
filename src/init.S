@@ -9,7 +9,7 @@
 /*** This is the kernel's entry point ***/
 _start: /* Start of the kernel */
         load_gp
-        load_sp
+        load_sp t0
 
         /* Trap handler interpret mscratch == 0 as trap in machine-mode */
         csrw    mscratch,x0    
@@ -85,7 +85,6 @@ wait:   /*** Wait for initilization to finish. ***/
         csrw    mtvec,t0
 
         /*** Here we start the processes. ***/
-        lla     ra,trap_resume_proc
         tail    sched_start
 
 _hang:

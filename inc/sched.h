@@ -11,6 +11,6 @@
 #define INVALID_PID 0xFFull
 
 void sched_init(void);
-proc_t* sched_yield(proc_t*);
-proc_t* sched_start(void);
+void sched_yield(void) __attribute__((noreturn));
+void sched_start(void) __attribute__((noreturn));
 void sched_update(cap_node_t* cn, uint64_t hartid, uint64_t begin, uint64_t end, uint64_t pid);

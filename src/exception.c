@@ -9,7 +9,7 @@
 #define MRET 0x0320000073ull
 #define ILLEGAL_INSTRUCTION 2ull
 
-proc_t* exception_handler(proc_t* current, uint64_t mcause, uint64_t mtval, uint64_t mepc)
+void exception_handler(uint64_t mcause, uint64_t mtval, uint64_t mepc)
 {
 #ifndef NDEBUG
         kprintf("EXCEPTION pid=0x%lx mcause=0x%lx mtval=0x%lx mepc=0x%lx\n", current->pid, mcause, mtval, mepc);
@@ -32,5 +32,4 @@ proc_t* exception_handler(proc_t* current, uint64_t mcause, uint64_t mtval, uint
                 current->regs.a0 = mcause;
                 current->regs.a1 = mtval;
         }
-        return current;
 }

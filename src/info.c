@@ -1,6 +1,6 @@
 // See LICENSE file for copyright and license details.
 #include "info.h"
-
+#ifndef NDEBUG
 #include "kprint.h"
 #include "platform.h"
 
@@ -20,3 +20,4 @@ void print_info(void)
         kprintf("Ticks per second:             %d\n", TICKS_PER_SECOND);
         kprintf("===================================================\n");
 }
+#endif

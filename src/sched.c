@@ -88,14 +88,14 @@ void wait_and_set_timeout(uint64_t time, uint64_t length, uint64_t timeout)
         write_timeout(hartid, end_time);
 }
 
-proc_t* sched_yield(proc_t* current)
+void sched_yield(void)
 {
         kassert(current != NULL);
         proc_release(current);
-        return sched_start();
+        sched_start();
 }
 
-proc_t* sched_start(void)
+void sched_start(void)
 {
         uintptr_t hartid = read_csr(mhartid);
         /* Process to run and number of time slices to run for */
@@ -120,7 +120,8 @@ proc_t* sched_start(void)
         proc_load_pmp(proc);
 #endif
         wait_and_set_timeout(time, length, timeout);
-        return proc;
+        current = proc;
+        trap_resume_proc();
 }
 
 void sched_update(cap_node_t* cn, uint64_t hartid, uint64_t begin, uint64_t end, uint64_t pid)

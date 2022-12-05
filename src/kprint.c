@@ -1,6 +1,7 @@
 // See LICENSE file for copyright and license details.
 #include "kprint.h"
 
+#ifndef NDEBUG
 #include "lock.h"
 #include "snprintf.h"
 #include "uart.h"
@@ -23,3 +24,4 @@ int kprintf(const char* format, ...)
         va_end(args);
         return puts(buf);
 }
+#endif

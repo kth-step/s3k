@@ -3,4 +3,4 @@
 #include <stdint.h>
 
 #include "proc.h"
-proc_t* exception_handler(proc_t* proc, uint64_t mcause, uint64_t mtval, uint64_t mepc);
+void exception_handler(uint64_t mcause, uint64_t mtval, uint64_t mepc);

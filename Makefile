@@ -28,10 +28,11 @@ LD=$(RISCV_PREFIX)ld
 CFLAGS=-march=rv64imac -mabi=lp64 -mcmodel=medany
 CFLAGS+=-std=c18
 CFLAGS+=-Wall
-CFLAGS+=-gdwarf-2 -O3
-CFLAGS+=-nostdlib -static -ffreestanding
+CFLAGS+=-gdwarf-2 -O2
+CFLAGS+=-nostartfiles -static -ffreestanding
 CFLAGS+=-Iinc -I$(BSP) -include $(CONFIG_H) 
 CFLAGS+=-T$(LDS)
+CFLAGS+=-DNDEBUG
 
 .PHONY: all api clean
 .SECONDARY:

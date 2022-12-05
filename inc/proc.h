@@ -43,6 +43,7 @@ struct proc {
 };
 
 extern proc_t processes[N_PROC];
+register proc_t* current __asm__("tp");
 
 void proc_init(uint64_t init_payload);
 void proc_load_pmp(proc_t* proc);

@@ -24,5 +24,5 @@
 
 /* Stack size. */
 /* log_2 of stack size. */
-#define LOG_STACK_SIZE 12
+#define LOG_STACK_SIZE 10
 #define STACK_SIZE (1UL << LOG_STACK_SIZE)

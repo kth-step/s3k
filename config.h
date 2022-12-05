@@ -2,16 +2,16 @@
 #pragma once
 
 /* Number of processes. */
-#define N_PROC 8
+#define N_PROC 4
 
 /* Number of capabilities per process */
-#define N_CAPS 64
+#define N_CAPS 32
 
 /* Number of time slices in a major frame. */
-#define N_QUANTUM 128
+#define N_QUANTUM 64
 
 /* Number of communications channels */
-#define N_CHANNELS (N_PROC * (N_PROC - 1))
+#define N_CHANNELS 10
 
 /* Number of ticks per quantum. */
 /* TICKS_PER_SECOND defined in platform.h */

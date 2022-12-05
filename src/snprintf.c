@@ -6,6 +6,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#ifndef NDEBUG
 static inline char* outputStr(char* buf, char* ebuf, const char* s)
 {
         while (buf != ebuf && *s != '\0') {
@@ -135,3 +136,4 @@ int snprintf(char* buf, size_t n, const char* format, ...)
         va_start(args, format);
         return vsnprintf(buf, n, format, args);
 }
+#endif
