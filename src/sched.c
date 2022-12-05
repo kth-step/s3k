@@ -104,7 +104,7 @@ void sched_start(void)
 
         while (1) {
                 /* Get the current time */
-                time = (read_time() / TICKS) + 1;
+                time = (read_time() + SCHEDULER_TICKS) / TICKS;
                 /* Try getting a process at that time slice. */
                 if (!sched_get_proc(hartid, time, &proc, &length))
                         continue;
