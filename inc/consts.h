@@ -1,8 +1,7 @@
 // See LICENSE file for copyright and license details.
 #pragma once
 
-enum s3k_state
-{
+enum s3k_state {
         S3K_STATE_READY,
         S3K_STATE_RUNNING,
         S3K_STATE_WAITING,
@@ -13,8 +12,7 @@ enum s3k_state
         S3K_STATE_RECEIVING_THEN_SUSPEND
 };
 
-enum s3k_code
-{
+enum s3k_code {
         S3K_OK,                 /* No error */
         S3K_ERROR,              /* Generic error */
         S3K_EMPTY,              /* Capability slot is empty */
@@ -29,8 +27,7 @@ enum s3k_code
         S3K_UNIMPLEMENTED,      /* Function mussing for system call parameters */
 };
 
-enum s3k_call
-{
+enum s3k_call {
         /* Without capabilities */
         S3K_SYSCALL_GET_PID,
         S3K_SYSCALL_GET_REG,

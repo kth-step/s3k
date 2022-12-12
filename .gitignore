@@ -4,3 +4,4 @@
 *.elf
 *.bin
 *.g.h
+__pycache__

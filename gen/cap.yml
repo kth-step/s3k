@@ -1,84 +1,73 @@
 # See LICENSE file for copyright and license details.
 caps:
-  - name: empty
-    revokable: false
-  - name: memory
-    revokable: true
+  - name: Memory
     fields:
-      - begin 4
-      - end 4
-      - rwx 1
-      - free 4
+      - begin 32
+      - end 32
+      - rwx 3
+      - free 32
       - pmp 1
     asserts:
       - 'begin == free'
       - 'begin < end'
       - 'pmp == 0'
       - 'rwx == 0x4 || rwx == 0x5 || rwx == 0x6 || rwx == 0x7'
-  - name: pmp
-    revokable: false
+  - name: Pmp
     fields:
-      - addr 4
-      - rwx 1
+      - addr 32
+      - rwx 3
     asserts:
       - 'rwx == 0x4 || rwx == 0x5 || rwx == 0x6 || rwx == 0x7'
-  - name: time
-    revokable: true
+  - name: Time
     fields:
-      - hartid 1
-      - begin 2
-      - end 2
-      - free 2
+      - hartid 8
+      - begin 16
+      - end 16
+      - free 16
     asserts:
       - 'MIN_HARTID <= hartid'
       - 'hartid <= MAX_HARTID' 
       - 'begin == free'
       - 'begin < end'
       - 'end <= N_QUANTUM'
-  - name: channels
-    revokable: true
+  - name: Channels
     fields:
-      - begin 2
-      - end 2
-      - free 2
+      - begin 16
+      - end 16
+      - free 16
     asserts:
       - 'begin == free'
       - 'begin < end'
       - 'end <= N_CHANNELS'
-  - name: receiver
-    revokable: true
+  - name: Receiver
     fields:
-      - channel 2
+      - channel 16
       - grant 1
     asserts:
       - 'channel < N_CHANNELS'
-  - name: sender
-    revokable: true
+  - name: Sender
     fields:
-      - channel 2
+      - channel 16
       - grant 1
     asserts:
       - 'channel < N_CHANNELS'
-  - name: server
-    revokable: true
+  - name: Server
     fields:
-      - channel 2
+      - channel 16
       - grant 1
     asserts:
       - 'channel < N_CHANNELS'
-  - name: client
-    revokable: true
+  - name: Client
     fields:
-      - channel 2
+      - channel 16
       - grant 1
     asserts:
       - 'channel < N_CHANNELS'
-  - name: supervisor
-    revokable: true
+  - name: Supervisor
     fields:
-      - begin 1
-      - end 1
-      - free 1
+      - begin 8
+      - end 8
+      - free 8
     asserts:
       - 'begin == free'
       - 'begin < end'
