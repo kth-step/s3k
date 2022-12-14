@@ -16,9 +16,8 @@ static inline int uart_putchar(char c)
 
 static inline int uart_getchar(void)
 {
-    if (UART[5] & 1)
+        while (!(UART[5] & 1));
         return UART[0];
-    return 0;
 }
 
 static int uart_puts(const char *c) {
