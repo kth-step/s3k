@@ -10,7 +10,7 @@
 #define N_PMP 8
 
 /* Ticks per second */
-#define TICKS_PER_SECOND 10000000UL
+#define TICKS_PER_SECOND 10000000ul
 
 /* Min and max hartid usable by the kernel */
 #define MIN_HARTID 1

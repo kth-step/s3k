@@ -20,11 +20,19 @@ static inline int uart_getchar(void)
         return UART[0];
 }
 
-static int uart_puts(const char *c) {
+static inline int uart_write(const char * buf, int nbytes) {
+        for (int i = 0; i < nbytes; i++)
+                uart_putchar(buf[i]);
+        return nbytes;
+}
+
+static inline int uart_puts(const char* s) {
     int i = 0;
-    while (c[i] != '\0') {
-        uart_putchar(c[i]);
+    while (s[i] != '\0') {
+        uart_putchar(s[i]);
         i++;
     }
+    uart_putchar('\r');
+    uart_putchar('\n');
     return i;
 }

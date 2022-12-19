@@ -3,4 +3,7 @@
 *.da
 *.elf
 *.bin
-*.g.h
+inc/cap.h
+inc/offsets.h
+compile_commands.json
+.cache

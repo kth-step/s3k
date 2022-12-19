@@ -3,6 +3,8 @@
 
 PROGRAM ?=s3k
 
+BUILD?=build
+
 SRC=src
 INC=inc
 GEN=gen
@@ -13,53 +15,54 @@ LDS        ?=config.lds
 CONFIG_H   ?=config.h
 BSP        ?=bsp/virt
 
-SRCS=$(wildcard src/*.[cS]) $(wildcard *.S)
-GHDRS=inc/cap.g.h inc/offsets.g.h 
-HDRS=$(wildcard inc/*.h) $(CONFIG_H) $(PLATFORM_H)
-
-CAP_H=cap.g.h
-ASM_CONSTS_H=asm_consts.g.h
+SRCS=$(wildcard s3k/*.[cS])
+OBJS=$(patsubst %, $(BUILD)/%.o, $(SRCS))
 
 # Tools
 RISCV_PREFIX ?=riscv64-unknown-elf-
 CC=$(RISCV_PREFIX)gcc
 LD=$(RISCV_PREFIX)ld
+CPP=$(RISCV_PREFIX)cpp
 
 CFLAGS=-march=rv64imac -mabi=lp64 -mcmodel=medany
 CFLAGS+=-std=c18
 CFLAGS+=-Wall
 CFLAGS+=-gdwarf-2 -O2
 CFLAGS+=-nostartfiles -static -ffreestanding
-CFLAGS+=-Iinc -I$(BSP) -include $(CONFIG_H) 
+CFLAGS+=-Iinc -I$(BSP) -include $(CONFIG_H)
 CFLAGS+=-T$(LDS)
-CFLAGS+=-DNDEBUG
 
 .PHONY: all api clean
 .SECONDARY:
 
-all: build/s3k.elf
+all: $(BUILD)/s3k.elf
 
 clean:
-	rm -f inc/*.g.h api/*.g.h build/s3k.elf
+	rm -fr $(BUILD) inc/cap.h inc/offsets.h api/s3k.h
 
 # Generated headers
-inc/cap.g.h: gen/cap.yml
+inc/cap.h: gen/cap.yml
 	gen/gen_cap $< $@
 
-inc/offsets.g.h: gen/offsets.c inc/proc.h inc/consts.h
+inc/offsets.h: gen/offsets.c inc/proc.h inc/consts.h
 	$(CC) $(CFLAGS) -S -o $@ $< 
 	sed -i -e '/#define/!d' -e 's/.\+#define/#define/' $@
 
-# Kernel
-%.elf: $(LDS) $(SRCS) $(HDRS) $(GHDRS) $(PAYLOAD)
+$(BUILD)/%.c.o: %.c $(CONFIG_H) inc/cap.h inc/offsets.h
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -o $@ $(SRCS)
+	$(CC) $(CFLAGS)    -c -o $@ $<
+
+$(BUILD)/%.S.o: %.S
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS)    -c -o $@ $<
+
+# Kernel
+$(BUILD)/s3k.elf: $(LDS) $(OBJS)
+	@mkdir -p $(@D)
+	$(CC) $(CFLAGS)    -o $@ $(OBJS)
 
 # API
-api: api/s3k_cap.g.h api/s3k_consts.g.h
+api: api/s3k.h
+%s3k.h: api/s3k_call.h inc/cap.h inc/consts.h
+	$(CPP) api/s3k_call.h > $@
 
-api/s3k_cap.g.h: inc/cap.g.h
-	sed '/kassert/d' $< > $@
-
-api/s3k_consts.g.h: inc/consts.h
-	cp $< $@

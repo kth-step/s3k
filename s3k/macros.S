@@ -1,7 +1,7 @@
 // See LICENSE file for copyright and license details.
 
 #include "platform.h"
-#include "offsets.g.h"
+#include "offsets.h"
 
 .macro load_gp
         .option push

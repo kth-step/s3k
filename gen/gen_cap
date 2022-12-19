@@ -7,7 +7,7 @@ import re
 
 def binpack(bins, fields):
     if len(fields) == 0:
-        return [[],[]]
+        return [[], []]
     f, s = fields[0]
     for i, b in enumerate(bins):
         if s > b:
@@ -16,7 +16,7 @@ def binpack(bins, fields):
         new_bins[i] -= s
         packing = binpack(new_bins, fields[1:])
         if packing:
-            packing[i].append((f,s))
+            packing[i].append((f, s))
             return packing
     return None
 
@@ -33,23 +33,19 @@ def get_bin(bins, f):
             if ff == f:
                 return i, b
 
-def make_assert(s):
-    return f"kassert({s});"
-
 def make_getter(cap_name, name, size, bins):
     output = list()
     if name == 'padd':
         return
-    output.append(f"static inline uint64_t cap_{cap_name}_get_{name}(cap_t cap) {{")
-    make_assert(f"cap_is_type(cap, CAP_TYPE_{cap_name.upper()})")
+    output.append(f"static inline unsigned long cap_{cap_name}_get_{name}(cap_t cap) {{")
     i, b = get_bin(bins, name)
     offset = get_offset(b, name)
     if i == 0:
         offset += 8
     if offset:
-        output.append(f"return (cap.word{i} >> {offset}) & 0x{'ff'*size}ull;")
+        output.append(f"\treturn (cap.word{i} >> {offset}) & 0x{'ff'*size}ul;")
     else:
-        output.append(f"return cap.word{i} & 0x{'ff'*size}ull;")
+        output.append(f"\treturn cap.word{i} & 0x{'ff'*size}ul;")
     output.append('}')
     return "\n".join(output)
 
@@ -57,31 +53,24 @@ def make_setter(cap_name, name, size, bins):
     output = list()
     if name == 'padd':
         return
-    output.append(f'static inline cap_t cap_{cap_name}_set_{name}(cap_t cap, uint64_t {name}) {{')
-    make_assert(f"cap_is_type(cap, CAP_TYPE_{cap_name.upper()})")
-    make_assert(f"({name} & 0x{'ff'*size}ull) == {name}")
+    output.append(f'static inline cap_t cap_{cap_name}_set_{name}(cap_t cap, unsigned long {name}) {{')
     i, b = get_bin(bins, name)
     offset = get_offset(b, name)
     if i == 0:
         offset += 8
-    mask = f"0x{'ff'*size + '00'*(offset//8)}ull"
-    output.append(f"cap.word{i} = (cap.word{i} & ~{mask}) | {name} << {offset};")
-    output.append("return cap;")
+    mask = f"0x{'ff'*size + '00'*(offset//8)}ul"
+    output.append(f"\tcap.word{i} = (cap.word{i} & ~{mask}) | {name} << {offset};")
+    output.append("\treturn cap;")
     output.append("}")
     return "\n".join(output)
 
-def make_constructor(cap_name, fields, asserts, bins):
+def make_constructor(cap_name, fields, bins):
     output = list()
-    parameters = [f"uint64_t {name}" for (name, size) in fields if name != 'padd']
+    parameters = [f"unsigned long {name}" for (name, size) in fields if name != 'padd']
     output.append(f"static inline cap_t cap_mk_{cap_name}({', '.join(parameters)}) {{")
-    for (name, size) in fields:
-        if name != 'padd':
-            make_assert(f"({name} & 0x{'ff'*size}ull) == {name}")
-    for a in asserts:
-        make_assert(a)
-    output.append("cap_t cap;")
-    output.append(f"cap.word0 = (uint64_t)CAP_TYPE_{cap_name.upper()};")
-    output.append(f"cap.word1 = 0;")
+    output.append("\tcap_t cap;")
+    output.append(f"\tcap.word0 = (unsigned long)CAP_TYPE_{cap_name.upper()};")
+    output.append(f"\tcap.word1 = 0;")
     for (i,b) in enumerate(bins):
         for (f, s) in b:
             if f == 'padd':
@@ -90,10 +79,10 @@ def make_constructor(cap_name, fields, asserts, bins):
             if i == 0:
                 offset += 8
             if offset:
-                output.append(f"cap.word{i} |= {f} << {offset};")
+                output.append(f"\tcap.word{i} |= {f} << {offset};")
             else:
-                output.append(f"cap.word{i} |= {f};")
-    output.append("return cap;")
+                output.append(f"\tcap.word{i} |= {f};")
+    output.append("\treturn cap;")
     output.append("}")
     return "\n".join(output)
 
@@ -101,7 +90,7 @@ def make_revokable(caps):
     output = list()
     output.append("static inline int cap_is_revokable(cap_t cap) {")
     p = [f"cap_is_type(cap, CAP_TYPE_{cap['name'].upper()})" for cap in caps if cap['revokable']]
-    output.append(f"return {'&&'.join(p)};")
+    output.append(f"\treturn {'&&'.join(p)};")
     output.append("}")
     return "\n".join(output)
 
@@ -113,8 +102,7 @@ def make_cap_functions(data):
     fields = [tuple(f.split()) for f in data['fields']]
     fields = [(n, int(s)) for n, s in fields]
     bins = binpack([7,8], fields)
-    asserts = data['asserts'] if 'asserts' in data else []
-    output.append(make_constructor(cap_name, fields, asserts, bins))
+    output.append(make_constructor(cap_name, fields, bins))
     for (f, s) in fields:
         output.append(make_getter(cap_name, f, s, bins))
         output.append(make_setter(cap_name, f, s, bins))
@@ -165,32 +153,30 @@ def main(data):
 
     caps = data['caps']
     enums = ", ".join([f"CAP_TYPE_{d['name'].upper()}"  for d in caps])
-    
+
     hdr = f"""\
 #pragma once
-#include "kassert.h"
-#include <stdint.h>
 
 #define NULL_CAP ((cap_t){{0,0}})
 
 typedef enum cap_type {{
-{enums}, NUM_OF_CAP_TYPES
+    {enums}, NUM_OF_CAP_TYPES
 }} cap_type_t;
 
 typedef struct cap {{
-uint64_t word0, word1;
+    unsigned long word0, word1;
 }} cap_t;
 
-static inline uint64_t pmp_napot_begin(uint64_t addr) {{
+static inline unsigned long pmp_napot_begin(unsigned long addr) {{
     return addr & (addr + 1);
 }}
 
-static inline uint64_t pmp_napot_end(uint64_t addr) {{
+static inline unsigned long pmp_napot_end(unsigned long addr) {{
     return addr | (addr + 1);
 }}
 
 static inline cap_type_t cap_get_type(cap_t cap) {{
-return 0xffull & cap.word0;
+    return (cap_type_t)(0xfful & cap.word0);
 }}
 
 static inline int cap_is_type(cap_t cap, cap_type_t t) {{
@@ -200,12 +186,12 @@ static inline int cap_is_type(cap_t cap, cap_type_t t) {{
 
     output = list()
     output.append(hdr)
-    
+
     for i in caps:
         output.append(make_cap_functions(i))
-    
+
     output.append(make_revokable(caps))
-    
+
     for p in data['predicates']:
         output.append(make_pred(p))
 
@@ -226,4 +212,4 @@ if __name__ == "__main__":
     else:
         with open(args.output, "w") as f:
             print(output, file=f)
-    
+
