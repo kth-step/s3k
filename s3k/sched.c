@@ -113,8 +113,14 @@ void sched_start(void)
                 if (timeout >= end_time) {
                         continue;
                 }
-                if (proc_acquire(proc))
+                if (proc_acquire(proc)) {
                         break;
+                } else {
+                        uint64_t hartid = read_csr(mhartid);
+                        write_timeout(hartid, end_time);
+                        while (!(read_csr(mip) & 128))
+                                __asm__ volatile("wfi");
+                }
         }
 #ifdef MEMORY_PROTECTION
         proc_load_pmp(proc);
