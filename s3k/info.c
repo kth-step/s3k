@@ -2,6 +2,7 @@
 #ifndef NDEBUG
 
 #include "info.h"
+
 #include "kprint.h"
 #include "platform.h"
 

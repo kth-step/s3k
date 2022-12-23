@@ -1,16 +1,19 @@
 // See LICENSE file for copyright and license details.
 #ifndef NDEBUG
 #include "kprint.h"
-#include "lock.h"
-#include "uart.h"
+
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 
+#include "lock.h"
+#include "uart.h"
+
 static lock_t lock = INIT_LOCK;
 
-int write(const char* buf, int nbytes) {
+int write(const char* buf, int nbytes)
+{
         lock_acquire(&lock);
         int i = uart_write(buf, nbytes);
         lock_release(&lock);
@@ -35,20 +38,21 @@ int kprintf(const char* restrict format, ...)
         return write(buf, len);
 }
 
-static inline void outputStr(char* buf, int *j, int nbytes, const char* s, char padding, int padd_width)
+static inline void outputStr(char* buf, int* j, int nbytes, const char* s, char padding, int padd_width)
 {
         int len;
-        for (len = 0; s[len] != '\0'; len++);
+        for (len = 0; s[len] != '\0'; len++)
+                ;
         padd_width -= len;
         for (int i = 0; i < padd_width; i++)
                 buf[(*j)++] = padding;
 
         while (*s != '\0' && *j < nbytes)
                 buf[(*j)++] = *s++;
-
 }
 
-static inline void outputNum(char* buf, int *j, int nbytes, unsigned long long num, bool neg, int base, char padding, int padd_width)
+static inline void outputNum(char* buf, int* j, int nbytes, unsigned long long num, bool neg, int base, char padding,
+                             int padd_width)
 {
         char nbuf[64];
         nbuf[63] = '\0';
@@ -95,20 +99,20 @@ int vsnprintf(char* buf, size_t nbytes, const char* format, va_list args)
                 }
                 switch (format[f++]) {
                 case 'd': {
-                                  long long num = va_arg(args, int);
-                                  bool neg = num < 0;
-                                  num = neg ? -num : num;
+                        long long num = va_arg(args, int);
+                        bool neg = num < 0;
+                        num = neg ? -num : num;
                         outputNum(buf, &i, nbytes, 0xFFFFFFFF & num, neg, 10, padding, padd_width);
                         break;
                 }
                 case 'u':
-                        outputNum(buf, &i, nbytes, 0xFFFFFFFF & va_arg(args, int) , false, 10, padding, padd_width);
+                        outputNum(buf, &i, nbytes, 0xFFFFFFFF & va_arg(args, int), false, 10, padding, padd_width);
                         break;
                 case 'o':
-                        outputNum(buf, &i, nbytes, 0xFFFFFFFF & va_arg(args, int) , false, 8, padding, padd_width);
+                        outputNum(buf, &i, nbytes, 0xFFFFFFFF & va_arg(args, int), false, 8, padding, padd_width);
                         break;
                 case 'x':
-                        outputNum(buf, &i, nbytes, 0xFFFFFFFF & va_arg(args, int) , false, 16, padding, padd_width);
+                        outputNum(buf, &i, nbytes, 0xFFFFFFFF & va_arg(args, int), false, 16, padding, padd_width);
                         break;
                 case 's':
                         outputStr(buf, &i, nbytes, va_arg(args, char*), ' ', padd_width);
@@ -121,24 +125,24 @@ int vsnprintf(char* buf, size_t nbytes, const char* format, va_list args)
                         break;
                 case 'l':
                         switch (format[f++]) {
-                                case 'd': {
-                                                  long long num = va_arg(args, long);
-                                                  bool neg = num < 0;
-                                                  num = neg ? -num : num;
-                                                  outputNum(buf, &i, nbytes, num, neg, 10, padding, padd_width);
-                                                  break;
-                                          }
-                                case 'u':
-                                          outputNum(buf, &i, nbytes, va_arg(args, unsigned long) , false, 10, padding, padd_width);
-                                          break;
-                                case 'o':
-                                          outputNum(buf, &i, nbytes, va_arg(args, unsigned long) , false, 8, padding, padd_width);
-                                          break;
-                                case 'x':
-                                          outputNum(buf, &i, nbytes, va_arg(args, unsigned long) , false, 16, padding, padd_width);
-                                          break;
-                                default:
-                                          __builtin_unreachable();
+                        case 'd': {
+                                long long num = va_arg(args, long);
+                                bool neg = num < 0;
+                                num = neg ? -num : num;
+                                outputNum(buf, &i, nbytes, num, neg, 10, padding, padd_width);
+                                break;
+                        }
+                        case 'u':
+                                outputNum(buf, &i, nbytes, va_arg(args, unsigned long), false, 10, padding, padd_width);
+                                break;
+                        case 'o':
+                                outputNum(buf, &i, nbytes, va_arg(args, unsigned long), false, 8, padding, padd_width);
+                                break;
+                        case 'x':
+                                outputNum(buf, &i, nbytes, va_arg(args, unsigned long), false, 16, padding, padd_width);
+                                break;
+                        default:
+                                __builtin_unreachable();
                         }
                         break;
                 default:

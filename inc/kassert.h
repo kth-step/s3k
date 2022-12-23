@@ -4,12 +4,12 @@
 #ifndef NDEBUG
 #include "kprint.h"
 extern void hang(void) __attribute__((noreturn));
-#define kassert(val)                                                                           \
-        do {                                                                                   \
-                if (!(val)) {                                                                  \
+#define kassert(val)                                                                              \
+        do {                                                                                      \
+                if (!(val)) {                                                                     \
                         kprintf("{[ASSERT '%s' FAILED AT %s:%d]}\r\n", #val, __FILE__, __LINE__); \
-                        hang();                                                                \
-                }                                                                              \
+                        hang();                                                                   \
+                }                                                                                 \
         } while (0)
 #else
 #define kassert(val)                             \

@@ -173,7 +173,8 @@ unsigned long s3k_supervisor_read_cap(unsigned long i, unsigned long pid, unsign
         return code;
 }
 
-unsigned long s3k_supervisor_move_cap(unsigned long i, unsigned long pid, unsigned long take, unsigned long src, unsigned long dest)
+unsigned long s3k_supervisor_move_cap(unsigned long i, unsigned long pid, unsigned long take, unsigned long src,
+                                      unsigned long dest)
 {
         unsigned long args[8] = {i, pid, take, src, dest};
         return _S3K_SYSCALL(S3K_SYSCALL_SUP_MOVE_CAP, args, 5);
