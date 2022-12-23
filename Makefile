@@ -1,65 +1,69 @@
 # See LICENSE file for copyright and license details.
 .POSIX:
-
-PROGRAM ?=s3k
+.PHONY: all api clean
+.SECONDARY:
 
 BUILD?=build
 
-SRC=src
-INC=inc
-GEN=gen
-
-API=api
-
-LDS        ?=config.lds
-CONFIG_H   ?=config.h
-BSP        ?=bsp/virt
-
-SRCS=$(wildcard s3k/*.[cS])
-OBJS=$(patsubst %, $(BUILD)/%.o, $(SRCS))
+CONFIG_H ?=config.h
+BSP      ?=bsp/virt
 
 # Tools
 RISCV_PREFIX ?=riscv64-unknown-elf-
 CC=$(RISCV_PREFIX)gcc
 LD=$(RISCV_PREFIX)ld
-CPP=$(RISCV_PREFIX)cpp
 
-CFLAGS=-march=rv64imac -mabi=lp64 -mcmodel=medany
-CFLAGS+=-std=c18
-CFLAGS+=-Wall
-CFLAGS+=-gdwarf-2 -O2
-CFLAGS+=-nostartfiles -static -ffreestanding
-CFLAGS+=-Iinc -I$(BSP) -include $(CONFIG_H)
-CFLAGS+=-T$(LDS)
+# Compilation flags
+CFLAGS =-march=rv64imac -mabi=lp64 -mcmodel=medany
+CFLAGS+=-std=gnu18
+CFLAGS+=-Wall -Werror
+CFLAGS+=-g -O2
+CFLAGS+=-static
+CFLAGS+=-nostartfiles -ffreestanding
+CFLAGS+=-Iinc -I$(BSP) 
+CFLAGS+=-include $(CONFIG_H)
+CFLAGS+=-Ts3k.lds
+CFLAGS+=-DNDEBUG
 
-.PHONY: all api clean
-.SECONDARY:
+# Source Files
+C_SRC=$(wildcard s3k/*.c)
+S_SRC=$(wildcard s3k/*.S)
+
+# Target objects
+OBJ=$(patsubst %.c, $(BUILD)/%.o, $(C_SRC)) $(patsubst %.S, $(BUILD)/%.o, $(S_SRC))
+
 
 all: $(BUILD)/s3k.elf
 
 clean:
 	rm -fr $(BUILD) inc/cap.h inc/offsets.h api/s3k.h
 
-# Generated headers
+
+# Generated capability header
 inc/cap.h: gen/cap.yml
 	gen/gen_cap $< $@
 
+
+# Generated offset header
 inc/offsets.h: gen/offsets.c inc/proc.h inc/consts.h
 	$(CC) $(CFLAGS) -S -o $@ $< 
 	sed -i -e '/#define/!d' -e 's/.\+#define/#define/' $@
 
-$(BUILD)/%.c.o: %.c $(CONFIG_H) inc/cap.h inc/offsets.h
+
+# Compile C files
+$(BUILD)/%.o: %.c $(CONFIG_H) inc/cap.h inc/offsets.h
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS)    -c -o $@ $<
 
-$(BUILD)/%.S.o: %.S
+# Compile ASM files
+$(BUILD)/%.o: %.S
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS)    -c -o $@ $<
 
 # Kernel
-$(BUILD)/s3k.elf: $(LDS) $(OBJS)
+$(BUILD)/s3k.elf: $(LDS) $(OBJ)
 	@mkdir -p $(@D)
-	$(CC) $(CFLAGS)    -o $@ $(OBJS)
+	$(CC) $(CFLAGS)    -o $@ $(OBJ)
 
 # API
 api: api/s3k.h

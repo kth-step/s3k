@@ -11,8 +11,7 @@ SECTIONS {
         .text : {
                 _text = .;
                 KEEP(*(.init))
-                *(.text)
-                *(.text.*)
+                *(.text .text.*)
                 _etext = .;
         }
 
@@ -37,9 +36,7 @@ SECTIONS {
                 _ebss = .;
         } 
 
-        _kernel_top = .;
-
-        __global_pointer$ = MIN(_sbss + 0x800, MAX(_data + 0x800, _ebss - 0x800));
+        __global_pointer$ = MIN(_sdata + 0x800, MAX(_data + 0x800, _ebss - 0x800));
         
-        ASSERT ((_kernel_top <= _payload), "Error: Kernel binary is too large.")
+        ASSERT ((_ebss <= _payload), "Error: Kernel binary is too large.")
 }
