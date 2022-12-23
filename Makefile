@@ -41,7 +41,7 @@ clean:
 
 # Generated capability header
 inc/cap.h: gen/cap.yml
-	gen/gen_cap $< $@
+	./scripts/gen_cap.py $< $@
 
 
 # Generated offset header

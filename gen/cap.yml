@@ -1,88 +1,35 @@
 # See LICENSE file for copyright and license details.
-caps:
-  - name: empty
-    revokable: false
+capabilities:
   - name: memory
-    revokable: true
     fields:
-      - begin 4
-      - end 4
-      - rwx 1
-      - free 4
-      - pmp 1
-    asserts:
-      - 'begin == free'
-      - 'begin < end'
-      - 'pmp == 0'
-      - 'rwx == 0x4 || rwx == 0x5 || rwx == 0x6 || rwx == 0x7'
+      begin: 32
+      end: 32
+      free: 32
+      rwx: 3
+      lock: 1
   - name: pmp
-    revokable: false
     fields:
-      - addr 4
-      - rwx 1
-    asserts:
-      - 'rwx == 0x4 || rwx == 0x5 || rwx == 0x6 || rwx == 0x7'
+      addr: 32
+      rwx: 3
   - name: time
-    revokable: true
     fields:
-      - hartid 1
-      - begin 2
-      - end 2
-      - free 2
-    asserts:
-      - 'MIN_HARTID <= hartid'
-      - 'hartid <= MAX_HARTID' 
-      - 'begin == free'
-      - 'begin < end'
-      - 'end <= N_QUANTUM'
-  - name: channels
-    revokable: true
+      begin: 16
+      end: 16
+      free: 16
+      hartid: 8
+  - name: ports 
     fields:
-      - begin 2
-      - end 2
-      - free 2
-    asserts:
-      - 'begin == free'
-      - 'begin < end'
-      - 'end <= N_CHANNELS'
-  - name: receiver
-    revokable: true
+      begin: 16
+      end: 16
+      free: 16
+  - name: socket
     fields:
-      - channel 2
-      - grant 1
-    asserts:
-      - 'channel < N_CHANNELS'
-  - name: sender
-    revokable: true
-    fields:
-      - channel 2
-      - grant 1
-    asserts:
-      - 'channel < N_CHANNELS'
-  - name: server
-    revokable: true
-    fields:
-      - channel 2
-      - grant 1
-    asserts:
-      - 'channel < N_CHANNELS'
-  - name: client
-    revokable: true
-    fields:
-      - channel 2
-      - grant 1
-    asserts:
-      - 'channel < N_CHANNELS'
+      port: 16
   - name: supervisor
-    revokable: true
     fields:
-      - begin 1
-      - end 1
-      - free 1
-    asserts:
-      - 'begin == free'
-      - 'begin < end'
-      - 'end <= N_PROC'
+      begin: 16
+      end: 16
+      free: 16
 
 predicates:
   - name: is_child
@@ -90,119 +37,76 @@ predicates:
       - parent: memory
         child: memory
         conditions:
-        - 'p:begin <= c:begin'
-        - 'c:end <= p:free'
-        - '(c:rwx & p:rwx) == c:rwx'
+        - p.begin <= c.begin
+        - c.end <= p.end
       - parent: memory
         child: pmp
         conditions:
-          - 'p:free <= pmp_napot_begin(c:addr)'
-          - 'pmp_napot_end(c:addr) <= p:end'
-          - 'p:pmp == 1'
-          - '(c:rwx & p:rwx) == c:rwx'
+          - p.begin <= (c.addr & (c.addr + 1))
+          - (c.addr + 1) <= p.end
       - parent: time
         child: time
         conditions:
-          - 'p:begin <= c:begin'
-          - 'c:end <= p:free'
-          - 'p:hartid == c:hartid'
-      - parent: channels
-        child: channels
+          - p.begin <= c.begin
+          - c.end <= p.end
+          - p.hartid == c.hartid
+      - parent: ports 
+        child: ports
         conditions:
-          - 'p:begin <= c:begin'
-          - 'c:end <= p:free'
-      - parent: channels
-        child: receiver
+          - p.begin <= c.begin
+          - c.end <= p.end
+      - parent: ports
+        child: socket
         conditions:
-          - 'p:begin <= c:channel'
-          - 'c:channel < p:free'
-      - parent: channels
-        child: sender
-        conditions:
-          - 'p:begin <= c:channel'
-          - 'c:channel < p:free'
-      - parent: channels
-        child: server
-        conditions:
-          - 'p:begin <= c:channel'
-          - 'c:channel < p:free'
-      - parent: channels
-        child: client
-        conditions:
-          - 'p:begin <= c:channel'
-          - 'c:channel < p:free'
-      - parent: receiver
-        child: sender
-        conditions:
-          - 'p:channel == c:channel'
-      - parent: server
-        child: client 
-        conditions:
-          - 'p:channel == c:channel'
+          - p.begin <= c.port
+          - c.port < p.end
       - parent: supervisor
         child: supervisor
         conditions:
-          - 'p:begin <= c:begin'
-          - 'c:end <= p:free'
+          - p.begin <= c.begin
+          - c.end <= p.end
   - name: can_derive
     cases:
       - parent: memory
         child: memory
         conditions:
-          - 'p:pmp == 0'
-          - 'c:pmp == 0'
-          - 'p:free == c:begin'
-          - 'c:end <= p:end'
-          - '(c:rwx & p:rwx) == c:rwx'
-          - 'c:free == c:begin'
-          - 'c:begin < c:end'
+          - p.lock == 0
+          - c.lock == 0
+          - p.free == c.begin
+          - c.end <= p.end
+          - (c.rwx & p.rwx) == c.rwx
+          - c.free == c.begin
+          - c.begin < c.end
       - parent: memory
         child: pmp
         conditions:
-          - 'p:free <= pmp_napot_begin(c:addr)'
-          - 'pmp_napot_end(c:addr) <= p:end'
-          - '(c:rwx & p:rwx) == c:rwx'
+          - p.free <= (c.addr & (c.addr + 1))
+          - (c.addr + 1) <= p.end
+          - (c.rwx & p.rwx) == c.rwx
       - parent: time
         child: time
         conditions:
-          - 'p:hartid == c:hartid'
-          - 'p:free == c:begin'
-          - 'c:end <= p:end'
-          - 'c:free == c:begin'
-          - 'c:begin < c:end'
-      - parent: channels
-        child: channels
+          - p.hartid == c.hartid
+          - p.free == c.begin
+          - c.end <= p.end
+          - c.free == c.begin
+          - c.begin < c.end
+      - parent: ports 
+        child: ports
         conditions:
-          - 'p:free == c:begin'
-          - 'c:end <= p:end'
-          - 'c:free == c:begin'
-          - 'c:begin < c:end'
-      - parent: channels
-        child: receiver
+          - p.free == c.begin
+          - c.end <= p.end
+          - c.free == c.begin
+          - c.begin < c.end
+      - parent: ports
+        child: socket
         conditions:
-          - 'p:free == c:channel'
-          - 'c:channel < p:end'
-          - 'c:grant == 0 || c:grant == 1'
-      - parent: receiver
-        child: sender
-        conditions:
-          - 'p:channel == c:channel'
-          - 'p:grant == c:grant'
-      - parent: channels
-        child: server
-        conditions:
-          - 'p:free == c:channel'
-          - 'c:channel < p:end'
-          - 'c:grant == 0 || c:grant == 1'
-      - parent: server 
-        child: client
-        conditions:
-          - 'p:channel == c:channel'
-          - 'p:grant == c:grant'
+          - p.free <= c.port
+          - c.port < p.end
       - parent: supervisor
         child: supervisor
         conditions:
-          - 'p:free <= c:begin'
-          - 'c:end <= p:end'
-          - 'c:free == c:begin'
-          - 'c:begin < c:end'
+          - p.free <= c.begin
+          - c.end <= p.end
+          - c.free == c.begin
+          - c.begin < c.end

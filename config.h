@@ -10,8 +10,8 @@
 /* Number of time slices in a major frame. */
 #define N_QUANTUM 64
 
-/* Number of communications channels */
-#define N_CHANNELS 10
+/* Number of ipc ports */
+#define N_PORTS 10
 
 /* Number of ticks per quantum. */
 /* TICKS_PER_SECOND defined in platform.h */

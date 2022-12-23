@@ -27,8 +27,8 @@ static inline bool cap_node_delete(cap_node_t* node);
 /* Delete node iff node->prev == prev */
 static inline bool cap_node_delete2(cap_node_t* node, cap_node_t* prev);
 /* Insert node after parent, if insertion is successful, set the data to cap */
-static inline bool cap_node_insert(cap_t cap, cap_node_t* node, cap_node_t* parent);
-static inline bool cap_node_move(cap_t cap, cap_node_t* src_node, cap_node_t* dest_node);
+static inline bool cap_node_insert(cap_node_t* node, cap_node_t* parent);
+static inline bool cap_node_move(cap_node_t* src_node, cap_node_t* dest_node);
 
 /* Check if a node has been deleted */
 bool cap_node_is_deleted(cap_node_t* cn)
@@ -72,10 +72,9 @@ bool cap_node_delete2(cap_node_t* node, cap_node_t* prev)
  * Insert a child capability after the parent
  * only if the parent is not deleted.
  */
-bool cap_node_insert(cap_t cap, cap_node_t* node, cap_node_t* prev)
+bool cap_node_insert(cap_node_t* node, cap_node_t* prev)
 {
-        kassert(node->prev == NULL);
-        node->cap = cap;
+        ASSERT(node->prev == NULL);
         cap_node_t* next = prev->next;
         while (prev->prev != NULL) {
                 node->next = next;
@@ -89,7 +88,8 @@ bool cap_node_insert(cap_t cap, cap_node_t* node, cap_node_t* prev)
         return false;
 }
 
-bool cap_node_move(cap_t cap, cap_node_t* src_node, cap_node_t* dest_node)
+bool cap_node_move(cap_node_t* src_node, cap_node_t* dest_node)
 {
-        return cap_node_insert(cap, dest_node, src_node) && cap_node_delete(src_node);
+        dest_node->cap = src_node->cap;
+        return cap_node_insert(dest_node, src_node) && cap_node_delete(src_node);
 }
