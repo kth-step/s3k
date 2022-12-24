@@ -43,7 +43,7 @@ predicates:
         child: pmp
         conditions:
           - p.begin <= (c.addr & (c.addr + 1))
-          - (c.addr + 1) <= p.end
+          - ((c.addr | (c.addr + 1)) + 1) <= p.end
       - parent: time
         child: time
         conditions:
@@ -81,7 +81,7 @@ predicates:
         child: pmp
         conditions:
           - p.free <= (c.addr & (c.addr + 1))
-          - (c.addr + 1) <= p.end
+          - ((c.addr | (c.addr + 1)) + 1) <= p.end
           - (c.rwx & p.rwx) == c.rwx
       - parent: time
         child: time
