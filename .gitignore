@@ -1,0 +1,6 @@
+s3k.elf
+s3k.da
+src/cap.c
+*.o
+*.d
+*.su

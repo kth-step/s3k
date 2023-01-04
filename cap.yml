@@ -1,0 +1,85 @@
+# See LICENSE file for copyright and license details.
+capabilities:
+  - name: time 
+    fields:
+      hartid: 8
+      begin: 8
+      free: 8
+      end: 8
+  - name: memory
+    fields:
+      begin: 32
+      free: 32
+      end: 32
+      rwx: 3
+      lock: 1
+  - name: monitor
+    fields:
+      begin: 8
+      free: 8
+      end: 8
+  - name: pmp
+    fields:
+      addr: 48
+      cfg: 5
+
+predicates:
+  - name: time_is_child
+    cases:
+      - parent: time
+        child: time
+        conditions:
+          - p.begin <= c.begin
+          - c.end <= p.end
+          - p.hartid == c.hartid
+
+  - name: memory_is_child
+    cases:
+      - parent: memory
+        child: memory
+        conditions:
+        - p.begin <= c.begin
+        - c.end <= p.end
+
+  - name: monitor_is_child
+    cases:
+      - parent: monitor
+        child: monitor
+        conditions:
+        - p.begin <= c.begin
+        - c.end <= p.end
+
+  - name: memory_can_derive
+    cases:
+      - parent: memory
+        child: memory
+        conditions:
+          - p.lock == 0
+          - c.lock == 0
+          - p.free == c.begin
+          - c.end <= p.end
+          - (c.rwx & p.rwx) == c.rwx
+          - c.free == c.begin
+          - c.begin < c.end
+
+  - name: time_can_derive
+    cases:
+      - parent: time
+        child: time
+        conditions:
+          - p.hartid == c.hartid
+          - p.free == c.begin
+          - c.end <= p.end
+          - c.free == c.begin
+          - c.begin < c.end
+
+  - name: monitor_can_derive
+    cases:
+      - parent: monitor
+        child: monitor
+        conditions:
+          - p.free == c.begin
+          - c.end <= p.end
+          - c.free == c.begin
+          - c.begin < c.end
+

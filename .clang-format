@@ -1,0 +1,20 @@
+Language: Cpp
+BasedOnStyle: Google
+
+ColumnLimit: 100
+IndentWidth: 8
+TabWidth: 8
+UseTab: Always
+DerivePointerAlignment: false
+PointerAlignment: Right
+
+AllowShortFunctionsOnASingleLine: None
+AllowShortEnumsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+IndentCaseLabels: false
+BreakBeforeBraces: Linux
+SeparateDefinitionBlocks: Always
+
+AlignConsecutiveMacros: AcrossComments
+
