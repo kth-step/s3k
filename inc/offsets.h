@@ -1,6 +1,5 @@
 /* See LICENSE file for copyright and license details. */
-#ifndef __OFFSETS_H__
-#define __OFFSETS_H__
+#pragma once
 
 /* Standard registers */
 #define REGS_PC	   0
@@ -40,5 +39,3 @@
 #define REGS_EPC   264
 #define REGS_TVAL  272
 #define REGS_TVEC  280
-
-#endif /* __OFFSETS_H__ */

@@ -28,12 +28,16 @@ _start:
 	la	t0,trap_entry
 	csrw	mtvec,t0
 
-	csrwi	mstatus,0
+	csrw	pmpcfg0,0x0F
+	li	t0,-1
+	csrw	pmpaddr0,t0
+
+	csrw	mstatus,0
+	li	t0,(1<<7)
+	csrw	mie,t0
 
 	/* initialize the kernel */
-	la	a0,_payload
+	li	a0,PAYLOAD
 	call	init_kernel
-	/* call scheduler */
-	call	schedule_next
-	/* resume user process */
-	j	trap_exit
+	call	sched_next
+	tail	trap_exit

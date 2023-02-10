@@ -1,58 +1,95 @@
 # See LICENSE file for copyright and license details.
 capabilities:
-  - name: time 
+  - name: Time
     fields:
       hartid: 8
-      begin: 8
-      free: 8
-      end: 8
-  - name: memory
+      begin: 12
+      free: 12
+      end: 12
+  - name: Memory
     fields:
-      begin: 32
-      free: 32
-      end: 32
+      begin: 16
+      free: 16
+      end: 16
+      offset: 6
       rwx: 3
       lock: 1
-  - name: monitor
-    fields:
-      begin: 8
-      free: 8
-      end: 8
-  - name: pmp
+  - name: Pmp
     fields:
       addr: 48
       cfg: 5
+  - name: Monitor
+    fields:
+      begin: 12
+      free: 12
+      end: 12
+  - name: Channel
+    fields:
+      begin: 12
+      free: 12
+      end: 12
+  - name: Socket
+    fields: 
+      port: 12
+      tag: 12
 
 predicates:
-  - name: time_is_child
+  - name: TimeIsChild 
     cases:
-      - parent: time
-        child: time
+      - parent: Time
+        child: Time
+        conditions:
+          - p.hartid == c.hartid
+          - p.begin <= c.begin
+          - c.end <= p.free
+  - name: MemoryIsChild 
+    cases:
+      - parent: Memory
+        child: Memory
+        conditions:
+        - p.begin <= c.begin
+        - c.end <= p.free
+  - name: MonitorIsChild
+    cases:
+      - parent: Monitor
+        child: Monitor
+        conditions:
+        - p.begin <= c.begin
+        - c.end <= p.free
+  - name: ChannelIsChild
+    cases:
+      - parent: Channel
+        child: Channel
         conditions:
           - p.begin <= c.begin
-          - c.end <= p.end
+          - c.end < p.free
+      - parent: Channel
+        child: Socket
+        conditions:
+          - p.begin <= c.port
+          - c.port < p.free
+  - name: SocketIsChild
+    cases:
+      - parent: Socket
+        child: Socket
+        conditions:
+          - p.port == c.port
+          - p.tag == 0
+
+  - name: TimeCanDerive
+    cases:
+      - parent: Time
+        child: Time
+        conditions:
           - p.hartid == c.hartid
-
-  - name: memory_is_child
+          - p.free == c.begin
+          - c.end <= p.end
+          - c.free == c.begin
+          - c.begin <= c.end
+  - name: MemoryCanDerive
     cases:
-      - parent: memory
-        child: memory
-        conditions:
-        - p.begin <= c.begin
-        - c.end <= p.end
-
-  - name: monitor_is_child
-    cases:
-      - parent: monitor
-        child: monitor
-        conditions:
-        - p.begin <= c.begin
-        - c.end <= p.end
-
-  - name: memory_can_derive
-    cases:
-      - parent: memory
-        child: memory
+      - parent: Memory
+        child: Memory
         conditions:
           - p.lock == 0
           - c.lock == 0
@@ -60,26 +97,36 @@ predicates:
           - c.end <= p.end
           - (c.rwx & p.rwx) == c.rwx
           - c.free == c.begin
-          - c.begin < c.end
-
-  - name: time_can_derive
+          - c.begin <= c.end
+  - name: MonitorCanDerive
     cases:
-      - parent: time
-        child: time
-        conditions:
-          - p.hartid == c.hartid
-          - p.free == c.begin
-          - c.end <= p.end
-          - c.free == c.begin
-          - c.begin < c.end
-
-  - name: monitor_can_derive
-    cases:
-      - parent: monitor
-        child: monitor
+      - parent: Monitor
+        child: Monitor
         conditions:
           - p.free == c.begin
           - c.end <= p.end
           - c.free == c.begin
           - c.begin < c.end
-
+  - name: ChannelCanDerive
+    cases:
+      - parent: Channel
+        child: Channel
+        conditions:
+          - p.free == c.begin
+          - c.end <= p.end
+          - c.free == c.begin
+          - c.begin < c.end
+      - parent: Channel
+        child: Socket
+        conditions:
+          - p.free <= c.port
+          - c.port < p.end
+          - c.port == 0
+  - name: SocketCanDerive
+    cases:
+      - parent: Socket
+        child: Socket
+        conditions:
+          - p.port == c.port
+          - p.tag == 0
+          - 0 < c.tag

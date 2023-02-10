@@ -1,11 +1,13 @@
 /* See LICENSE file for copyright and license details. */
-#include "proc.h"
+#include "exception.h"
 
-struct proc *handle_exception(struct proc *proc, uint64_t mcause, uint64_t mepc, uint64_t mtval)
+#include "proc.h"
+#include "trap.h"
+
+void handle_exception(uint64_t mcause, uint64_t mepc, uint64_t mtval)
 {
-	proc->regs.cause = mcause;
-	proc->regs.epc = mepc;
-	proc->regs.tval = mtval;
-	proc->regs.pc = proc->regs.tvec;
-	return proc;
+	current->regs.cause = mcause;
+	current->regs.epc = mepc;
+	current->regs.tval = mtval;
+	current->regs.pc = current->regs.tvec;
 }

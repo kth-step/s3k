@@ -1,67 +1,76 @@
 /* See LICENSE file for copyright and license details. */
+
 #include "sched.h"
 
+#include "bsp/timer.h"
 #include "consts.h"
 #include "csr.h"
 #include "proc.h"
-#include "timer.h"
+#include "trap.h"
+
+#define NONE_PID 0xFF
 
 struct sched_entry {
 	uint8_t pid;
-	uint64_t len;
+	uint8_t len;
 };
 
-static uint16_t schedule[4][NSLICE];
+static volatile struct sched_entry schedule[4][NSLICE];
 
-struct sched_entry schedule_get(uint64_t hartid, size_t i)
+static struct sched_entry sched_get(uint64_t hartid, size_t i)
 {
-	uint16_t entry = schedule[hartid][i];
-	return (struct sched_entry){(uint8_t)entry & 0xFFull, (entry >> 8) + 1};
+	return schedule[hartid][i];
 }
 
-void schedule_set(uint64_t hartid, size_t i, struct sched_entry entry)
+void sched_update(uint64_t hartid, uint64_t pid, uint64_t begin, uint64_t end)
 {
-	schedule[hartid][i] = (uint16_t)entry.pid | ((uint16_t)(entry.len - 1) << 8);
-}
-
-void schedule_update(uint64_t hartid, uint64_t pid, uint64_t begin, uint64_t end)
-{
-	static struct ticklock lock = {0};
-	ticklock_lock(&lock);
-	while (begin < end) {
-		struct sched_entry entry = (struct sched_entry){(uint8_t)pid, end - begin};
-		schedule_set(hartid, begin, entry);
-		begin++;
+	for (uint64_t i = begin; i < end; i++) {
+		schedule[hartid][i] = (struct sched_entry){pid, end - i};
 	}
-	ticklock_unlock(&lock);
 }
 
-struct proc *schedule_next(void)
+void sched_delete(uint64_t hartid, uint64_t begin, uint64_t end)
+{
+	sched_update(hartid, NONE_PID, begin, end);
+}
+
+void sched_next(void)
 {
 	uint64_t hartid = csrr_mhartid();
-	uint64_t state;
 	uint64_t quantum;
 	struct sched_entry entry;
-	struct proc *proc;
+retry:
 	do {
-		quantum = (timer_gettime() - NSLACK) / NTICK;
-		entry = schedule_get(quantum % NTICK, hartid);
-		if (entry.pid == 0xFFull)
+		quantum = (time_get() + NSLACK) / NTICK;
+		entry = sched_get(hartid, quantum % NSLICE);
+		if (entry.pid == NONE_PID)
 			continue;
-		proc = &processes[entry.pid];
-		state = proc->state;
-		if (state != PS_READY)
+		current = &processes[entry.pid];
+		if (current->sleep > time_get())
 			continue;
-	} while (!__atomic_compare_exchange_n(&proc->state, &state, PS_RUNNING, false,
-					      __ATOMIC_ACQUIRE, __ATOMIC_RELAXED));
-	proc_loadpmp(proc);
-	uint64_t endtime = (quantum + entry.len) * NTICK;
-	timer_settimer(hartid, endtime);
-	return proc;
+	} while (!__sync_bool_compare_and_swap(&current->state, PS_READY, PS_RUNNING));
+	proc_load_pmp(current);
+	if (!csrr_pmpcfg0()) {
+		__atomic_fetch_and(&current->state, ~PS_RUNNING, __ATOMIC_RELEASE);
+		goto retry;
+	}
+	timeout_set(hartid, quantum * NTICK);
+	while (!(csrr_mip() & (1 << 7))) {
+		__asm__ volatile("wfi");
+	}
+	timeout_set(hartid, (quantum + entry.len) * NTICK - NSLACK);
 }
 
-struct proc *schedule_yield(struct proc *proc)
+void sched_yield(void)
 {
-	__atomic_fetch_and(&proc->state, ~PS_RUNNING, __ATOMIC_RELEASE);
-	return schedule_next();
+	__atomic_fetch_and(&current->state, ~PS_RUNNING, __ATOMIC_RELEASE);
+	current = NULL;
+	sched_next();
+}
+
+void sched_init(void)
+{
+	for (int i = 0; i < NHART; i++) {
+		sched_update(i, 0, 0, NSLICE);
+	}
 }

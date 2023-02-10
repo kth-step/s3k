@@ -1,16 +1,19 @@
-#ifndef __COMMON_H__
-#define __COMMON_H__
+/**
+ * @file common.h
+ * @brief Macros.
+ * @copyright MIT License
+ * @author Henrik Karlsson (henrik10@kth.se)
+ */
+#pragma once
 
-#if DEBUG
+#ifndef NDEBUG
 /* Check if property holds, if not, halt */
-/* TODO: print error */
-#define ASSERT(x)         \
-	if (!(x))         \
-		while (1) \
-			;
+#define assert(x)    \
+	while (!(x)) \
+		__asm__ volatile("wfi");
 #else
 /* Assume the property holds */
-#define ASSERT(x) \
+#define assert(x) \
 	if (!(x)) \
 	__builtin_unreachable()
 #endif
@@ -24,5 +27,3 @@
 
 /* Returns the size of an array */
 #define ARRAY_SIZE(x) (sizeof(x) / (sizeof((x)[0])))
-
-#endif /* __COMMON_H__ */

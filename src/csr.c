@@ -21,6 +21,7 @@
 	}
 
 CSRR(mhartid)
+CSRR(mip)
 
 CSRR(pmpcfg0)
 CSRR(pmpaddr0)
