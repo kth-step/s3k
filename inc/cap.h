@@ -47,9 +47,8 @@ struct memory {
 
 struct pmp {
 	uint64_t type : 4;
+	uint64_t addr : 52;
 	uint64_t cfg : 8;
-	uint64_t addr : 34;
-	uint64_t _padd : 18;
 };
 
 struct monitor {

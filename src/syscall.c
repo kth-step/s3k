@@ -241,7 +241,6 @@ static void _derive_memory(cnode_handle_t orig_handle, union cap orig_cap,
 {
 	if (drv_cap.type == CAPTY_MEMORY) {  // Memory
 		orig_cap.memory.free = drv_cap.memory.begin;
-		orig_cap.memory.lock = (drv_cap.memory.end == orig_cap.memory.end);
 	} else {  // PMP
 		orig_cap.memory.lock = true;
 	}

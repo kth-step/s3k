@@ -16,7 +16,7 @@ CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany\
 	 -ffunction-sections -fdata-sections\
 	 -Wno-builtin-declaration-mismatch\
 	 -flto -fwhole-program --specs=nosys.specs\
-	 -Og -g3
+	 -Os -g3
 ASFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany
 LDFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany\
 	  -nostartfiles -nostdlib\

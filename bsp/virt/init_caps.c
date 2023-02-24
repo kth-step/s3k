@@ -9,15 +9,15 @@ void init_caps(void)
 {
 	// All caps should be distinct
 	const union cap caps[] = {
-	    cap_pmp(0x20003fff, CAP_RWX),	       // RWX to init proc program
-	    cap_memory(0x0020, 0xFFFF, 0x8, CAP_RWX),  // Main memory capability
-	    cap_memory(0x0000, 0x0001, 0x1, CAP_RW),   // UART memory capability
-	    cap_time(0, 0, NSLICE),		       // time to hart 0
-	    cap_time(1, 0, NSLICE),		       // time to hart 1
-	    cap_time(2, 0, NSLICE),		       // time to hart 2
-	    cap_time(3, 0, NSLICE),		       // time to hart 3
-	    cap_monitor(0, NPROC),		       // Monitor capability to all processes
-	    cap_channel(0, NCHANNEL),		       // CHannel capability
+	    cap_pmp(0x20003fff, CAP_RWX),		// RWX to init proc program
+	    cap_memory(0x0020, 0x8000, 0x10, CAP_RWX),	// Main memory capability
+	    cap_memory(0x0000, 0x0001, 0x2, CAP_RW),	// UART memory capability
+	    cap_time(0, 0, NSLICE),			// time to hart 0
+	    cap_time(1, 0, NSLICE),			// time to hart 1
+	    cap_time(2, 0, NSLICE),			// time to hart 2
+	    cap_time(3, 0, NSLICE),			// time to hart 3
+	    cap_monitor(0, NPROC),			// Monitor capability to all processes
+	    cap_channel(0, NCHANNEL),			// CHannel capability
 	};
 	// Initialize cnode to get working root handle
 	cnode_init();

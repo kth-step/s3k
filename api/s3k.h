@@ -36,7 +36,9 @@ enum s3k_excpt {
 	S3K_EXCPT_COLLISION,	 ///< Capability slot is occupied.
 	S3K_EXCPT_DERIVATION,	 ///< Capability can not be derived.
 	S3K_EXCPT_PREEMPTED,	 ///< System call was preempted.
-	S3K_EXCPT_BUSY,		 ///< Process busy.
+	S3K_EXCPT_SUSPENDED,	 ///< Process was suspended
+	S3K_EXCPT_MPID,		 ///< Bad PID for monitor operation.
+	S3K_EXCPT_MBUSY,	 ///< Process busy.
 	S3K_EXCPT_UNIMPLEMENTED	 ///< System call not implemented for specified capability.
 };
 
@@ -136,9 +138,8 @@ struct s3k_memory {
 /// PMP Frame capability
 struct s3k_pmp {
 	uint64_t type : 4;
+	uint64_t addr : 52;
 	uint64_t cfg : 8;
-	uint64_t addr : 34;
-	uint64_t _padd : 18;
 };
 
 /// Monitor capability

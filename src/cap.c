@@ -12,7 +12,7 @@ union cap cap_memory(uint64_t begin, uint64_t end, uint64_t offset, uint64_t rwx
 
 union cap cap_pmp(uint64_t addr, uint64_t rwx)
 {
-	return (union cap){.pmp = {CAPTY_PMP, 0x18 | rwx, addr, 0}};
+	return (union cap){.pmp = {CAPTY_PMP, addr, 0x18 | rwx}};
 }
 
 union cap cap_monitor(uint64_t begin, uint64_t end)
@@ -49,8 +49,8 @@ static bool cap_memory_derive_pmp(struct memory parent, struct pmp child)
 	uint64_t pmp_end = pmp_napot_end(child.addr);
 	uint64_t rwx = child.cfg & 0x7;
 	uint64_t mode = child.cfg >> 3;
-	uint64_t mem_free = ((uint64_t)parent.offset << 28) | (parent.free << 12);
-	uint64_t mem_end = ((uint64_t)parent.offset << 28) + ((parent.end + 1) << 12);
+	uint64_t mem_free = ((uint64_t)parent.offset << 27) + ((uint64_t)parent.free << 12);
+	uint64_t mem_end = ((uint64_t)parent.offset << 27) + ((uint64_t)parent.end << 12);
 	return mem_free <= pmp_begin && pmp_end <= mem_end && ((parent.rwx & rwx) == rwx) &&
 	       mode == 0x3;
 }
@@ -129,11 +129,9 @@ static bool cap_memory_parent_pmp(struct memory parent, struct pmp child)
 	uint64_t pmp_begin = pmp_napot_begin(child.addr);
 	uint64_t pmp_end = pmp_napot_end(child.addr);
 	uint64_t rwx = child.cfg & 0x7;
-	uint64_t mode = child.cfg >> 3;
-	uint64_t mem_free = ((uint64_t)parent.offset << 28) | (parent.free << 12);
-	uint64_t mem_end = ((uint64_t)parent.offset << 28) + ((parent.end + 1) << 12);
-	return mem_free <= pmp_begin && pmp_end <= mem_end && ((parent.rwx & rwx) == rwx) &&
-	       mode == 0x3;
+	uint64_t mem_free = ((uint64_t)parent.offset << 27) + (parent.free << 12);
+	uint64_t mem_end = ((uint64_t)parent.offset << 27) + (parent.end << 12);
+	return mem_free <= pmp_begin && pmp_end <= mem_end && ((parent.rwx & rwx) == rwx);
 }
 
 static bool cap_monitor_parent_monitor(struct monitor parent, struct monitor child)
