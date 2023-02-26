@@ -19,10 +19,10 @@
 ///
 /// @{
 
-#define S3K_RWX 0x7
-#define S3K_RW	0x3
-#define S3K_RX	0x5
-#define S3K_R	0x1
+#define S3K_RWX 0x7  ///< Read, write and execute for Memory and PMP capability
+#define S3K_RW	0x3  ///< Read and write permissions for memory and PMP capability
+#define S3K_RX	0x5  ///< Read and execute permissions for memory and PMP capability
+#define S3K_R	0x1  ///< Read permissions for memory and PMP capability
 
 /**
  * @brief Enumeration S3K system call exception codes.
@@ -116,39 +116,39 @@ enum s3k_reg {
 
 /// Time slice capability
 struct s3k_time {
-	uint64_t type : 4;
-	uint64_t _padd : 4;
-	uint64_t hartid : 8;
-	uint64_t begin : 16;
-	uint64_t free : 16;
-	uint64_t end : 16;
+	uint64_t type : 4;    ///< Type of capability, should be S3K_CAPTY_TIME.
+	uint64_t _padd : 4;   ///< Padding, should be zero.
+	uint64_t hartid : 8;  ///< Hardware Thread ID.
+	uint64_t begin : 16;  ///< Beginning of time slice.
+	uint64_t free : 16;   ///< Beginning of available/unallocated time slice.
+	uint64_t end : 16;    ///< End of time slice.
 };
 
 /// Memory Slice capability
 struct s3k_memory {
-	uint64_t type : 4;
-	uint64_t lock : 1;
-	uint64_t rwx : 3;
-	uint64_t offset : 8;
-	uint64_t begin : 16;
-	uint64_t free : 16;
-	uint64_t end : 16;
+	uint64_t type : 4;    ///< Type of capability, should be S3K_CAPTY_MEMORY
+	uint64_t lock : 1;    ///< Prevents creating of memory capabilities
+	uint64_t rwx : 3;     ///< Read, write and execute (reverse order)
+	uint64_t offset : 8;  ///< 128 MiB offset of memory slice
+	uint64_t begin : 16;  ///< Beginning of memory slice
+	uint64_t free : 16;   ///< Beginning of available/unallocated memory slice
+	uint64_t end : 16;    ///< End of memory slice
 };
 
 /// PMP Frame capability
 struct s3k_pmp {
-	uint64_t type : 4;
-	uint64_t addr : 52;
-	uint64_t cfg : 8;
+	uint64_t type : 4;   ///< Type of capability, should be S3K_CAPTY_PMP
+	uint64_t addr : 52;  ///< pmpaddr
+	uint64_t cfg : 8;    ///< pmpcfg
 };
 
 /// Monitor capability
 struct s3k_monitor {
-	uint64_t type : 4;
-	uint64_t _padd : 12;
-	uint64_t begin : 16;
-	uint64_t free : 16;
-	uint64_t end : 16;
+	uint64_t type : 4;    ///< Type of capability, should be S3K_CAPTY_MONITOR
+	uint64_t _padd : 12;  ///< Padding, should be zero
+	uint64_t begin : 16;  ///< Beginning of monitored PIDs.
+	uint64_t free : 16;   ///< Beginning of available monitored PIDs.
+	uint64_t end : 16;    ///< End of monitred PIDs
 };
 
 /// Channel capability
@@ -170,14 +170,14 @@ struct s3k_socket {
 
 /// Capability description
 union s3k_cap {
-	uint64_t type : 4;
-	uint64_t raw;
-	struct s3k_time time;
-	struct s3k_memory memory;
-	struct s3k_pmp pmp;
-	struct s3k_monitor monitor;
-	struct s3k_channel channel;
-	struct s3k_socket socket;
+	uint64_t type : 4;	     ///< Type of capability
+	uint64_t raw;		     ///< Capability as 64-bit word
+	struct s3k_time time;	     ///< As time slice capability
+	struct s3k_memory memory;    ///< As memory slice capability
+	struct s3k_pmp pmp;	     ///< As PMP frame capability
+	struct s3k_monitor monitor;  ///< As monitor slice capability
+	struct s3k_channel channel;  ///< As channel slice capability
+	struct s3k_socket socket;    ///< As socket capability
 };
 
 _Static_assert(sizeof(union s3k_cap) == 8, "sizeof(union s3k_cap) != 8");
@@ -402,29 +402,75 @@ uint64_t pmp_napot_begin(uint64_t addr);
  * @return The end of the address range.
  */
 uint64_t pmp_napot_end(uint64_t addr);
-/// Create a time slice capability
+
+/**
+ * @brief Create a time slice capability
+ * @param hartid Hardware thread to run on.
+ * @param begin Start of time slice.
+ * @param end End of time slice.
+ * @return A time slice capability.
+ */
 union s3k_cap s3k_time(uint64_t hartid, uint64_t begin, uint64_t end);
-/// Create a memory slice capability
+
+/**
+ * @brief Create a memory slice capability
+ *
+ * To compress the representation of memory slices, we have split the beginning and end of the
+ * memory slice with offset. The start of the memory slice is `(offset << 27) + (begin << 12)', the
+ * end is `(offset << 27) + (begin << 12)'.
+ *
+ * @param begin Start of memory slice.
+ * @param end End of end slice.
+ * @param offset 128 MiB offset
+ * @param rwx Read, write, and execute permissions.
+ * @return A memory slice capability.
+ */
 union s3k_cap s3k_memory(uint64_t begin, uint64_t end, uint64_t offset, uint64_t rwx);
-/// Create a PMP frame capability
+
+/**
+ * @brief Create a PMP NAPOT frame capability
+ *
+ * @param addr PMP address in NAPOT format.
+ * @param cfg PMP cfg.
+ * @return A PMP capability.
+ */
 union s3k_cap s3k_pmp(uint64_t addr, uint64_t rwx);
-/// Create a monitor slice capability
+
+/**
+ * @brief Create a monitor slice capability
+ *
+ * @param begin Start of monitored processes' PID.
+ * @param end End of monitored processes' PID.
+ * @return A monitor slice capability.
+ */
 union s3k_cap s3k_monitor(uint64_t begin, uint64_t end);
 /// Create a channel slice capability
 union s3k_cap s3k_channel(uint64_t begin, uint64_t end);
 /// Create a socket capability
 union s3k_cap s3k_socket(uint64_t port, uint64_t tag);
+/// Check if a time slice can derive the child.
 bool s3k_time_derive(union s3k_cap parent, union s3k_cap child);
+/// Check if a memory slice can derive the child.
 bool s3k_memory_derive(union s3k_cap parent, union s3k_cap child);
+/// Check if a monitor slice can derive the child.
 bool s3k_monitor_derive(union s3k_cap parent, union s3k_cap child);
+/// Check if channel slice can derive the child.
 bool s3k_channel_derive(union s3k_cap parent, union s3k_cap child);
+/// Check if socket slice can derive the child.
 bool s3k_socket_derive(union s3k_cap parent, union s3k_cap child);
+/// Check if parent can derive the child.
 bool s3k_can_derive(union s3k_cap parent, union s3k_cap child);
+/// Check if the time slice capability is a parent
 bool s3k_time_parent(union s3k_cap parent, union s3k_cap child);
+/// Check if the memory slice capability is a parent
 bool s3k_memory_parent(union s3k_cap parent, union s3k_cap child);
+/// Check if the monitor slice capability is a parent
 bool s3k_monitor_parent(union s3k_cap parent, union s3k_cap child);
+/// Check if the channel slice capability is a parent
 bool s3k_channel_parent(union s3k_cap parent, union s3k_cap child);
+/// Check if the socket slice capability is a parent
 bool s3k_socket_parent(union s3k_cap parent, union s3k_cap child);
+/// Check if capability is a parent
 bool s3k_is_parent(union s3k_cap parent, union s3k_cap child);
 
 /// @}
