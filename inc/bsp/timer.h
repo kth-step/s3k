@@ -1,11 +1,12 @@
-/* See LICENSE file for copyright and license details. */
 /**
  * @file timer.h
- * @brief Read and set time and timers.
- *
+ * @brief Read and set time and timeout values.
+ * @copyright MIT License
  * @author Henrik Karlsson (henrik10@kth.se)
  */
-#pragma once
+#ifndef __TIMER_H__
+#define __TIMER_H__
+
 #include <stdint.h>
 
 /**
@@ -34,3 +35,5 @@ uint64_t timeout_get(uint64_t i);
  * @param deadline New deadline.
  */
 void timeout_set(uint64_t i, uint64_t timeout);
+
+#endif /* __TIMER_H__ */

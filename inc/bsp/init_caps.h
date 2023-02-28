@@ -1,14 +1,16 @@
-/* See LICENSE file for copyright and license details. */
 /**
  * @file init_caps.h
  * @brief Set the initial capabilities.
- *
+ * @copyright MIT License
  * @author Henrik Karlsson (henrik10@kth.se)
  */
-#pragma once
+#ifndef __INIT_CAPS_H__
+#define __INIT_CAPS_H__
 #include "proc.h"
 
 /**
  * Set the initial capabilities for the platform.
  */
 void init_caps(void);
+
+#endif /* __INIT_CAPS_H__ */

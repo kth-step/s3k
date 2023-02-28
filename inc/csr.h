@@ -1,11 +1,13 @@
-/* See LICENSE file for copyright and license details. */
 /**
  * @file csr.h
  * @brief Functions for reading and writing to CSR registers.
- *
+ * @copyright MIT License
  * @author Henrik Karlsson (henrik10@kth.se)
  */
-#pragma once
+
+#ifndef __CSR_H__
+#define __CSR_H__
+
 #include <stdint.h>
 
 #include "common.h"
@@ -54,3 +56,5 @@ void csrw_pmpaddr5(uint64_t val);
 void csrw_pmpaddr6(uint64_t val);
 /** Write to pmpaddr7 */
 void csrw_pmpaddr7(uint64_t val);
+
+#endif /* __CSR_H__ */

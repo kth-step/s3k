@@ -1,5 +1,12 @@
-/* See LICENSE file for copyright and license details. */
-#pragma once
+/**
+ * @file consts.h
+ * @brief Constants and enums.
+ * @copyright MIT License
+ * @author Henrik Karlsson (henrik10@kth.se)
+ */
+
+#ifndef __CONSTS_H__
+#define __CONSTS_H__
 
 typedef enum reg_id {
 	/* General purpose registers */
@@ -62,3 +69,5 @@ typedef enum reg_id {
 #define PS_BLOCKED_BUSY	  3
 #define PS_SUSPENDED	  4
 #define PS_SUSPENDED_BUSY 5
+
+#endif __CONSTS_H__

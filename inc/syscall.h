@@ -1,5 +1,12 @@
-/* See LICENSE file for copyright and license details. */
-#pragma once
+/**
+ * @file stack.h
+ * @brief Definition of system calls and error codes.
+ * @copyright MIT License
+ * @author Henrik Karlsson (henrik10@kth.se)
+ */
+#ifndef __SYSCALL_H__
+#define __SYSCALL_H__
+
 #include <stdint.h>
 
 #include "proc.h"
@@ -67,5 +74,6 @@ uint64_t syscall_send(uint64_t send_idx, uint64_t msg0, uint64_t msg1, uint64_t 
 /// Send then receive a message.
 uint64_t syscall_sendrecv(uint64_t recv_idx, uint64_t send_idx, uint64_t msg0, uint64_t msg1,
 			  uint64_t cap0, uint64_t cap1);
-
 /// @}
+
+#endif /* __SYSCALL_H__ */

@@ -4,7 +4,9 @@
  * @copyright MIT License
  * @author Henrik Karlsson (henrik10@kth.se)
  */
-#pragma once
+#ifndef __CAP_H__
+#define __CAP_H__
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -114,3 +116,4 @@ bool cap_socket_parent(union cap parent, union cap child);
 uint64_t pmp_napot_addr(uint64_t begin, uint64_t end);
 uint64_t pmp_napot_begin(uint64_t addr);
 uint64_t pmp_napot_end(uint64_t addr);
+#endif /* __CAP_H__ */

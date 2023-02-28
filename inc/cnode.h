@@ -4,7 +4,9 @@
  * @copyright MIT License
  * @author Henrik Karlsson (henrik10@kth.se)
  */
-#pragma once
+#ifndef __CNODE_H__
+#define __CNODE_H__
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -104,3 +106,4 @@ void cnode_delete(cnode_handle_t handle);
  */
 bool cnode_delete_if(cnode_handle_t handle, cnode_handle_t prev_handle);
 /// @}
+#endif /* __CNODE_H__ */

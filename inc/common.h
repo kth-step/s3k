@@ -4,7 +4,9 @@
  * @copyright MIT License
  * @author Henrik Karlsson (henrik10@kth.se)
  */
-#pragma once
+
+#ifndef __COMMON_H__
+#define __COMMON_H__
 
 #ifndef NDEBUG
 /* Check if property holds, if not, halt */
@@ -27,3 +29,5 @@
 
 /* Returns the size of an array */
 #define ARRAY_SIZE(x) (sizeof(x) / (sizeof((x)[0])))
+
+#endif /* __COMMON_H__ */

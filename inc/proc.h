@@ -1,11 +1,12 @@
-/* See LICENSE file for copyright and license details. */
 /**
  * @file proc.h
  * @brief Process control block.
- *
+ * @copyright MIT License
  * @author Henrik Karlsson (henrik10@kth.se)
  */
-#pragma once
+#ifndef __PROC_H__
+#define __PROC_H__
+
 #include <stdint.h>
 
 #include "cnode.h"
@@ -78,3 +79,5 @@ register struct proc *current __asm__("tp");
  * @param proc Process for which we load PMP settings.
  */
 void proc_load_pmp(const struct proc *proc);
+
+#endif /* __PROC_H__ */
