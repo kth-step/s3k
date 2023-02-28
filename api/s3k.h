@@ -114,6 +114,9 @@ enum s3k_reg {
 	S3K_REG_COUNT	///< *Number of S3K registers.*
 };
 
+/// @defgroup cap-def S3K Capability Definitions
+/// @{
+
 /// Time slice capability
 struct s3k_time {
 	uint64_t type : 4;    ///< Type of capability, should be S3K_CAPTY_TIME.
@@ -181,6 +184,8 @@ union s3k_cap {
 };
 
 _Static_assert(sizeof(union s3k_cap) == 8, "sizeof(union s3k_cap) != 8");
+
+/// @}
 
 /**
  * @defgroup api-syscall System Calls
@@ -382,6 +387,11 @@ enum s3k_excpt s3k_mtakecap(uint64_t i, uint64_t pid, uint64_t src, uint64_t dst
 /**************************** API UTILITY *********************************/
 
 /**
+ * @defgroup api-pmp PMP helper functions
+ * @{
+ */
+
+/**
  * @brief Returns a PMP NAPOT representation of the address range.
  * @param begin Start of the range
  * @param end End of the range
@@ -402,6 +412,13 @@ uint64_t pmp_napot_begin(uint64_t addr);
  * @return The end of the address range.
  */
 uint64_t pmp_napot_end(uint64_t addr);
+
+/// @}
+
+/**
+ * @defgroup api-cap-constr S3K Capability constructors.
+ * @{
+ */
 
 /**
  * @brief Create a time slice capability
@@ -448,6 +465,13 @@ union s3k_cap s3k_monitor(uint64_t begin, uint64_t end);
 union s3k_cap s3k_channel(uint64_t begin, uint64_t end);
 /// Create a socket capability
 union s3k_cap s3k_socket(uint64_t port, uint64_t tag);
+
+/// @}
+
+/**
+ * @defgroup api-cap-help S3K Capability helper functions.
+ * @{
+ */
 /// Check if a time slice can derive the child.
 bool s3k_time_derive(union s3k_cap parent, union s3k_cap child);
 /// Check if a memory slice can derive the child.
@@ -473,6 +497,7 @@ bool s3k_socket_parent(union s3k_cap parent, union s3k_cap child);
 /// Check if capability is a parent
 bool s3k_is_parent(union s3k_cap parent, union s3k_cap child);
 
+/// @}
 /// @}
 
 #endif /* _S3K_H_ */
