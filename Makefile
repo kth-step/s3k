@@ -26,7 +26,7 @@ options:
 	@printf "LDFLAGS  = ${LDFLAGS}\n"
 	@printf "ASFLAGS  = ${ASFLAGS}\n"
 	@printf "CFLAGS   = ${CFLAGS}\n"
-	@printf "CONFIG_H = ${abspath CONFIG_H}\n"
+	@printf "CONFIG_H = ${abspath ${CONFIG_H}}\n"
 
 
 obj/%.o: %.S
