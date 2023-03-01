@@ -1,5 +1,5 @@
 /* See LICENSE file for copyright and license details. */
-#include "offsets.h"
+//#include "offsets.h"
 #include "stack.h"
 .globl trap_entry
 .globl trap_exit

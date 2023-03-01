@@ -19,7 +19,7 @@ void init_kernel(uint64_t payload)
 			processes[pid].pid = pid;
 			processes[pid].state = PS_SUSPENDED;
 		}
-		processes[0].regs.pc = payload;
+		processes[0].regs[REG_PC] = payload;
 		processes[0].state = PS_READY;
 		init_caps();
 		sched_init();

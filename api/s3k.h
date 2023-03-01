@@ -71,7 +71,7 @@ enum s3k_capty {
  * Includes RISC-V's general purpose registers (GPR), program counter, and S3K specific
  * virtual registers (VR).
  */
-enum s3k_reg {
+enum reg {
 	/* General purpose registers */
 	S3K_REG_PC,   ///< Program counter
 	S3K_REG_RA,   ///< Return address (GPR)
@@ -106,12 +106,18 @@ enum s3k_reg {
 	S3K_REG_T5,   ///< Temporary register (GPR)
 	S3K_REG_T6,   ///< Temporary register (GPR)
 	/* Virtual registers */
-	S3K_REG_CAUSE,	///< Exception cause code.
-	S3K_REG_TVAL,	///< Exception value.
-	S3K_REG_EPC,	///< Exception program counter.
-	S3K_REG_TVEC,	///< Exception handling vector.
-	S3K_REG_PMP,	///< PMP configuration.
-	S3K_REG_COUNT	///< *Number of S3K registers.*
+	/* Trap handling setup */
+	S3K_REG_TPC,  ///< Trap program counter.
+	S3K_REG_TSP,  ///< Trap stack pointer.
+	/* Exception handling registers */
+	S3K_REG_EPC,	 ///< Exception program counter.
+	S3K_REG_ESP,	 ///< Exception stack pointer.
+	S3K_REG_ECAUSE,	 ///< Exception cause code.
+	S3K_REG_EVAL,	 ///< Exception value.
+	/* PMP registers */
+	S3K_REG_PMP,  ///< PMP configuration.
+	/* End of registers */
+	S3K_REG_COUNT  ///< *Number of S3K registers.*
 };
 
 /// @defgroup cap-def S3K Capability Definitions

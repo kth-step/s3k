@@ -48,7 +48,7 @@ uint64_t syscall_yield(void)
 {
 	current->sleep = timeout_get(csrr_mhartid());
 	sched_yield();
-	return current->regs.a0;
+	return current->regs[REG_A0];
 }
 
 uint64_t syscall_getcap(uint64_t idx)
@@ -390,7 +390,7 @@ uint64_t syscall_mgetreg(uint64_t mon_idx, uint64_t pid, uint64_t reg)
 		return EXCPT_MBUSY;
 	}
 	uint64_t *regs = (uint64_t *)&proc->regs;
-	current->regs.a1 = regs[reg % REG_COUNT];
+	current->regs[REG_A1] = regs[reg % REG_COUNT];
 	__sync_fetch_and_and(&proc->state, ~PSF_BUSY);
 	_unlock();
 	return EXCPT_NONE;
@@ -441,7 +441,7 @@ uint64_t syscall_mgetcap(uint64_t mon_idx, uint64_t pid, uint64_t node_idx)
 	}
 	cnode_handle_t node_handle = cnode_get_handle(pid, node_idx);
 	union cap node_cap = cnode_get_cap(node_handle);
-	current->regs.a1 = node_cap.raw;
+	current->regs[REG_A1] = node_cap.raw;
 	__sync_fetch_and_and(&proc->state, ~PSF_BUSY);
 	_unlock();
 	return EXCPT_NONE;

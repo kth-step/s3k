@@ -11,4 +11,4 @@
 void trap_entry(void) __attribute__((noreturn));
 void trap_exit(void) __attribute__((noreturn));
 
-#define /* __TRAP_H__ */
+#endif /* __TRAP_H__ */

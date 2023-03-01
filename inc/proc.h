@@ -12,59 +12,54 @@
 #include "cnode.h"
 #include "lock.h"
 
-struct regs {
-	uint64_t pc;	 ///< Program counter
-	uint64_t ra;	 ///< Return address (GPR)
-	uint64_t sp;	 ///< Stack pointer (GPR)
-	uint64_t gp;	 ///< Global pointer (GPR)
-	uint64_t tp;	 ///< Thread pointer (GPR)
-	uint64_t t0;	 ///< Temporary register (GPR)
-	uint64_t t1;	 ///< Temporary register (GPR)
-	uint64_t t2;	 ///< Temporary register (GPR)
-	uint64_t s0;	 ///< Saved register/Stack frame pointer (GPR)
-	uint64_t s1;	 ///< Saved register (GPR)
-	uint64_t a0;	 ///< Argument/Return register (GPR)
-	uint64_t a1;	 ///< Argument/Return register (GPR)
-	uint64_t a2;	 ///< Argument register (GPR)
-	uint64_t a3;	 ///< Argument register (GPR)
-	uint64_t a4;	 ///< Argument register (GPR)
-	uint64_t a5;	 ///< Argument register (GPR)
-	uint64_t a6;	 ///< Argument register (GPR)
-	uint64_t a7;	 ///< Argument register (GPR)
-	uint64_t s2;	 ///< Saved register (GPR)
-	uint64_t s3;	 ///< Saved register (GPR)
-	uint64_t s4;	 ///< Saved register (GPR)
-	uint64_t s5;	 ///< Saved register (GPR)
-	uint64_t s6;	 ///< Saved register (GPR)
-	uint64_t s7;	 ///< Saved register (GPR)
-	uint64_t s8;	 ///< Saved register (GPR)
-	uint64_t s9;	 ///< Saved register (GPR)
-	uint64_t s10;	 ///< Saved register (GPR)
-	uint64_t s11;	 ///< Saved register (GPR)
-	uint64_t t3;	 ///< Temporary register (GPR)
-	uint64_t t4;	 ///< Temporary register (GPR)
-	uint64_t t5;	 ///< Temporary register (GPR)
-	uint64_t t6;	 ///< Temporary register (GPR)
-	uint64_t cause;	 ///< Exception cause code.
-	uint64_t tval;	 ///< Exception value.
-	uint64_t epc;	 ///< Exception program counter.
-	uint64_t tvec;	 ///< Exception handling vector.
-	uint64_t pmp;	 ///< PMP configuration.
+enum reg {
+	/* General purpose registers */
+	REG_PC,	  ///< Program counter
+	REG_RA,	  ///< Return address (GPR)
+	REG_SP,	  ///< Stack pointer (GPR)
+	REG_GP,	  ///< Global pointer (GPR)
+	REG_TP,	  ///< Thread pointer (GPR)
+	REG_T0,	  ///< Temporary register (GPR)
+	REG_T1,	  ///< Temporary register (GPR)
+	REG_T2,	  ///< Temporary register (GPR)
+	REG_S0,	  ///< Saved register/Stack frame pointer (GPR)
+	REG_S1,	  ///< Saved register (GPR)
+	REG_A0,	  ///< Argument/Return register (GPR)
+	REG_A1,	  ///< Argument/Return register (GPR)
+	REG_A2,	  ///< Argument register (GPR)
+	REG_A3,	  ///< Argument register (GPR)
+	REG_A4,	  ///< Argument register (GPR)
+	REG_A5,	  ///< Argument register (GPR)
+	REG_A6,	  ///< Argument register (GPR)
+	REG_A7,	  ///< Argument register (GPR)
+	REG_S2,	  ///< Saved register (GPR)
+	REG_S3,	  ///< Saved register (GPR)
+	REG_S4,	  ///< Saved register (GPR)
+	REG_S5,	  ///< Saved register (GPR)
+	REG_S6,	  ///< Saved register (GPR)
+	REG_S7,	  ///< Saved register (GPR)
+	REG_S8,	  ///< Saved register (GPR)
+	REG_S9,	  ///< Saved register (GPR)
+	REG_S10,  ///< Saved register (GPR)
+	REG_S11,  ///< Saved register (GPR)
+	REG_T3,	  ///< Temporary register (GPR)
+	REG_T4,	  ///< Temporary register (GPR)
+	REG_T5,	  ///< Temporary register (GPR)
+	REG_T6,	  ///< Temporary register (GPR)
+	/* Virtual registers */
+	/* Trap handling setup */
+	REG_TPC,  ///< Trap program counter.
+	REG_TSP,  ///< Trap stack pointer.
+	/* Exception handling registers */
+	REG_EPC,     ///< Exception program counter.
+	REG_ESP,     ///< Exception stack pointer.
+	REG_ECAUSE,  ///< Exception cause code.
+	REG_EVAL,    ///< Exception value.
+	/* PMP registers */
+	REG_PMP,  ///< PMP configuration.
+	/* End of registers */
+	REG_COUNT  ///< *Number of S3K registers.*
 };
-Använda PMP capability i 3, 2, 5
-
-0x00_00_00_00_00_00_00_00
-
-pmpcfg0   <- pmp7cfg, pmp6cfg, ..., pmp1cfg,pmp0cfg
-
-pmpaddr0
-pmpaddr1
-pmpaddr2
-pmpaddr3
-pmpaddr4
-pmpaddr5
-pmpaddr6
-pmpaddr7
 
 /**
  * @brief Process control block.
@@ -73,7 +68,7 @@ pmpaddr7
  */
 struct proc {
 	/** The registers of the process (RISC-V registers and virtual registers). */
-	struct regs regs;
+	uint64_t regs[REG_COUNT];
 	/** Process ID. */
 	uint64_t pid;
 	/** Process state. */
