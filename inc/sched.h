@@ -3,7 +3,8 @@
  * @brief Scheduler.
  * @copyright MIT License
  * @author Henrik Karlsson (henrik10@kth.se)
- * @bug QEMU mret does not work properly if all pmp registers are 0, so we have a temporary fix in sched_next.
+ * @bug QEMU mret does not work properly if all pmp registers are 0, so we have
+ * a temporary fix in sched_next.
  */
 #ifndef __SCHED_H__
 #define __SCHED_H__

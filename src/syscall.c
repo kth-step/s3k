@@ -28,7 +28,7 @@ static void _unlock(void)
 uint64_t syscall_getinfo(uint64_t info)
 {
 	switch (info) {
-	case 0: 
+	case 0:
 		return current->pid;
 	case 1:
 		return csrr_mhartid();
@@ -129,8 +129,8 @@ static void _revoke_time_post_hook(cnode_handle_t handle, union cap cap)
 static void _revoke_memory_hook(cnode_handle_t handle, union cap cap, union cap child_cap)
 {
 	if (cap.type == CAPTY_MEMORY) {
-		cap.memory.free = child_cap.memory.free;  // Inherit free region
-		cap.memory.lock = child_cap.memory.lock;  // Inherit lock
+		cap.memory.free = child_cap.memory.free; // Inherit free region
+		cap.memory.lock = child_cap.memory.lock; // Inherit lock
 		cnode_set_cap(handle, cap);
 	}
 }
@@ -167,10 +167,12 @@ static void _revoke_channel_post_hook(cnode_handle_t handle, union cap cap)
 
 static void _revoke_socket_hook(cnode_handle_t handle, union cap cap, union cap child_cap)
 {
+	/* This should be empty */
 }
 
 static void _revoke_socket_post_hook(cnode_handle_t handle, union cap cap)
 {
+	/* This should be empty */
 }
 
 uint64_t syscall_revcap(uint64_t idx)
@@ -240,34 +242,32 @@ uint64_t syscall_revcap(uint64_t idx)
 	return EXCPT_NONE;
 }
 
-static void _derive_time(cnode_handle_t orig_handle, union cap orig_cap, cnode_handle_t drv_handle,
-			 union cap drv_cap)
+static void _derive_time(cnode_handle_t orig_handle, union cap orig_cap, cnode_handle_t drv_handle, union cap drv_cap)
 {
 	orig_cap.time.free = drv_cap.time.begin;
 	cnode_set_cap(orig_handle, orig_cap);
 	sched_update(drv_cap.time.hartid, current->pid, drv_cap.time.begin, drv_cap.time.end);
 }
 
-static void _derive_memory(cnode_handle_t orig_handle, union cap orig_cap,
-			   cnode_handle_t drv_handle, union cap drv_cap)
+static void _derive_memory(cnode_handle_t orig_handle, union cap orig_cap, cnode_handle_t drv_handle, union cap drv_cap)
 {
-	if (drv_cap.type == CAPTY_MEMORY) {  // Memory
+	if (drv_cap.type == CAPTY_MEMORY) { // Memory
 		orig_cap.memory.free = drv_cap.memory.begin;
-	} else {  // PMP
+	} else { // PMP
 		orig_cap.memory.lock = true;
 	}
 	cnode_set_cap(orig_handle, orig_cap);
 }
 
-static void _derive_monitor(cnode_handle_t orig_handle, union cap orig_cap,
-			    cnode_handle_t drv_handle, union cap drv_cap)
+static void _derive_monitor(cnode_handle_t orig_handle, union cap orig_cap, cnode_handle_t drv_handle,
+			    union cap drv_cap)
 {
 	orig_cap.monitor.free = drv_cap.monitor.begin;
 	cnode_set_cap(orig_handle, orig_cap);
 }
 
-static void _derive_channel(cnode_handle_t orig_handle, union cap orig_cap,
-			    cnode_handle_t drv_handle, union cap drv_cap)
+static void _derive_channel(cnode_handle_t orig_handle, union cap orig_cap, cnode_handle_t drv_handle,
+			    union cap drv_cap)
 {
 	// Update free pointer.
 	if (drv_cap.type == CAPTY_CHANNEL) {
@@ -278,9 +278,9 @@ static void _derive_channel(cnode_handle_t orig_handle, union cap orig_cap,
 	cnode_set_cap(orig_handle, orig_cap);
 }
 
-static void _derive_socket(cnode_handle_t orig_handle, union cap orig_cap,
-			   cnode_handle_t drv_handle, union cap drv_cap)
+static void _derive_socket(cnode_handle_t orig_handle, union cap orig_cap, cnode_handle_t drv_handle, union cap drv_cap)
 {
+	/* This should be empty */
 }
 
 uint64_t syscall_drvcap(uint64_t orig_idx, uint64_t drv_idx, union cap drv_cap)
@@ -483,8 +483,7 @@ uint64_t syscall_mtakecap(uint64_t mon_idx, uint64_t pid, uint64_t src_idx, uint
 		union cap src_cap = cnode_get_cap(src_handle);
 		cnode_move(src_handle, dst_handle);
 		if (src_cap.type == CAPTY_TIME) {
-			sched_update(src_cap.time.hartid, current->pid, src_cap.time.free,
-				     src_cap.time.end);
+			sched_update(src_cap.time.hartid, current->pid, src_cap.time.free, src_cap.time.end);
 		}
 	}
 	__sync_fetch_and_and(&proc->state, ~PSF_BUSY);
@@ -529,15 +528,13 @@ uint64_t syscall_recv(uint64_t recv_idx)
 	return EXCPT_UNIMPLEMENTED;
 }
 
-uint64_t syscall_send(uint64_t send_idx, uint64_t msg0, uint64_t msg1, uint64_t cap0, uint64_t cap1,
-		      uint64_t yield)
+uint64_t syscall_send(uint64_t send_idx, uint64_t msg0, uint64_t msg1, uint64_t cap0, uint64_t cap1, uint64_t yield)
 {
 	return EXCPT_UNIMPLEMENTED;
 }
 
-uint64_t syscall_sendrecv(uint64_t send_idx, uint64_t recv_idx, uint64_t msg0, uint64_t msg1,
-			  uint64_t cap0, uint64_t cap1)
+uint64_t syscall_sendrecv(uint64_t send_idx, uint64_t recv_idx, uint64_t msg0, uint64_t msg1, uint64_t cap0,
+			  uint64_t cap1)
 {
 	return EXCPT_UNIMPLEMENTED;
 }
-

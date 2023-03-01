@@ -17,8 +17,9 @@
 ///
 /// Kernel internal module for handling capability tree.
 ///
-/// The capability tree is not an actual tree, it is a linked list backed by an array. The tree
-/// properties exists implicitly by the relations of capabilities.
+/// The capability tree is not an actual tree, it is a linked list backed by an
+/// array. The tree properties exists implicitly by the relations of
+/// capabilities.
 ///
 /// @{
 

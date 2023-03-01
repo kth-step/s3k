@@ -1,20 +1,69 @@
 Language: Cpp
-BasedOnStyle: Google
 
-ColumnLimit: 100
-IndentWidth: 8
-TabWidth: 8
 UseTab: Always
-DerivePointerAlignment: false
+TabWidth: 8
+IndentWidth: 8
+ContinuationIndentWidth: 8
+ColumnLimit: 120
+
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlines: Left
+AlignOperands: true
+AlignTrailingComments: true
+AllowAllParametersOfDeclarationOnNextLine: false
+
+
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+BinPackArguments: true
+BinPackParameters: true
+
+BreakBeforeBraces: Linux
+BreakBeforeBinaryOperators: true
+BreakBeforeTernaryOperators: false
+
+BreakStringLiterals: false
+
+IndentCaseLabels: false
+
 PointerAlignment: Right
 
-AllowShortFunctionsOnASingleLine: None
-AllowShortEnumsOnASingleLine: false
-AllowShortIfStatementsOnASingleLine: Never
-AllowShortLoopsOnASingleLine: false
-IndentCaseLabels: false
-BreakBeforeBraces: Linux
+SpaceAfterCStyleCast: false
+
+SpaceBeforeAssignmentOperators: true
+
+SpaceBeforeParens: ControlStatements
+
+SpaceInEmptyParentheses: false
+
+SpacesBeforeTrailingComments: 1
+
+SpacesInCStyleCastParentheses: false
+
+SpacesInContainerLiterals: false
+
+SpacesInParentheses: false
+
+SpacesInSquareBrackets: false
+
+Cpp11BracedListStyle: false
+
+MaxEmptyLinesToKeep: 1
+
 SeparateDefinitionBlocks: Always
 
-AlignConsecutiveMacros: AcrossComments
+PenaltyBreakAssignment: 10
+PenaltyBreakBeforeFirstCallParameter: 30
+PenaltyBreakComment: 10
+PenaltyBreakFirstLessLess: 0
+PenaltyBreakString: 10
+PenaltyExcessCharacter: 100
+PenaltyReturnTypeOnItsOwnLine: 60
 
+SortIncludes: true

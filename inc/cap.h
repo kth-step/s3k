@@ -14,18 +14,18 @@
 #include "consts.h"
 
 #define CAP_RWX 0x7
-#define CAP_RW	0x3
-#define CAP_RX	0x5
-#define CAP_R	0x1
+#define CAP_RW 0x3
+#define CAP_RX 0x5
+#define CAP_R 0x1
 
 enum capty {
-	CAPTY_NONE,	///< No capability
-	CAPTY_TIME,	///< Time Slice capability
-	CAPTY_MEMORY,	///< Memory Slice capability
-	CAPTY_PMP,	///< PMP Frame capability
-	CAPTY_MONITOR,	///< Monitor capability
-	CAPTY_CHANNEL,	///< IPC Channel capability
-	CAPTY_SOCKET,	///< IPC Socket capability
+	CAPTY_NONE,    ///< No capability
+	CAPTY_TIME,    ///< Time Slice capability
+	CAPTY_MEMORY,  ///< Memory Slice capability
+	CAPTY_PMP,     ///< PMP Frame capability
+	CAPTY_MONITOR, ///< Monitor capability
+	CAPTY_CHANNEL, ///< IPC Channel capability
+	CAPTY_SOCKET,  ///< IPC Socket capability
 };
 
 struct time {

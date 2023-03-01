@@ -23,9 +23,10 @@
 /* Do not inline the function. */
 #define NOINLINE __attribute__((noinline))
 /* The function is side-effect free but may depend on the environment. */
-#define PURE	 __attribute__((pure))
-/* The function is side-effect free and does not depend on mutable environment. */
-#define CONST	 __attribute__((const))
+#define PURE __attribute__((pure))
+/* The function is side-effect free and does not depend on mutable environment.
+ */
+#define CONST __attribute__((const))
 
 /* Returns the size of an array */
 #define ARRAY_SIZE(x) (sizeof(x) / (sizeof((x)[0])))

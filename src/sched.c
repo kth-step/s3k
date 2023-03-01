@@ -25,7 +25,7 @@ static struct sched_entry sched_get(uint64_t hartid, size_t i)
 void sched_update(uint64_t hartid, uint64_t pid, uint64_t begin, uint64_t end)
 {
 	for (uint64_t i = begin; i < end; i++) {
-		schedule[hartid][i] = (struct sched_entry){pid, end - i};
+		schedule[hartid][i] = (struct sched_entry){ pid, end - i };
 	}
 }
 
@@ -50,7 +50,7 @@ retry:
 			continue;
 	} while (!__sync_bool_compare_and_swap(&current->state, PS_READY, PS_RUNNING));
 	proc_load_pmp(current);
-	if (!csrr_pmpcfg0()) {
+	if (!csrr_pmpcfg0()) { // Temporary fix. QEMU does not allow this to be zero.
 		__atomic_fetch_and(&current->state, ~PS_RUNNING, __ATOMIC_RELEASE);
 		goto retry;
 	}

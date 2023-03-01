@@ -16,15 +16,16 @@
 
 /// System call exceptions
 typedef enum excpt {
-	EXCPT_NONE,	     ///< No exception.
-	EXCPT_EMPTY,	     ///< Capability slot is empty.
-	EXCPT_COLLISION,     ///< Capability slot is occupied.
-	EXCPT_DERIVATION,    ///< Capability can not be derived.
-	EXCPT_PREEMPTED,     ///< System call was preempted.
-	EXCPT_SUSPENDED,     ///< Process was suspended
-	EXCPT_MPID,	     ///< Bad PID for monitor operation.
-	EXCPT_MBUSY,	     ///< Process busy.
-	EXCPT_UNIMPLEMENTED  ///< System call not implemented for specified capability.
+	EXCPT_NONE,	    ///< No exception.
+	EXCPT_EMPTY,	    ///< Capability slot is empty.
+	EXCPT_COLLISION,    ///< Capability slot is occupied.
+	EXCPT_DERIVATION,   ///< Capability can not be derived.
+	EXCPT_PREEMPTED,    ///< System call was preempted.
+	EXCPT_SUSPENDED,    ///< Process was suspended
+	EXCPT_MPID,	    ///< Bad PID for monitor operation.
+	EXCPT_MBUSY,	    ///< Process busy.
+	EXCPT_UNIMPLEMENTED ///< System call not implemented for specified
+			    ///< capability.
 } Excpt;
 
 // Simple system calls
@@ -69,11 +70,10 @@ uint64_t syscall_mgivecap(uint64_t mon, uint64_t pid, uint64_t i, uint64_t j);
 /// Receive a message.
 uint64_t syscall_recv(uint64_t recv_idx);
 /// Send a message.
-uint64_t syscall_send(uint64_t send_idx, uint64_t msg0, uint64_t msg1, uint64_t cap0, uint64_t cap1,
-		      uint64_t yield);
+uint64_t syscall_send(uint64_t send_idx, uint64_t msg0, uint64_t msg1, uint64_t cap0, uint64_t cap1, uint64_t yield);
 /// Send then receive a message.
-uint64_t syscall_sendrecv(uint64_t recv_idx, uint64_t send_idx, uint64_t msg0, uint64_t msg1,
-			  uint64_t cap0, uint64_t cap1);
+uint64_t syscall_sendrecv(uint64_t recv_idx, uint64_t send_idx, uint64_t msg0, uint64_t msg1, uint64_t cap0,
+			  uint64_t cap1);
 /// @}
 
 #endif /* __SYSCALL_H__ */
