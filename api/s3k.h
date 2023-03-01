@@ -204,7 +204,7 @@ _Static_assert(sizeof(union s3k_cap) == 8, "sizeof(union s3k_cap) != 8");
 /// S3K Syscall Numbers
 typedef enum s3k_syscall {
 	// Capabilityless syscalls
-	S3K_SYSCALL_GETPID,  ///< Get process ID
+	S3K_SYSCALL_GETINFO, ///< Get information about current execution. 
 	S3K_SYSCALL_GETREG,  ///< Get register value
 	S3K_SYSCALL_SETREG,  ///< Set register value
 	S3K_SYSCALL_YIELD,   ///< Yield remaining time slice
@@ -230,10 +230,27 @@ typedef enum s3k_syscall {
 
 /**
  * @brief Get the process ID.
- *
  * @return Process ID.
  */
 uint64_t s3k_getpid(void);
+
+/**
+ * @brief Get hardware thread ID.
+ * @return Hart ID.
+ */
+uint64_t s3k_gethartid(void);
+
+/**
+ * @brief Get the current RTC time.
+ * @return Time.
+ */
+uint64_t s3k_gettime(void);
+
+/**
+ * @brief Get the time slice timeout.
+ * @return Timeout.
+ */
+uint64_t s3k_gettimeout(void);
 
 /**
  * @brief Get the value of a register.

@@ -127,7 +127,7 @@ _hang:
 _syscall_table:
 .option push
 .option norvc
-	j	syscall_getpid
+	j	syscall_getinfo
 	j	syscall_getreg
 	j	syscall_setreg
 	j	syscall_yield

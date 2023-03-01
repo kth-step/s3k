@@ -25,9 +25,19 @@ static void _unlock(void)
 }
 
 /*** System call handlers ***/
-uint64_t syscall_getpid()
+uint64_t syscall_getinfo(uint64_t info)
 {
-	return current->pid;
+	switch (info) {
+	case 0: 
+		return current->pid;
+	case 1:
+		return csrr_mhartid();
+	case 2:
+		return time_get();
+	case 3:
+		return timeout_get(csrr_mhartid());
+	}
+	return 0;
 }
 
 uint64_t syscall_getreg(uint64_t regIdx)

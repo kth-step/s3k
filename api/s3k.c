@@ -3,9 +3,33 @@
 // Syscall
 uint64_t s3k_getpid(void)
 {
-	register uint64_t a0 __asm__("a0");
-	register uint64_t a7 __asm__("a7") = S3K_SYSCALL_GETPID;
-	__asm__ volatile("ecall" : "=r"(a0) : "r"(a7));
+	register uint64_t a0 __asm__("a0") = 0;
+	register uint64_t a7 __asm__("a7") = S3K_SYSCALL_GETINFO;
+	__asm__ volatile("ecall" : "+r"(a0) : "r"(a7));
+	return a0;
+}
+
+uint64_t s3k_gethartid(void)
+{
+	register uint64_t a0 __asm__("a0") = 1;
+	register uint64_t a7 __asm__("a7") = S3K_SYSCALL_GETINFO;
+	__asm__ volatile("ecall" : "+r"(a0) : "r"(a7));
+	return a0;
+}
+
+uint64_t s3k_gettime(void)
+{
+	register uint64_t a0 __asm__("a0") = 2;
+	register uint64_t a7 __asm__("a7") = S3K_SYSCALL_GETINFO;
+	__asm__ volatile("ecall" : "+r"(a0) : "r"(a7));
+	return a0;
+}
+
+uint64_t s3k_gettimeout(void)
+{
+	register uint64_t a0 __asm__("a0") = 3;
+	register uint64_t a7 __asm__("a7") = S3K_SYSCALL_GETINFO;
+	__asm__ volatile("ecall" : "+r"(a0) : "r"(a7));
 	return a0;
 }
 

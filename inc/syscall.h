@@ -29,7 +29,7 @@ typedef enum excpt {
 
 // Simple system calls
 /// Get process ID.
-uint64_t syscall_getpid(void);
+uint64_t syscall_getinfo(uint64_t info);
 /// Get register value.
 uint64_t syscall_getreg(uint64_t reg);
 /// Get register value.
