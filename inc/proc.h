@@ -51,6 +51,20 @@ struct regs {
 	uint64_t tvec;	 ///< Exception handling vector.
 	uint64_t pmp;	 ///< PMP configuration.
 };
+Använda PMP capability i 3, 2, 5
+
+0x00_00_00_00_00_00_00_00
+
+pmpcfg0   <- pmp7cfg, pmp6cfg, ..., pmp1cfg,pmp0cfg
+
+pmpaddr0
+pmpaddr1
+pmpaddr2
+pmpaddr3
+pmpaddr4
+pmpaddr5
+pmpaddr6
+pmpaddr7
 
 /**
  * @brief Process control block.

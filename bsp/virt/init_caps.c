@@ -9,7 +9,7 @@ void init_caps(void)
 {
 	// All caps should be distinct
 	const union cap caps[] = {
-	    cap_pmp(0x20003fff, CAP_RWX),		// RWX to init proc program
+	    cap_pmp(0x20005fff, CAP_RWX),		// RWX to init proc program
 	    cap_memory(0x0020, 0x8000, 0x10, CAP_RWX),	// Main memory capability
 	    cap_memory(0x0000, 0x0001, 0x2, CAP_RW),	// UART memory capability
 	    cap_time(0, 0, NSLICE),			// time to hart 0
