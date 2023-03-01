@@ -55,6 +55,7 @@ SpacesInSquareBrackets: false
 Cpp11BracedListStyle: false
 
 MaxEmptyLinesToKeep: 1
+KeepEmptyLinesAtTheStartOfBlocks: false
 
 SeparateDefinitionBlocks: Always
 
