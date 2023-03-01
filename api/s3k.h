@@ -71,7 +71,7 @@ enum s3k_capty {
  * Includes RISC-V's general purpose registers (GPR), program counter, and S3K specific
  * virtual registers (VR).
  */
-enum reg {
+enum s3k_reg {
 	/* General purpose registers */
 	S3K_REG_PC,   ///< Program counter
 	S3K_REG_RA,   ///< Return address (GPR)
