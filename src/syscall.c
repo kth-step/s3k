@@ -41,6 +41,8 @@ uint64_t syscall_setreg(uint64_t regIdx, uint64_t val)
 	uint64_t *regs = (uint64_t *)&current->regs;
 	uint64_t tmp = regs[regIdx % REG_COUNT];
 	regs[regIdx % REG_COUNT] = val;
+	if (regIdx == REG_PMP)
+		proc_load_pmp(current);
 	return tmp;
 }
 
