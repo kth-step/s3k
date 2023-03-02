@@ -34,10 +34,11 @@ void sched_delete(uint64_t hartid, uint64_t begin, uint64_t end)
 	sched_update(hartid, NONE_PID, begin, end);
 }
 
-void sched_next(void)
+struct proc *sched_next()
 {
 	uint64_t hartid = csrr_mhartid();
 	uint64_t quantum;
+	struct proc *proc;
 	struct sched_entry entry;
 retry:
 	do {
@@ -45,13 +46,13 @@ retry:
 		entry = sched_get(hartid, quantum % NSLICE);
 		if (entry.pid == NONE_PID)
 			continue;
-		current = &processes[entry.pid];
-		if (current->sleep > time_get())
+		proc = &processes[entry.pid];
+		if (proc->sleep > time_get())
 			continue;
-	} while (!__sync_bool_compare_and_swap(&current->state, PS_READY, PS_RUNNING));
-	proc_load_pmp(current);
+	} while (!__sync_bool_compare_and_swap(&proc->state, PS_READY, PS_RUNNING));
+	proc_load_pmp(proc);
 	if (!csrr_pmpcfg0()) { // Temporary fix. QEMU does not allow this to be zero.
-		__atomic_fetch_and(&current->state, ~PS_RUNNING, __ATOMIC_RELEASE);
+		__atomic_fetch_and(&proc->state, ~PS_RUNNING, __ATOMIC_RELEASE);
 		goto retry;
 	}
 	timeout_set(hartid, quantum * NTICK);
@@ -59,13 +60,13 @@ retry:
 		__asm__ volatile("wfi");
 	}
 	timeout_set(hartid, (quantum + entry.len) * NTICK - NSLACK);
+	return proc;
 }
 
-void sched_yield(void)
+struct proc *sched_yield(struct proc *proc)
 {
-	__atomic_fetch_and(&current->state, ~PS_RUNNING, __ATOMIC_RELEASE);
-	current = NULL;
-	sched_next();
+	__atomic_fetch_and(&proc->state, ~PS_RUNNING, __ATOMIC_RELEASE);
+	return sched_next();
 }
 
 void sched_init(void)

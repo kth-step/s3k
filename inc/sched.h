@@ -14,9 +14,9 @@
 #include "common.h"
 
 /// Yield the current time slice.
-void sched_yield(void);
+struct proc *sched_yield(struct proc *proc);
 /// Find the next process to schedule.
-void sched_next(void);
+struct proc *sched_next(void);
 /// Initialize scheduler.
 void sched_init(void);
 

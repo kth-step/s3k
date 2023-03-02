@@ -81,9 +81,6 @@ struct proc {
 /// An array of all processes control blocks.
 extern struct proc processes[NPROC];
 
-/// Thread local pointer to current process.
-register struct proc *current __asm__("tp");
-
 /**
  * Loads the PMP settings of the process to the hardware.
  * @param proc Process for which we load PMP settings.

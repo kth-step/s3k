@@ -210,7 +210,7 @@ _Static_assert(sizeof(union s3k_cap) == 8, "sizeof(union s3k_cap) != 8");
  */
 
 /// S3K Syscall Numbers
-typedef enum s3k_syscall {
+enum s3k_syscall {
 	// Capabilityless syscalls
 	S3K_SYSCALL_GETINFO, ///< Get information about current execution.
 	S3K_SYSCALL_GETREG,  ///< Get register value
@@ -234,7 +234,7 @@ typedef enum s3k_syscall {
 	S3K_SYSCALL_RECV,     ///< Receive message/capability
 	S3K_SYSCALL_SEND,     ///< Send message/capability
 	S3K_SYSCALL_SENDRECV, ///< Send then receive message/capability
-} s3k_syscall_t;
+};
 
 /**
  * @brief Get the process ID.

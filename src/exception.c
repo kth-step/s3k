@@ -8,30 +8,31 @@
 
 #define MRET 0x30200073
 
-static void handle_ret(void) {
-	current->regs[REG_PC] = current->regs[REG_EPC];
-	current->regs[REG_SP] = current->regs[REG_ESP];
-	current->regs[REG_ECAUSE] = 0;
-	current->regs[REG_EVAL] = 0;
-	current->regs[REG_EPC] = 0;
-	current->regs[REG_ESP] = 0;
-}
-
-static void handle_default(uint64_t mcause, uint64_t mepc, uint64_t mtval) {
-	current->regs[REG_ECAUSE] = mcause;
-	current->regs[REG_EVAL] = mtval;
-	current->regs[REG_EPC] = current->regs[REG_PC];
-	current->regs[REG_ESP] = current->regs[REG_SP];
-	current->regs[REG_PC] = current->regs[REG_TPC];
-	current->regs[REG_SP] = current->regs[REG_TSP];
-}
-
-void handle_exception(uint64_t mcause, uint64_t mepc, uint64_t mtval)
+static struct proc *handle_ret(struct proc *proc)
 {
-	if (mcause == ILLEGAL_INSTRUCTION && mtval == MRET) {
-		handle_ret()
-	} else {
-		handle_default();
-	}
+	proc->regs[REG_PC] = proc->regs[REG_EPC];
+	proc->regs[REG_SP] = proc->regs[REG_ESP];
+	proc->regs[REG_ECAUSE] = 0;
+	proc->regs[REG_EVAL] = 0;
+	proc->regs[REG_EPC] = 0;
+	proc->regs[REG_ESP] = 0;
+	return proc;
 }
 
+static struct proc *handle_default(struct proc *proc, uint64_t mcause, uint64_t mepc, uint64_t mtval)
+{
+	proc->regs[REG_ECAUSE] = mcause;
+	proc->regs[REG_EVAL] = mtval;
+	proc->regs[REG_EPC] = mepc;
+	proc->regs[REG_ESP] = proc->regs[REG_SP];
+	proc->regs[REG_PC] = proc->regs[REG_TPC];
+	proc->regs[REG_SP] = proc->regs[REG_TSP];
+	return proc;
+}
+
+struct proc *handle_exception(struct proc *proc, uint64_t mcause, uint64_t mepc, uint64_t mtval)
+{
+	if (mcause == ILLEGAL_INSTRUCTION && mtval == MRET)
+		return handle_ret(proc);
+	return handle_default(proc, mcause, mepc, mtval);
+}

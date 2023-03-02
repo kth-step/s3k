@@ -9,6 +9,6 @@
 #define __EXCEPTION_H__
 
 #include <stdint.h>
-void handle_exception(uint64_t mcause, uint64_t mepc, uint64_t mtval);
+struct proc *handle_exception(struct proc *proc, uint64_t mcause, uint64_t mepc, uint64_t mtval);
 
 #endif /* __EXCEPTION_H__ */
