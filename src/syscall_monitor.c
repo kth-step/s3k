@@ -9,7 +9,6 @@
 #include "sched.h"
 #include "trap.h"
 
-
 struct proc *syscall_msuspend(struct proc *proc, uint64_t mon_idx, uint64_t pid)
 {
 	cnode_handle_t mon_handle = cnode_get_handle(proc->pid, mon_idx);
