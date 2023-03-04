@@ -1,0 +1,17 @@
+name: Compilation Checker
+on: [push]
+jobs:
+  compilation-checking:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get toolchain
+        run: >
+          cd $HOME &&
+          wget -q https://static.dev.sifive.com/dev-tools/riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14.tar.gz &&
+          tar -xf riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14.tar.gz &&
+          mv riscv64-unknown-elf-gcc-8.3.0-2019.08.0-x86_64-linux-ubuntu14 riscv
+      - name: Compile kernel
+        run: export PATH=$HOME/riscv/bin:$PATH && make
+
