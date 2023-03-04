@@ -6,7 +6,7 @@
 #include "common.h"
 #include "lock.h"
 #include "proc.h"
-#include "sched.h"
+#include "schedule.h"
 
 void init_kernel(uint64_t payload)
 {
@@ -22,7 +22,7 @@ void init_kernel(uint64_t payload)
 		processes[0].regs[REG_PC] = payload;
 		processes[0].state = PS_READY;
 		init_caps();
-		sched_init();
+		schedule_init();
 		__sync_synchronize();
 		done = 1;
 	}

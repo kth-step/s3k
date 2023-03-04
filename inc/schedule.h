@@ -14,15 +14,15 @@
 #include "common.h"
 
 /// Yield the current time slice.
-struct proc *sched_yield(struct proc *proc);
+struct proc *schedule_yield(struct proc *proc);
 /// Find the next process to schedule.
-struct proc *sched_next(void);
+struct proc *schedule_next(void);
 /// Initialize scheduler.
-void sched_init(void);
+void schedule_init(void);
 
 /// Delete scheduling at hartid, begin-end.
-void sched_delete(uint64_t hartid, uint64_t begin, uint64_t end);
+void schedule_delete(uint64_t hartid, uint64_t begin, uint64_t end);
 /// Let pid run on hartid, begin-end.
-void sched_update(uint64_t hartid, uint64_t pid, uint64_t begin, uint64_t end);
+void schedule_update(uint64_t hartid, uint64_t pid, uint64_t begin, uint64_t end);
 
 #endif /* __SCHED_H__ */

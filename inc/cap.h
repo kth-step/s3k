@@ -88,7 +88,9 @@ union cap {
 	struct socket socket;
 };
 
+#ifdef _Static_assert
 _Static_assert(sizeof(union cap) == 8, "union cap size != 8 bytes");
+#endif
 
 // Constructors
 union cap cap_time(uint64_t hartid, uint64_t begin, uint64_t end);

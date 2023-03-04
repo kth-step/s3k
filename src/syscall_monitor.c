@@ -6,7 +6,7 @@
 #include "common.h"
 #include "consts.h"
 #include "csr.h"
-#include "sched.h"
+#include "schedule.h"
 #include "trap.h"
 
 struct proc *syscall_msuspend(struct proc *proc, uint64_t mon_idx, uint64_t pid)
@@ -213,7 +213,7 @@ struct proc *syscall_mtakecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 		union cap src_cap = cnode_get_cap(src_handle);
 		cnode_move(src_handle, dst_handle);
 		if (src_cap.type == CAPTY_TIME) {
-			sched_update(src_cap.time.hartid, proc->pid, src_cap.time.free, src_cap.time.end);
+			schedule_update(src_cap.time.hartid, proc->pid, src_cap.time.free, src_cap.time.end);
 		}
 	}
 	__sync_fetch_and_and(&other_proc->state, ~PSF_BUSY);
@@ -258,7 +258,7 @@ struct proc *syscall_mgivecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 		union cap src_cap = cnode_get_cap(src_handle);
 		cnode_move(src_handle, dst_handle);
 		if (src_cap.type == CAPTY_TIME) {
-			sched_update(src_cap.time.hartid, pid, src_cap.time.free, src_cap.time.end);
+			schedule_update(src_cap.time.hartid, pid, src_cap.time.free, src_cap.time.end);
 		}
 	}
 	__sync_fetch_and_and(&other_proc->state, ~PSF_BUSY);

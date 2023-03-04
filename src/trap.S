@@ -75,7 +75,7 @@ _exception:
 	j    trap_exit
 
 _interrupt:
-	call sched_yield
+	call schedule_yield
 	j    trap_exit
 
 _syscall:

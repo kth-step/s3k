@@ -6,7 +6,7 @@
 #include "common.h"
 #include "consts.h"
 #include "csr.h"
-#include "sched.h"
+#include "schedule.h"
 #include "trap.h"
 
 // Lock used for capability operations.
@@ -69,7 +69,7 @@ struct proc *syscall_setreg(struct proc *proc, uint64_t regIdx, uint64_t val)
 struct proc *syscall_yield(struct proc *proc)
 {
 	proc->sleep = timeout_get(csrr_mhartid());
-	return sched_yield(proc);
+	return schedule_yield(proc);
 }
 
 struct proc *syscall_getcap(struct proc *proc, uint64_t idx)
@@ -116,7 +116,7 @@ struct proc *syscall_delcap(struct proc *proc, uint64_t idx)
 	if (cnode_contains(handle)) {
 		cnode_delete(handle);
 		if (cap.type == CAPTY_TIME)
-			sched_delete(cap.time.hartid, cap.time.free, cap.time.end);
+			schedule_delete(cap.time.hartid, cap.time.free, cap.time.end);
 		proc->regs[REG_A0] = EXCPT_NONE;
 	} else {
 		proc->regs[REG_A0] = EXCPT_EMPTY;
@@ -129,14 +129,14 @@ static void _revoke_time_hook(cnode_handle_t handle, union cap cap, union cap ch
 {
 	cap.time.free = child_cap.time.free;
 	cnode_set_cap(handle, cap);
-	sched_update(cap.time.hartid, cnode_get_pid(handle), cap.time.free, cap.time.end);
+	schedule_update(cap.time.hartid, cnode_get_pid(handle), cap.time.free, cap.time.end);
 }
 
 static void _revoke_time_post_hook(cnode_handle_t handle, union cap cap)
 {
 	cap.time.free = cap.time.begin;
 	cnode_set_cap(handle, cap);
-	sched_update(cap.time.hartid, cnode_get_pid(handle), cap.time.free, cap.time.end);
+	schedule_update(cap.time.hartid, cnode_get_pid(handle), cap.time.free, cap.time.end);
 }
 
 static void _revoke_memory_hook(cnode_handle_t handle, union cap cap, union cap child_cap)
@@ -266,7 +266,7 @@ static void _derive_time(cnode_handle_t orig_handle, union cap orig_cap, cnode_h
 {
 	orig_cap.time.free = drv_cap.time.begin;
 	cnode_set_cap(orig_handle, orig_cap);
-	sched_update(drv_cap.time.hartid, cnode_get_pid(orig_handle), drv_cap.time.begin, drv_cap.time.end);
+	schedule_update(drv_cap.time.hartid, cnode_get_pid(orig_handle), drv_cap.time.begin, drv_cap.time.end);
 }
 
 static void _derive_memory(cnode_handle_t orig_handle, union cap orig_cap, cnode_handle_t drv_handle, union cap drv_cap)

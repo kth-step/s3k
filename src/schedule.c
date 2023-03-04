@@ -1,6 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 
-#include "sched.h"
+#include "schedule.h"
 
 #include "bsp/timer.h"
 #include "consts.h"
@@ -17,24 +17,24 @@ struct sched_entry {
 
 static volatile struct sched_entry schedule[4][NSLICE];
 
-static struct sched_entry sched_get(uint64_t hartid, size_t i)
+static struct sched_entry schedule_get(uint64_t hartid, size_t i)
 {
 	return schedule[hartid][i];
 }
 
-void sched_update(uint64_t hartid, uint64_t pid, uint64_t begin, uint64_t end)
+void schedule_update(uint64_t hartid, uint64_t pid, uint64_t begin, uint64_t end)
 {
 	for (uint64_t i = begin; i < end; i++) {
 		schedule[hartid][i] = (struct sched_entry){ pid, end - i };
 	}
 }
 
-void sched_delete(uint64_t hartid, uint64_t begin, uint64_t end)
+void schedule_delete(uint64_t hartid, uint64_t begin, uint64_t end)
 {
-	sched_update(hartid, NONE_PID, begin, end);
+	schedule_update(hartid, NONE_PID, begin, end);
 }
 
-struct proc *sched_next()
+struct proc *schedule_next()
 {
 	uint64_t hartid = csrr_mhartid();
 	uint64_t quantum;
@@ -43,7 +43,7 @@ struct proc *sched_next()
 retry:
 	do {
 		quantum = (time_get() + NSLACK) / NTICK;
-		entry = sched_get(hartid, quantum % NSLICE);
+		entry = schedule_get(hartid, quantum % NSLICE);
 		if (entry.pid == NONE_PID)
 			continue;
 		proc = &processes[entry.pid];
@@ -63,15 +63,15 @@ retry:
 	return proc;
 }
 
-struct proc *sched_yield(struct proc *proc)
+struct proc *schedule_yield(struct proc *proc)
 {
 	__atomic_fetch_and(&proc->state, ~PS_RUNNING, __ATOMIC_RELEASE);
-	return sched_next();
+	return schedule_next();
 }
 
-void sched_init(void)
+void schedule_init(void)
 {
 	for (int i = 0; i < NHART; i++) {
-		sched_update(i, 0, 0, NSLICE);
+		schedule_update(i, 0, 0, NSLICE);
 	}
 }

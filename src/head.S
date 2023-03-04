@@ -43,5 +43,5 @@ _start:
 	// initialize the kernel
 	li   a0, PAYLOAD
 	call init_kernel
-	call sched_next
+	call schedule_next
 	tail trap_exit
