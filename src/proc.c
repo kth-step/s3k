@@ -9,7 +9,7 @@ struct proc processes[NPROC];
 void proc_load_pmp(const struct proc *proc)
 {
 	uint64_t pmp = proc->regs[REG_PMP];
-	uint64_t pmpcfg;
+	uint64_t pmpcfg = 0;
 	uint64_t pmpaddr[8];
 	cnode_handle_t handle;
 	union cap cap;
