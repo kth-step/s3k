@@ -197,7 +197,9 @@ union s3k_cap {
 	struct s3k_socket socket;   ///< As socket capability
 };
 
+#ifdef _Static_assert
 _Static_assert(sizeof(union s3k_cap) == 8, "sizeof(union s3k_cap) != 8");
+#endif /* _Static_assert */
 
 /// @}
 
@@ -345,9 +347,9 @@ enum s3k_excpt s3k_revcap(uint64_t i);
  */
 enum s3k_excpt s3k_drvcap(uint64_t i, uint64_t j, union s3k_cap cap);
 
-enum s3k_excpt s3kReceive(void);
-enum s3k_excpt s3kSend(void);
-enum s3k_excpt s3kSendReceive(void);
+enum s3k_excpt s3k_recv(void);
+enum s3k_excpt s3k_send(void);
+enum s3k_excpt s3k_sendrecv(void);
 /**
  * @brief Monitor suspends a process.
  *
@@ -430,20 +432,20 @@ enum s3k_excpt s3k_mtakecap(uint64_t i, uint64_t pid, uint64_t src, uint64_t dst
  * @return The PMP NAPOT representation of the range.
  * @warning If there is not NAPOT representation, then returns 0.
  */
-uint64_t pmp_napot_addr(uint64_t begin, uint64_t end) __attribute__((const));
+uint64_t s3k_pmp_napot_addr(uint64_t begin, uint64_t end) __attribute__((const));
 /**
  * @brief Returns start of the range of PMP NAPOT address.
  * @param addr The PMP NAPOT address.
  * @return The start of the address range.
  */
-uint64_t pmp_napot_begin(uint64_t addr);
+uint64_t s3k_pmp_napot_begin(uint64_t addr);
 
 /**
  * @brief Returns the end of the range of PMP NAPOT address.
  * @param addr The PMP NAPOT address
  * @return The end of the address range.
  */
-uint64_t pmp_napot_end(uint64_t addr);
+uint64_t s3k_pmp_napot_end(uint64_t addr);
 
 /// @}
 

@@ -92,6 +92,11 @@ union cap {
 _Static_assert(sizeof(union cap) == 8, "union cap size != 8 bytes");
 #endif
 
+// PMP utils
+uint64_t pmp_napot_addr(uint64_t begin, uint64_t end);
+uint64_t pmp_napot_begin(uint64_t addr);
+uint64_t pmp_napot_end(uint64_t addr);
+
 // Constructors
 union cap cap_time(uint64_t hartid, uint64_t begin, uint64_t end);
 union cap cap_memory(uint64_t begin, uint64_t end, uint64_t offset, uint64_t rwx);
@@ -114,8 +119,4 @@ bool cap_monitor_parent(union cap parent, union cap child);
 bool cap_channel_parent(union cap parent, union cap child);
 bool cap_socket_parent(union cap parent, union cap child);
 
-// PMP utils
-uint64_t pmp_napot_addr(uint64_t begin, uint64_t end);
-uint64_t pmp_napot_begin(uint64_t addr);
-uint64_t pmp_napot_end(uint64_t addr);
 #endif /* __CAP_H__ */

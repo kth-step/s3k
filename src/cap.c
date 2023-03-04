@@ -1,5 +1,20 @@
 #include "cap.h"
 
+uint64_t pmp_napot_addr(uint64_t begin, uint64_t end)
+{
+	return (begin | (((end - begin) - 1) >> 1)) >> 2;
+}
+
+uint64_t pmp_napot_begin(uint64_t addr)
+{
+	return ((addr + 1) & addr) << 2;
+}
+
+uint64_t pmp_napot_end(uint64_t addr)
+{
+	return (((addr + 1) | addr) + 1) << 2;
+}
+
 union cap cap_time(uint64_t hartid, uint64_t begin, uint64_t end)
 {
 	return (union cap){ .time = { CAPTY_TIME, 0, hartid, begin, begin, end } };
@@ -180,19 +195,4 @@ bool cap_socket_parent(union cap parent, union cap child)
 {
 	return parent.type == CAPTY_SOCKET && child.type == CAPTY_SOCKET
 	       && cap_socket_parent_socket(parent.socket, child.socket);
-}
-
-uint64_t pmp_napot_addr(uint64_t begin, uint64_t end)
-{
-	return (begin | (((end - begin) - 1) >> 1)) >> 2;
-}
-
-uint64_t pmp_napot_begin(uint64_t addr)
-{
-	return ((addr + 1) & addr) << 2;
-}
-
-uint64_t pmp_napot_end(uint64_t addr)
-{
-	return (((addr + 1) | addr) + 1) << 2;
 }
