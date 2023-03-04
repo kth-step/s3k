@@ -1,6 +1,8 @@
-s3k.elf
-s3k.da
 docs
+*.elf
+*.da
 *.o
 *.d
 *.su
+*.out
+*.elf
