@@ -23,5 +23,5 @@ LDFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany\
 	  -Wstack-usage=256 -fstack-usage\
 	  -Wl,--gc-sections\
 	  -flto\
-	  -Tbsp/${PLATFORM}.lds
-INC = -Iinc -Ibsp/${PLATFORM}/inc
+	  -Tplat/${PLATFORM}/linker.lds
+INC = -Iinc

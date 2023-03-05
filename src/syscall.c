@@ -1,12 +1,12 @@
 /* See LICENSE file for copyright and license details. */
 #include "syscall.h"
 
-#include "bsp/timer.h"
 #include "cap.h"
 #include "common.h"
 #include "consts.h"
 #include "csr.h"
 #include "schedule.h"
+#include "timer.h"
 #include "trap.h"
 
 // Lock used for capability operations.

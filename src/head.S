@@ -41,7 +41,6 @@ _start:
 	csrw mie, t0
 
 	// initialize the kernel
-	li   a0, PAYLOAD
 	call init_kernel
 	call schedule_next
 	tail trap_exit

@@ -1,45 +1,123 @@
 #include "csr.h"
 
-#define CSRR(X)                                              \
-	uint64_t csrr_##X(void)                              \
-	{                                                    \
-		uint64_t val;                                \
-		__asm__ volatile("csrr %0," #X : "=r"(val)); \
-		return val;                                  \
-	}
+uint64_t csrr_mhartid(void)
+{
+	uint64_t val;
+	__asm__ volatile("csrr %0,mhartid" : "=r"(val));
+	return val;
+}
 
-#define CSRW(X)                                                \
-	void csrw_##X(uint64_t val)                            \
-	{                                                      \
-		__asm__ volatile("csrw " #X ",%0" ::"r"(val)); \
-	}
+uint64_t csrr_mip(void)
+{
+	uint64_t val;
+	__asm__ volatile("csrr %0,mip" : "=r"(val));
+	return val;
+}
 
-#define CSRS(X)                                                \
-	void csrs_##X(uint64_t val)                            \
-	{                                                      \
-		__asm__ volatile("csrs " #X ",%0" ::"r"(val)); \
-	}
+uint64_t csrr_pmpcfg0(void)
+{
+	uint64_t val;
+	__asm__ volatile("csrr %0,pmpcfg0" : "=r"(val));
+	return val;
+}
 
-CSRR(mhartid)
-CSRR(mip)
+void csrw_pmpcfg0(uint64_t val)
+{
+	__asm__ volatile("csrw pmpcfg0,%0" ::"r"(val));
+}
 
-CSRR(pmpcfg0)
-CSRR(pmpaddr0)
-CSRR(pmpaddr1)
-CSRR(pmpaddr2)
-CSRR(pmpaddr3)
-CSRR(pmpaddr4)
-CSRR(pmpaddr5)
-CSRR(pmpaddr6)
-CSRR(pmpaddr7)
+uint64_t csrr_pmpaddr0(void)
+{
+	uint64_t val;
+	__asm__ volatile("csrr %0,pmpaddr0" : "=r"(val));
+	return val;
+}
 
-CSRW(pmpcfg0)
-CSRS(pmpcfg0)
-CSRW(pmpaddr0)
-CSRW(pmpaddr1)
-CSRW(pmpaddr2)
-CSRW(pmpaddr3)
-CSRW(pmpaddr4)
-CSRW(pmpaddr5)
-CSRW(pmpaddr6)
-CSRW(pmpaddr7)
+uint64_t csrr_pmpaddr1(void)
+{
+	uint64_t val;
+	__asm__ volatile("csrr %0,pmpaddr1" : "=r"(val));
+	return val;
+}
+
+uint64_t csrr_pmpaddr2(void)
+{
+	uint64_t val;
+	__asm__ volatile("csrr %0,pmpaddr2" : "=r"(val));
+	return val;
+}
+
+uint64_t csrr_pmpaddr3(void)
+{
+	uint64_t val;
+	__asm__ volatile("csrr %0,pmpaddr3" : "=r"(val));
+	return val;
+}
+
+uint64_t csrr_pmpaddr4(void)
+{
+	uint64_t val;
+	__asm__ volatile("csrr %0,pmpaddr4" : "=r"(val));
+	return val;
+}
+
+uint64_t csrr_pmpaddr5(void)
+{
+	uint64_t val;
+	__asm__ volatile("csrr %0,pmpaddr5" : "=r"(val));
+	return val;
+}
+
+uint64_t csrr_pmpaddr6(void)
+{
+	uint64_t val;
+	__asm__ volatile("csrr %0,pmpaddr6" : "=r"(val));
+	return val;
+}
+
+uint64_t csrr_pmpaddr7(void)
+{
+	uint64_t val;
+	__asm__ volatile("csrr %0,pmpaddr7" : "=r"(val));
+	return val;
+}
+
+void csrw_pmpaddr0(uint64_t val)
+{
+	__asm__ volatile("csrw pmpaddr0,%0" ::"r"(val));
+}
+
+void csrw_pmpaddr1(uint64_t val)
+{
+	__asm__ volatile("csrw pmpaddr1,%0" ::"r"(val));
+}
+
+void csrw_pmpaddr2(uint64_t val)
+{
+	__asm__ volatile("csrw pmpaddr2,%0" ::"r"(val));
+}
+
+void csrw_pmpaddr3(uint64_t val)
+{
+	__asm__ volatile("csrw pmpaddr3,%0" ::"r"(val));
+}
+
+void csrw_pmpaddr4(uint64_t val)
+{
+	__asm__ volatile("csrw pmpaddr4,%0" ::"r"(val));
+}
+
+void csrw_pmpaddr5(uint64_t val)
+{
+	__asm__ volatile("csrw pmpaddr5,%0" ::"r"(val));
+}
+
+void csrw_pmpaddr6(uint64_t val)
+{
+	__asm__ volatile("csrw pmpaddr6,%0" ::"r"(val));
+}
+
+void csrw_pmpaddr7(uint64_t val)
+{
+	__asm__ volatile("csrw pmpaddr7,%0" ::"r"(val));
+}

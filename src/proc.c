@@ -9,8 +9,8 @@ struct proc processes[NPROC];
 void proc_load_pmp(const struct proc *proc)
 {
 	uint64_t pmp = proc->regs[REG_PMP];
-	uint64_t pmpcfg = 0;
 	uint64_t pmpaddr[8];
+	uint64_t pmpcfg = 0;
 	cnode_handle_t handle;
 	union cap cap;
 	for (int i = 0; i < 8; i++) {
@@ -18,7 +18,7 @@ void proc_load_pmp(const struct proc *proc)
 		cap = cnode_get_cap(handle);
 		if (cap.type == CAPTY_PMP) {
 			pmpcfg |= cap.pmp.cfg << (i * 8);
-			pmpaddr[i] = cap.pmp.addr;
+			pmpaddr[i] = cap.pmp.cfg;
 		} else {
 			pmpaddr[i] = 0;
 		}

@@ -12,6 +12,8 @@ AlignConsecutiveDeclarations: false
 AlignEscapedNewlines: Left
 AlignOperands: true
 AlignTrailingComments: true
+AlignArrayOfStructures: Left
+Cpp11BracedListStyle: true
 AllowAllParametersOfDeclarationOnNextLine: false
 
 

@@ -2,10 +2,10 @@
 
 #include "schedule.h"
 
-#include "bsp/timer.h"
 #include "consts.h"
 #include "csr.h"
 #include "proc.h"
+#include "timer.h"
 #include "trap.h"
 
 #define NONE_PID 0xFF

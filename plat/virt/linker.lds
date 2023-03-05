@@ -2,6 +2,8 @@
 OUTPUT_ARCH(riscv)
 ENTRY(_start)
 
+_mtime = 0x200bff8;
+_mtimecmp = 0x2004000;
 _kernel_base = 0x80000000;
 _payload = _kernel_base + 0x10000;
 

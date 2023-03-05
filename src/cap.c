@@ -17,32 +17,44 @@ uint64_t pmp_napot_end(uint64_t addr)
 
 union cap cap_time(uint64_t hartid, uint64_t begin, uint64_t end)
 {
-	return (union cap){ .time = { CAPTY_TIME, 0, hartid, begin, begin, end } };
+	return (union cap){
+		.time = {CAPTY_TIME, 0, hartid, begin, begin, end}
+	};
 }
 
 union cap cap_memory(uint64_t begin, uint64_t end, uint64_t offset, uint64_t rwx)
 {
-	return (union cap){ .memory = { CAPTY_MEMORY, false, rwx, offset, begin, begin, end } };
+	return (union cap){
+		.memory = {CAPTY_MEMORY, false, rwx, offset, begin, begin, end}
+	};
 }
 
 union cap cap_pmp(uint64_t addr, uint64_t rwx)
 {
-	return (union cap){ .pmp = { CAPTY_PMP, addr, 0x18 | rwx } };
+	return (union cap){
+		.pmp = {CAPTY_PMP, addr, 0x18 | rwx}
+	};
 }
 
 union cap cap_monitor(uint64_t begin, uint64_t end)
 {
-	return (union cap){ .monitor = { CAPTY_MONITOR, 0, begin, begin, end } };
+	return (union cap){
+		.monitor = {CAPTY_MONITOR, 0, begin, begin, end}
+	};
 }
 
 union cap cap_channel(uint64_t begin, uint64_t end)
 {
-	return (union cap){ .channel = { CAPTY_CHANNEL, 0, begin, begin, end } };
+	return (union cap){
+		.channel = {CAPTY_CHANNEL, 0, begin, begin, end}
+	};
 }
 
 union cap cap_socket(uint64_t channel, uint64_t tag)
 {
-	return (union cap){ .socket = { CAPTY_SOCKET, 0, channel, tag } };
+	return (union cap){
+		.socket = {CAPTY_SOCKET, 0, channel, tag}
+	};
 }
 
 static bool cap_time_derive_time(struct time parent, struct time child)

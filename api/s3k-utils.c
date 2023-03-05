@@ -17,32 +17,44 @@ uint64_t s3k_pmp_napot_end(uint64_t addr)
 
 union s3k_cap s3k_time(uint64_t hartid, uint64_t begin, uint64_t end)
 {
-	return (union s3k_cap){ .time = { S3K_CAPTY_TIME, 0, hartid, begin, begin, end } };
+	return (union s3k_cap){
+		.time = {S3K_CAPTY_TIME, 0, hartid, begin, begin, end}
+	};
 }
 
 union s3k_cap s3k_memory(uint64_t begin, uint64_t end, uint64_t offset, uint64_t rwx)
 {
-	return (union s3k_cap){ .memory = { S3K_CAPTY_MEMORY, false, rwx, offset, begin, begin, end } };
+	return (union s3k_cap){
+		.memory = {S3K_CAPTY_MEMORY, false, rwx, offset, begin, begin, end}
+	};
 }
 
 union s3k_cap s3k_pmp(uint64_t addr, uint64_t rwx)
 {
-	return (union s3k_cap){ .pmp = { S3K_CAPTY_PMP, addr, 0x18 | rwx } };
+	return (union s3k_cap){
+		.pmp = {S3K_CAPTY_PMP, addr, 0x18 | rwx}
+	};
 }
 
 union s3k_cap s3k_monitor(uint64_t begin, uint64_t end)
 {
-	return (union s3k_cap){ .monitor = { S3K_CAPTY_MONITOR, 0, begin, begin, end } };
+	return (union s3k_cap){
+		.monitor = {S3K_CAPTY_MONITOR, 0, begin, begin, end}
+	};
 }
 
 union s3k_cap s3k_channel(uint64_t begin, uint64_t end)
 {
-	return (union s3k_cap){ .channel = { S3K_CAPTY_CHANNEL, 0, begin, begin, end } };
+	return (union s3k_cap){
+		.channel = {S3K_CAPTY_CHANNEL, 0, begin, begin, end}
+	};
 }
 
 union s3k_cap s3k_socket(uint64_t channel, uint64_t tag)
 {
-	return (union s3k_cap){ .socket = { S3K_CAPTY_SOCKET, 0, channel, tag } };
+	return (union s3k_cap){
+		.socket = {S3K_CAPTY_SOCKET, 0, channel, tag}
+	};
 }
 
 bool s3k_time_derive_time(struct s3k_time parent, struct s3k_time child)

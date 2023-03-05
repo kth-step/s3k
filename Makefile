@@ -3,17 +3,17 @@
 
 include config.mk
 
-vpath %.c src bsp/${PLATFORM}
+vpath %.c src
 vpath %.S src
 
 ASSRC=head.S trap.S stack.S
 CSRC=cap.c cnode.c csr.c exception.c init.c lock.c proc.c schedule.c syscall.c\
-     syscall_monitor.c timer.c init_caps.c
+     syscall_monitor.c timer.c
 OBJ=${addprefix obj/, ${ASSRC:.S=.o} ${CSRC:.c=.o}}
 DEP=${OBJ:.o=.d}
 
 CONFIG_H?=config.h
-DEFS=${addprefix -D,${S3K_CONF}}
+PLATFORM_H?=plat/${PLATFORM}/platform.h
 
 all: options s3k.elf s3k.da
 
@@ -31,11 +31,11 @@ options:
 
 obj/%.o: %.S
 	@mkdir -p ${@D}
-	${CC} ${ASFLAGS} -include ${CONFIG_H} ${INC} -MMD -c -o $@ $<
+	${CC} ${ASFLAGS} -include ${CONFIG_H} -include ${PLATFORM_H} ${INC} -MMD -c -o $@ $<
 
 obj/%.o: %.c
 	@mkdir -p ${@D}
-	${CC} ${CFLAGS} -include ${CONFIG_H} ${INC} -MMD -c -o $@ $<
+	${CC} ${CFLAGS} -include ${CONFIG_H} -include ${PLATFORM_H} ${INC}  -MMD -c -o $@ $<
 
 s3k.elf: ${OBJ}
 	${CC} ${LDFLAGS} -o $@ ${OBJ}
