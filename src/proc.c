@@ -17,7 +17,7 @@ void proc_load_pmp(const struct proc *proc)
 		handle = cnode_get_handle(proc->pid, pmp & 0xFF);
 		cap = cnode_get_cap(handle);
 		if (cap.type == CAPTY_PMP) {
-			pmpcfg |= cap.pmp.cfg << (i * 8);
+			pmpcfg |= (uint64_t)cap.pmp.cfg << (i * 8);
 			pmpaddr[i] = cap.pmp.addr;
 		} else {
 			pmpaddr[i] = 0;

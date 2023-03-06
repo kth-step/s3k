@@ -1,6 +1,6 @@
 extern "C" {
-	#include "../src/cap.c"
-	#include "../api/s3k-utils.c"
+#include "../src/cap.c"
+#include "../api/s3k-utils.c"
 }
 #include <gtest/gtest.h>
 
@@ -17,15 +17,18 @@ class CapTest : public ::testing::Test
 	{
 	}
 
-	void SetUp() override {
+	void SetUp() override
+	{
 	}
 
-	void TearDown() override {
+	void TearDown() override
+	{
 	}
 };
 } // namespace
 
-TEST_F(CapTest, MakeTest) {
+TEST_F(CapTest, MakeTest)
+{
 	uint64_t hartid = 3, begin = 0x5, end = 0x12;
 	union cap cap = cap_time(hartid, begin, end);
 	EXPECT_EQ(cap.type, CAPTY_TIME);
@@ -37,7 +40,8 @@ TEST_F(CapTest, MakeTest) {
 	EXPECT_EQ(cap.time._padd, 0);
 }
 
-TEST_F(CapTest, MakeMemory) {
+TEST_F(CapTest, MakeMemory)
+{
 	uint64_t begin = 0x100, end = 0x200, offset = 0x3, rwx = CAP_RWX;
 	union cap cap = cap_memory(begin, end, offset, rwx);
 	EXPECT_EQ(cap.type, CAPTY_MEMORY);
@@ -48,7 +52,8 @@ TEST_F(CapTest, MakeMemory) {
 	EXPECT_EQ(cap.memory.rwx, rwx);
 }
 
-TEST_F(CapTest, MakePMP) {
+TEST_F(CapTest, MakePMP)
+{
 	uint64_t addr = 0x85fff, rwx = CAP_RWX;
 	union cap cap = cap_pmp(addr, rwx);
 	EXPECT_EQ(cap.type, CAPTY_PMP);
@@ -56,7 +61,8 @@ TEST_F(CapTest, MakePMP) {
 	EXPECT_EQ(cap.pmp.cfg, 0x18 | rwx);
 }
 
-TEST_F(CapTest, MakeMonitor) {
+TEST_F(CapTest, MakeMonitor)
+{
 	uint64_t begin = 0x1, end = 0x20;
 	union cap cap = cap_monitor(begin, end);
 	EXPECT_EQ(cap.type, CAPTY_MONITOR);
@@ -67,7 +73,8 @@ TEST_F(CapTest, MakeMonitor) {
 	EXPECT_EQ(cap.monitor._padd, 0);
 }
 
-TEST_F(CapTest, PmpAddr) {
+TEST_F(CapTest, PmpAddr)
+{
 	uint64_t begin = 0x100;
 	uint64_t end = 0x200;
 	uint64_t pmpaddr = pmp_napot_addr(begin, end);
@@ -78,7 +85,8 @@ TEST_F(CapTest, PmpAddr) {
 	EXPECT_EQ(0x220000, pmp_napot_end(0x85fff));
 }
 
-TEST_F(CapTest, MatchAPICap) {
+TEST_F(CapTest, MatchAPICap)
+{
 	union cap cap;
 	union s3k_cap s3k_cap;
 	cap = cap_time(0x1, 0x1, 0x20);
