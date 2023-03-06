@@ -44,7 +44,7 @@ s3k.da:	s3k.elf
 	${OBJDUMP} -d $< > $@
 
 format:
-	clang-format -i $(wildcard **/*.h) $(wildcard **/*.h) $(wildcard **/*.cc)
+	clang-format -i $(wildcard **/*.h) $(wildcard **/*.c) $(wildcard **/*.cc)
 
 clean:
 	git clean -fdX

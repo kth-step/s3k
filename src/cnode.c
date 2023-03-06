@@ -47,7 +47,7 @@ cnode_handle_t cnode_get_next(cnode_handle_t handle)
 union cap cnode_get_cap(cnode_handle_t handle)
 {
 	assert(handle < NPROC * NCAP);
-	return (union cap){.raw = cnodes[handle].raw_cap};
+	return (union cap){ .raw = cnodes[handle].raw_cap };
 }
 
 void cnode_set_cap(cnode_handle_t handle, union cap cap)

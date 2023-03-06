@@ -3,7 +3,7 @@ Language: Cpp
 UseTab: Always
 TabWidth: 8
 IndentWidth: 8
-ContinuationIndentWidth: 8
+ContinuationIndentWidth: 4
 ColumnLimit: 120
 
 AlignAfterOpenBracket: Align

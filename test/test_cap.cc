@@ -1,6 +1,6 @@
 extern "C" {
-#include "cap.h"
 #include "../api/s3k-utils.c"
+#include "cap.h"
 }
 #include <gtest/gtest.h>
 
