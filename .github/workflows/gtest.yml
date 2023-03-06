@@ -15,5 +15,7 @@ jobs:
           sudo cp lib/*.a /usr/lib && 
           sudo ln -s /usr/lib/libgtest.a /usr/local/lib/libgtest.a && 
           sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/libgtest_main.a
-      - name: Make & run tests
+      - name: Make tests
         run: make -C test
+      - name: Run tests
+        run: ./test/run_test.out

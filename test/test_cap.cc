@@ -1,5 +1,5 @@
 extern "C" {
-#include "../src/cap.c"
+#include "cap.h"
 #include "../api/s3k-utils.c"
 }
 #include <gtest/gtest.h>
@@ -104,10 +104,4 @@ TEST_F(CapTest, MatchAPICap)
 	cap = cap_monitor(0x1, 0x10);
 	s3k_cap = s3k_monitor(0x1, 0x10);
 	EXPECT_EQ(cap.raw, s3k_cap.raw);
-}
-
-int main(int argc, char **argv)
-{
-	::testing::InitGoogleTest(&argc, argv);
-	return RUN_ALL_TESTS();
 }

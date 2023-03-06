@@ -1,14 +1,24 @@
+
+vpath %.c ../src
+SRCS=cap.c cnode.c exception.c lock.c proc.c schedule.c syscall.c syscall_monitor.c mockup.c
+OBJS=$(SRCS:.c=.o)
+
 TEST_CC=$(wildcard test_*.cc)
-TEST_OUT=$(TEST_CC:.cc=.out)
-TEST_RES=$(TEST_CC:.cc=.res)
+TEST_OBJS=$(TEST_CC:.cc=.o)
 
-FLAGS=-std=gnu++17 -I../inc
+CFLAGS=-I../inc -DNPROC=2 -DNCAP=32 -DNSLACK=1000 -DNSLICE=128 -DNTICK=10000 -DNHART=2
+CXXFLAGS=-I../inc
 
-all: $(TEST_OUT) $(TEST_RES)
+all: run_tests.out
 
-test_%.out: test_%.cc
-	g++ $(FLAGS) -o $@ $< -lgtest
+%.o : %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
-test_%.res: test_%.out
-	./$< > $@ 
-	cat $@
+%.o: test_%.cc
+	$(CXX) $(CXXFLAGS) -c -o $@ $^ -lgtest
+
+run_tests.out: $(OBJS) $(TEST_OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgtest_main
+
+clean:
+	rm -f *.o *.out

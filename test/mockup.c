@@ -11,9 +11,6 @@
 #include <stddef.h>
 #include <sys/time.h>
 
-#define NPROC 4
-#define NCAP 32
-
 static uint64_t _mhartid;
 static uint64_t _timeout;
 static uint64_t _pmpcfg0;
