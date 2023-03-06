@@ -7,6 +7,7 @@
 #include "proc.h"
 #include "timer.h"
 #include "trap.h"
+#include "wfi.h"
 
 #define NONE_PID 0xFF
 
@@ -57,7 +58,7 @@ retry:
 	}
 	timeout_set(hartid, quantum * NTICK);
 	while (!(csrr_mip() & (1 << 7))) {
-		__asm__ volatile("wfi");
+		wfi();
 	}
 	timeout_set(hartid, (quantum + entry.len) * NTICK - NSLACK);
 	return proc;

@@ -13,7 +13,7 @@
 /* Check if property holds, if not, halt */
 #define assert(x)    \
 	while (!(x)) \
-		__asm__ volatile("wfi");
+		;
 #else
 /* Assume the property holds */
 #define assert(x) \

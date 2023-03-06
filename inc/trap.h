@@ -1,6 +1,6 @@
 /**
  * @file trap.h
- * @brief Defines trap entry/exit functions.
+ * @brief Declares trap entry/exit functions.
  * @copyright MIT License
  * @author Henrik Karlsson (henrik10@kth.se)
  */
