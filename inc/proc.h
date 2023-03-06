@@ -7,10 +7,10 @@
 #ifndef __PROC_H__
 #define __PROC_H__
 
-#include <stdint.h>
-
 #include "cnode.h"
 #include "lock.h"
+
+#include <stdint.h>
 
 enum reg {
 	/* General purpose registers */

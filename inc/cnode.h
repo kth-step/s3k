@@ -7,11 +7,11 @@
 #ifndef __CNODE_H__
 #define __CNODE_H__
 
+#include "cap.h"
+
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-
-#include "cap.h"
 
 /// @defgroup cnode Capability Node
 ///

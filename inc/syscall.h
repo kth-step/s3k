@@ -7,9 +7,9 @@
 #ifndef __SYSCALL_H__
 #define __SYSCALL_H__
 
-#include <stdint.h>
-
 #include "proc.h"
+
+#include <stdint.h>
 
 /// @defgroup syscall-handle System Call Handling
 /// @{

@@ -7,11 +7,11 @@
 #ifndef __CAP_H__
 #define __CAP_H__
 
-#include <stdbool.h>
-#include <stdint.h>
-
 #include "common.h"
 #include "consts.h"
+
+#include <stdbool.h>
+#include <stdint.h>
 
 #define CAP_RWX 0x7
 #define CAP_RW 0x3

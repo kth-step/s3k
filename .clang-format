@@ -70,3 +70,4 @@ PenaltyExcessCharacter: 100
 PenaltyReturnTypeOnItsOwnLine: 60
 
 SortIncludes: true
+IncludeBlocks: Regroup

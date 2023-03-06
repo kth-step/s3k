@@ -9,9 +9,9 @@
 #ifndef __SCHED_H__
 #define __SCHED_H__
 
-#include <stdint.h>
-
 #include "common.h"
+
+#include <stdint.h>
 
 /// Yield the current time slice.
 struct proc *schedule_yield(struct proc *proc);
