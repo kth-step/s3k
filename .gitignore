@@ -1,4 +1,5 @@
 docs
+test_detail.json
 *.elf
 *.da
 *.o

@@ -5,12 +5,13 @@ SRCS=cap.c cnode.c exception.c lock.c proc.c schedule.c syscall.c syscall_monito
 TEST_SRCS=$(wildcard test_*.cc)
 
 OBJS=$(patsubst %.c,obj/%.o, $(SRCS))
+DEPS=$(patsubst %.d,obj/%.o, $(SRCS))
 TEST_OBJS=$(patsubst %.cc,obj/%.o, $(TEST_SRCS))
 
-CFLAGS=-I../inc -DNPROC=2 -DNCAP=32 -DNSLACK=1000 -DNSLICE=128 -DNTICK=10000 -DNHART=2
+CFLAGS=-I../inc -MMD -DNPROC=2 -DNCAP=32 -DNSLACK=1000 -DNSLICE=128 -DNTICK=10000 -DNHART=2
 CXXFLAGS=-I../inc
 
-all: run_tests.out
+all: test
 
 obj/%.o : %.c
 	@mkdir -p $(@D)
@@ -23,5 +24,11 @@ obj/%.o: %.cc
 run_tests.out: $(OBJS) $(TEST_OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ -lgtest -lgtest_main
 
-clean:
-	rm -f $(OBJS) $(TEST_OBJS) run_test.out
+test_detail.json: run_tests.out
+	./run_tests.out --gtest_output=json
+
+test: test_detail.json
+
+.PHONY: test
+
+-include: $(DEPS)

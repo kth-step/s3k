@@ -7,18 +7,14 @@ vpath %.c src
 vpath %.S src
 
 ASSRC=head.S trap.S stack.S
-CSRC=cap.c cnode.c csr.c exception.c init.c lock.c proc.c schedule.c syscall.c\
-     syscall_monitor.c timer.c wfi.c
+CSRC=cap.c cnode.c csr.c exception.c init.c lock.c proc.c schedule.c syscall.c syscall_monitor.c timer.c wfi.c
 OBJ=${addprefix obj/, ${ASSRC:.S=.o} ${CSRC:.c=.o}}
 DEP=${OBJ:.o=.d}
 
 CONFIG_H?=config.h
 PLATFORM_H?=plat/${PLATFORM}/platform.h
 
-all: options s3k.elf s3k.da
-
-docs:
-	doxygen
+all: options test kernel
 
 options:
 	@printf "build options:\n"
@@ -28,6 +24,7 @@ options:
 	@printf "CFLAGS   = ${CFLAGS}\n"
 	@printf "CONFIG_H = ${abspath ${CONFIG_H}}\n"
 
+kernel: s3k.elf s3k.da
 
 obj/%.o: %.S
 	@mkdir -p ${@D}
@@ -43,6 +40,12 @@ s3k.elf: ${OBJ}
 s3k.da:	s3k.elf
 	${OBJDUMP} -d $< > $@
 
+docs:
+	doxygen
+
+test:
+	$(MAKE) -C test
+
 format:
 	clang-format -i $(wildcard **/*.h) $(wildcard **/*.c) $(wildcard **/*.cc)
 
@@ -51,4 +54,4 @@ clean:
 
 -include ${DEP}
 
-.PHONY: all options clean docs
+.PHONY: all options clean docs test kernel
