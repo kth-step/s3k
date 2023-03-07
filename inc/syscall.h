@@ -77,7 +77,8 @@ struct proc *syscall_delcap(struct proc *proc, uint64_t i);
 /// Revoke capability.
 struct proc *syscall_revcap(struct proc *proc, uint64_t i);
 /// Derive capability.
-struct proc *syscall_drvcap(struct proc *proc, uint64_t i, uint64_t j, union cap cap);
+struct proc *syscall_drvcap(struct proc *proc, uint64_t i, uint64_t j,
+			    union cap cap);
 
 // Monitor capability system calls
 /// Suspend a process
@@ -85,24 +86,31 @@ struct proc *syscall_msuspend(struct proc *proc, uint64_t mon, uint64_t pid);
 /// Resume a process
 struct proc *syscall_mresume(struct proc *proc, uint64_t mon, uint64_t pid);
 /// Get a register of a process
-struct proc *syscall_mgetreg(struct proc *proc, uint64_t mon, uint64_t pid, uint64_t reg);
+struct proc *syscall_mgetreg(struct proc *proc, uint64_t mon, uint64_t pid,
+			     uint64_t reg);
 /// Set a register of a process
-struct proc *syscall_msetreg(struct proc *proc, uint64_t mon, uint64_t pid, uint64_t reg, uint64_t val);
+struct proc *syscall_msetreg(struct proc *proc, uint64_t mon, uint64_t pid,
+			     uint64_t reg, uint64_t val);
 /// Read a capability of a process
-struct proc *syscall_mgetcap(struct proc *proc, uint64_t mon, uint64_t pid, uint64_t i);
+struct proc *syscall_mgetcap(struct proc *proc, uint64_t mon, uint64_t pid,
+			     uint64_t i);
 /// Take a capability from a process
-struct proc *syscall_mtakecap(struct proc *proc, uint64_t mon, uint64_t pid, uint64_t i, uint64_t j);
+struct proc *syscall_mtakecap(struct proc *proc, uint64_t mon, uint64_t pid,
+			      uint64_t i, uint64_t j);
 /// Give a capability to a process
-struct proc *syscall_mgivecap(struct proc *proc, uint64_t mon, uint64_t pid, uint64_t i, uint64_t j);
+struct proc *syscall_mgivecap(struct proc *proc, uint64_t mon, uint64_t pid,
+			      uint64_t i, uint64_t j);
 
 // IPC capability system calls
 /// Receive a message.
 struct proc *syscall_recv(struct proc *proc, uint64_t recv_idx);
 /// Send a message.
-struct proc *syscall_send(struct proc *proc, uint64_t send_idx, uint64_t msg0, uint64_t msg1, uint64_t cap0,
-			  uint64_t cap1, uint64_t yield);
+struct proc *syscall_send(struct proc *proc, uint64_t send_idx, uint64_t msg0,
+			  uint64_t msg1, uint64_t cap0, uint64_t cap1,
+			  uint64_t yield);
 /// Send then receive a message.
-struct proc *syscall_sendrecv(struct proc *proc, uint64_t recv_idx, uint64_t send_idx, uint64_t msg0, uint64_t msg1,
+struct proc *syscall_sendrecv(struct proc *proc, uint64_t recv_idx,
+			      uint64_t send_idx, uint64_t msg0, uint64_t msg1,
 			      uint64_t cap0, uint64_t cap1);
 /// @}
 

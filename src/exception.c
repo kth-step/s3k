@@ -19,7 +19,8 @@ static struct proc *handle_ret(struct proc *proc)
 	return proc;
 }
 
-static struct proc *handle_default(struct proc *proc, uint64_t mcause, uint64_t mepc, uint64_t mtval)
+static struct proc *handle_default(struct proc *proc, uint64_t mcause,
+				   uint64_t mepc, uint64_t mtval)
 {
 	proc->regs[REG_ECAUSE] = mcause;
 	proc->regs[REG_EVAL] = mtval;
@@ -30,7 +31,8 @@ static struct proc *handle_default(struct proc *proc, uint64_t mcause, uint64_t 
 	return proc;
 }
 
-struct proc *handle_exception(struct proc *proc, uint64_t mcause, uint64_t mepc, uint64_t mtval)
+struct proc *handle_exception(struct proc *proc, uint64_t mcause, uint64_t mepc,
+			      uint64_t mtval)
 {
 	if (mcause == ILLEGAL_INSTRUCTION && mtval == MRET)
 		return handle_ret(proc);

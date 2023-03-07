@@ -63,7 +63,8 @@ bool cnode_contains(cnode_handle_t handle)
 	return cnodes[handle].raw_cap != 0;
 }
 
-void cnode_insert(cnode_handle_t handle, union cap cap, cnode_handle_t prev_handle)
+void cnode_insert(cnode_handle_t handle, union cap cap,
+		  cnode_handle_t prev_handle)
 {
 	assert(handle < NPROC * NCAP);
 	assert(prev_handle <= NPROC * NCAP);

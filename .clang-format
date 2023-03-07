@@ -4,7 +4,7 @@ UseTab: Always
 TabWidth: 8
 IndentWidth: 8
 ContinuationIndentWidth: 4
-ColumnLimit: 120
+ColumnLimit: 80
 
 AlignAfterOpenBracket: Align
 AlignConsecutiveAssignments: false

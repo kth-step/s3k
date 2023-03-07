@@ -59,7 +59,6 @@ struct proc *syscall_setreg(struct proc *proc, uint64_t regIdx, uint64_t val)
 {
 	uint64_t *regs = (uint64_t *)&proc->regs;
 	regIdx %= REG_COUNT;
-	proc->regs[REG_A0] = regs[regIdx];
 	regs[regIdx] = val;
 	if (regIdx == REG_PMP)
 		proc_load_pmp(proc);
@@ -116,7 +115,8 @@ struct proc *syscall_delcap(struct proc *proc, uint64_t idx)
 	if (cnode_contains(handle)) {
 		cnode_delete(handle);
 		if (cap.type == CAPTY_TIME)
-			schedule_delete(cap.time.hartid, cap.time.free, cap.time.end);
+			schedule_delete(cap.time.hartid, cap.time.free,
+					cap.time.end);
 		proc->regs[REG_A0] = EXCPT_NONE;
 	} else {
 		proc->regs[REG_A0] = EXCPT_EMPTY;
@@ -125,21 +125,25 @@ struct proc *syscall_delcap(struct proc *proc, uint64_t idx)
 	return proc;
 }
 
-static void _revoke_time_hook(cnode_handle_t handle, union cap cap, union cap child_cap)
+static void _revoke_time_hook(cnode_handle_t handle, union cap cap,
+			      union cap child_cap)
 {
 	cap.time.free = child_cap.time.free;
 	cnode_set_cap(handle, cap);
-	schedule_update(cap.time.hartid, cnode_get_pid(handle), cap.time.free, cap.time.end);
+	schedule_update(cap.time.hartid, cnode_get_pid(handle), cap.time.free,
+			cap.time.end);
 }
 
 static void _revoke_time_post_hook(cnode_handle_t handle, union cap cap)
 {
 	cap.time.free = cap.time.begin;
 	cnode_set_cap(handle, cap);
-	schedule_update(cap.time.hartid, cnode_get_pid(handle), cap.time.free, cap.time.end);
+	schedule_update(cap.time.hartid, cnode_get_pid(handle), cap.time.free,
+			cap.time.end);
 }
 
-static void _revoke_memory_hook(cnode_handle_t handle, union cap cap, union cap child_cap)
+static void _revoke_memory_hook(cnode_handle_t handle, union cap cap,
+				union cap child_cap)
 {
 	if (cap.type == CAPTY_MEMORY) {
 		cap.memory.free = child_cap.memory.free; // Inherit free region
@@ -154,7 +158,8 @@ static void _revoke_memory_post_hook(cnode_handle_t handle, union cap cap)
 	cnode_set_cap(handle, cap);
 }
 
-static void _revoke_monitor_hook(cnode_handle_t handle, union cap cap, union cap child_cap)
+static void _revoke_monitor_hook(cnode_handle_t handle, union cap cap,
+				 union cap child_cap)
 {
 	cap.monitor.free = child_cap.monitor.free;
 	cnode_set_cap(handle, cap);
@@ -166,7 +171,8 @@ static void _revoke_monitor_post_hook(cnode_handle_t handle, union cap cap)
 	cnode_set_cap(handle, cap);
 }
 
-static void _revoke_channel_hook(cnode_handle_t handle, union cap cap, union cap child_cap)
+static void _revoke_channel_hook(cnode_handle_t handle, union cap cap,
+				 union cap child_cap)
 {
 	cap.channel.free = child_cap.channel.free;
 	cnode_set_cap(handle, cap);
@@ -178,7 +184,8 @@ static void _revoke_channel_post_hook(cnode_handle_t handle, union cap cap)
 	cnode_set_cap(handle, cap);
 }
 
-static void _revoke_socket_hook(cnode_handle_t handle, union cap cap, union cap child_cap)
+static void _revoke_socket_hook(cnode_handle_t handle, union cap cap,
+				union cap child_cap)
 {
 	/* This should be empty */
 }
@@ -262,14 +269,17 @@ struct proc *syscall_revcap(struct proc *proc, uint64_t idx)
 	return proc;
 }
 
-static void _derive_time(cnode_handle_t orig_handle, union cap orig_cap, cnode_handle_t drv_handle, union cap drv_cap)
+static void _derive_time(cnode_handle_t orig_handle, union cap orig_cap,
+			 cnode_handle_t drv_handle, union cap drv_cap)
 {
 	orig_cap.time.free = drv_cap.time.begin;
 	cnode_set_cap(orig_handle, orig_cap);
-	schedule_update(drv_cap.time.hartid, cnode_get_pid(orig_handle), drv_cap.time.begin, drv_cap.time.end);
+	schedule_update(drv_cap.time.hartid, cnode_get_pid(orig_handle),
+			drv_cap.time.begin, drv_cap.time.end);
 }
 
-static void _derive_memory(cnode_handle_t orig_handle, union cap orig_cap, cnode_handle_t drv_handle, union cap drv_cap)
+static void _derive_memory(cnode_handle_t orig_handle, union cap orig_cap,
+			   cnode_handle_t drv_handle, union cap drv_cap)
 {
 	if (drv_cap.type == CAPTY_MEMORY) { // Memory
 		orig_cap.memory.free = drv_cap.memory.begin;
@@ -279,15 +289,15 @@ static void _derive_memory(cnode_handle_t orig_handle, union cap orig_cap, cnode
 	cnode_set_cap(orig_handle, orig_cap);
 }
 
-static void _derive_monitor(cnode_handle_t orig_handle, union cap orig_cap, cnode_handle_t drv_handle,
-			    union cap drv_cap)
+static void _derive_monitor(cnode_handle_t orig_handle, union cap orig_cap,
+			    cnode_handle_t drv_handle, union cap drv_cap)
 {
 	orig_cap.monitor.free = drv_cap.monitor.begin;
 	cnode_set_cap(orig_handle, orig_cap);
 }
 
-static void _derive_channel(cnode_handle_t orig_handle, union cap orig_cap, cnode_handle_t drv_handle,
-			    union cap drv_cap)
+static void _derive_channel(cnode_handle_t orig_handle, union cap orig_cap,
+			    cnode_handle_t drv_handle, union cap drv_cap)
 {
 	// Update free pointer.
 	if (drv_cap.type == CAPTY_CHANNEL) {
@@ -298,12 +308,14 @@ static void _derive_channel(cnode_handle_t orig_handle, union cap orig_cap, cnod
 	cnode_set_cap(orig_handle, orig_cap);
 }
 
-static void _derive_socket(cnode_handle_t orig_handle, union cap orig_cap, cnode_handle_t drv_handle, union cap drv_cap)
+static void _derive_socket(cnode_handle_t orig_handle, union cap orig_cap,
+			   cnode_handle_t drv_handle, union cap drv_cap)
 {
 	/* This should be empty */
 }
 
-struct proc *syscall_drvcap(struct proc *proc, uint64_t orig_idx, uint64_t drv_idx, union cap drv_cap)
+struct proc *syscall_drvcap(struct proc *proc, uint64_t orig_idx,
+			    uint64_t drv_idx, union cap drv_cap)
 {
 	// Get handle
 	cnode_handle_t orig_handle = cnode_get_handle(proc->pid, orig_idx);
@@ -364,13 +376,15 @@ struct proc *syscall_recv(struct proc *proc, uint64_t recv_idx)
 	return proc;
 }
 
-struct proc *syscall_send(struct proc *proc, uint64_t send_idx, uint64_t msg0, uint64_t msg1, uint64_t cap0,
-			  uint64_t cap1, uint64_t yield)
+struct proc *syscall_send(struct proc *proc, uint64_t send_idx, uint64_t msg0,
+			  uint64_t msg1, uint64_t cap0, uint64_t cap1,
+			  uint64_t yield)
 {
 	return proc;
 }
 
-struct proc *syscall_sendrecv(struct proc *proc, uint64_t send_idx, uint64_t recv_idx, uint64_t msg0, uint64_t msg1,
+struct proc *syscall_sendrecv(struct proc *proc, uint64_t send_idx,
+			      uint64_t recv_idx, uint64_t msg0, uint64_t msg1,
 			      uint64_t cap0, uint64_t cap1)
 {
 	return proc;

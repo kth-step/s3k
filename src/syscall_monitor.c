@@ -68,7 +68,8 @@ struct proc *syscall_mresume(struct proc *proc, uint64_t mon_idx, uint64_t pid)
 	return proc;
 }
 
-struct proc *syscall_mgetreg(struct proc *proc, uint64_t mon_idx, uint64_t pid, uint64_t reg)
+struct proc *syscall_mgetreg(struct proc *proc, uint64_t mon_idx, uint64_t pid,
+			     uint64_t reg)
 {
 	cnode_handle_t mon_handle = cnode_get_handle(proc->pid, mon_idx);
 	union cap cap = cnode_get_cap(mon_handle);
@@ -92,7 +93,8 @@ struct proc *syscall_mgetreg(struct proc *proc, uint64_t mon_idx, uint64_t pid, 
 	}
 
 	struct proc *other_proc = &processes[pid];
-	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED, PS_SUSPENDED_BUSY)) {
+	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED,
+					  PS_SUSPENDED_BUSY)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;
 		return proc;
@@ -104,7 +106,8 @@ struct proc *syscall_mgetreg(struct proc *proc, uint64_t mon_idx, uint64_t pid, 
 	return proc;
 }
 
-struct proc *syscall_msetreg(struct proc *proc, uint64_t mon_idx, uint64_t pid, uint64_t reg, uint64_t val)
+struct proc *syscall_msetreg(struct proc *proc, uint64_t mon_idx, uint64_t pid,
+			     uint64_t reg, uint64_t val)
 {
 	cnode_handle_t mon_handle = cnode_get_handle(proc->pid, mon_idx);
 	union cap cap = cnode_get_cap(mon_handle);
@@ -128,7 +131,8 @@ struct proc *syscall_msetreg(struct proc *proc, uint64_t mon_idx, uint64_t pid, 
 		return proc;
 	}
 	struct proc *other_proc = &processes[pid];
-	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED, PS_SUSPENDED_BUSY)) {
+	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED,
+					  PS_SUSPENDED_BUSY)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;
 		return proc;
@@ -140,7 +144,8 @@ struct proc *syscall_msetreg(struct proc *proc, uint64_t mon_idx, uint64_t pid, 
 	return proc;
 }
 
-struct proc *syscall_mgetcap(struct proc *proc, uint64_t mon_idx, uint64_t pid, uint64_t node_idx)
+struct proc *syscall_mgetcap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
+			     uint64_t node_idx)
 {
 	cnode_handle_t mon_handle = cnode_get_handle(proc->pid, mon_idx);
 	union cap cap = cnode_get_cap(mon_handle);
@@ -164,7 +169,8 @@ struct proc *syscall_mgetcap(struct proc *proc, uint64_t mon_idx, uint64_t pid, 
 	}
 
 	struct proc *other_proc = &processes[pid];
-	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED, PS_SUSPENDED_BUSY)) {
+	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED,
+					  PS_SUSPENDED_BUSY)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;
 		return proc;
@@ -178,7 +184,8 @@ struct proc *syscall_mgetcap(struct proc *proc, uint64_t mon_idx, uint64_t pid, 
 	return proc;
 }
 
-struct proc *syscall_mtakecap(struct proc *proc, uint64_t mon_idx, uint64_t pid, uint64_t src_idx, uint64_t dst_idx)
+struct proc *syscall_mtakecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
+			      uint64_t src_idx, uint64_t dst_idx)
 {
 	cnode_handle_t mon_handle = cnode_get_handle(proc->pid, mon_idx);
 	union cap cap = cnode_get_cap(mon_handle);
@@ -201,7 +208,8 @@ struct proc *syscall_mtakecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 		return proc;
 	}
 	struct proc *other_proc = &processes[pid];
-	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED, PS_SUSPENDED_BUSY)) {
+	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED,
+					  PS_SUSPENDED_BUSY)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;
 		return proc;
@@ -212,7 +220,8 @@ struct proc *syscall_mtakecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 		union cap src_cap = cnode_get_cap(src_handle);
 		cnode_move(src_handle, dst_handle);
 		if (src_cap.type == CAPTY_TIME) {
-			schedule_update(src_cap.time.hartid, proc->pid, src_cap.time.free, src_cap.time.end);
+			schedule_update(src_cap.time.hartid, proc->pid,
+					src_cap.time.free, src_cap.time.end);
 		}
 	}
 	__sync_fetch_and_and(&other_proc->state, ~PSF_BUSY);
@@ -221,7 +230,8 @@ struct proc *syscall_mtakecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 	return proc;
 }
 
-struct proc *syscall_mgivecap(struct proc *proc, uint64_t mon_idx, uint64_t pid, uint64_t src_idx, uint64_t dst_idx)
+struct proc *syscall_mgivecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
+			      uint64_t src_idx, uint64_t dst_idx)
 {
 	cnode_handle_t mon_handle = cnode_get_handle(proc->pid, mon_idx);
 	union cap cap = cnode_get_cap(mon_handle);
@@ -245,7 +255,8 @@ struct proc *syscall_mgivecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 	}
 
 	struct proc *other_proc = &processes[pid];
-	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED, PS_SUSPENDED_BUSY)) {
+	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED,
+					  PS_SUSPENDED_BUSY)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;
 		return proc;
@@ -257,7 +268,8 @@ struct proc *syscall_mgivecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 		union cap src_cap = cnode_get_cap(src_handle);
 		cnode_move(src_handle, dst_handle);
 		if (src_cap.type == CAPTY_TIME) {
-			schedule_update(src_cap.time.hartid, pid, src_cap.time.free, src_cap.time.end);
+			schedule_update(src_cap.time.hartid, pid,
+					src_cap.time.free, src_cap.time.end);
 		}
 	}
 	__sync_fetch_and_and(&other_proc->state, ~PSF_BUSY);

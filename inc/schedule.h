@@ -23,6 +23,7 @@ void schedule_init(void);
 /// Delete scheduling at hartid, begin-end.
 void schedule_delete(uint64_t hartid, uint64_t begin, uint64_t end);
 /// Let pid run on hartid, begin-end.
-void schedule_update(uint64_t hartid, uint64_t pid, uint64_t begin, uint64_t end);
+void schedule_update(uint64_t hartid, uint64_t pid, uint64_t begin,
+		     uint64_t end);
 
 #endif /* __SCHED_H__ */

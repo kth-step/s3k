@@ -85,7 +85,8 @@ bool cnode_contains(cnode_handle_t handle);
  * @param cap Capability to insert.
  * @param prev_handle Handle to node m.
  */
-void cnode_insert(cnode_handle_t handle, union cap cap, cnode_handle_t prev_handle);
+void cnode_insert(cnode_handle_t handle, union cap cap,
+		  cnode_handle_t prev_handle);
 
 /**
  * @brief Move capability from node n to node m.

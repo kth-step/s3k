@@ -2,7 +2,8 @@
 
 void tl_lock(struct ticket_lock *l)
 {
-	uint64_t ticket = __atomic_fetch_add(&l->next_tick, 1, __ATOMIC_ACQUIRE);
+	uint64_t ticket
+	    = __atomic_fetch_add(&l->next_tick, 1, __ATOMIC_ACQUIRE);
 	while (l->serving != ticket)
 		;
 }

@@ -20,9 +20,10 @@
 /// @{
 
 #define S3K_RWX 0x7 ///< Read, write and execute for Memory and PMP capability
-#define S3K_RW 0x3  ///< Read and write permissions for memory and PMP capability
-#define S3K_RX 0x5  ///< Read and execute permissions for memory and PMP capability
-#define S3K_R 0x1   ///< Read permissions for memory and PMP capability
+#define S3K_RW 0x3 ///< Read and write permissions for memory and PMP capability
+#define S3K_RX \
+	0x5 ///< Read and execute permissions for memory and PMP capability
+#define S3K_R 0x1 ///< Read permissions for memory and PMP capability
 
 /**
  * @brief Enumeration S3K system call exception codes.
@@ -148,8 +149,8 @@ struct s3k_memory {
 	uint64_t rwx : 3;    ///< Read, write and execute (reverse order)
 	uint64_t offset : 8; ///< 128 MiB offset of memory slice
 	uint64_t begin : 16; ///< Beginning of memory slice
-	uint64_t free : 16;  ///< Beginning of available/unallocated memory slice
-	uint64_t end : 16;   ///< End of memory slice
+	uint64_t free : 16; ///< Beginning of available/unallocated memory slice
+	uint64_t end : 16;  ///< End of memory slice
 };
 
 /// PMP Frame capability
@@ -161,7 +162,7 @@ struct s3k_pmp {
 
 /// Monitor capability
 struct s3k_monitor {
-	uint64_t type : 4;   ///< Type of capability, should be S3K_CAPTY_MONITOR
+	uint64_t type : 4; ///< Type of capability, should be S3K_CAPTY_MONITOR
 	uint64_t _padd : 12; ///< Padding, should be zero
 	uint64_t begin : 16; ///< Beginning of monitored PIDs.
 	uint64_t free : 16;  ///< Beginning of available monitored PIDs.
@@ -375,7 +376,8 @@ enum s3k_excpt s3k_mresume(uint64_t i, uint64_t pid);
  * @param val Read value
  * @return TODO
  */
-enum s3k_excpt s3k_mgetreg(uint64_t i, uint64_t pid, enum s3k_reg reg, uint64_t *val);
+enum s3k_excpt s3k_mgetreg(uint64_t i, uint64_t pid, enum s3k_reg reg,
+			   uint64_t *val);
 /**
  * @brief Monitor write a process's register.
  *
@@ -385,7 +387,8 @@ enum s3k_excpt s3k_mgetreg(uint64_t i, uint64_t pid, enum s3k_reg reg, uint64_t 
  * @param val Value to write
  * @return TODO
  */
-enum s3k_excpt s3k_msetreg(uint64_t i, uint64_t pid, enum s3k_reg reg, uint64_t val);
+enum s3k_excpt s3k_msetreg(uint64_t i, uint64_t pid, enum s3k_reg reg,
+			   uint64_t val);
 /**
  * @brief Monitor read process's capability.
  *
@@ -395,7 +398,8 @@ enum s3k_excpt s3k_msetreg(uint64_t i, uint64_t pid, enum s3k_reg reg, uint64_t 
  * @param cap Read capability
  * @return TODO
  */
-enum s3k_excpt s3k_mgetcap(uint64_t i, uint64_t pid, uint64_t j, union s3k_cap *cap);
+enum s3k_excpt s3k_mgetcap(uint64_t i, uint64_t pid, uint64_t j,
+			   union s3k_cap *cap);
 /**
  * @brief Monitor give a capability to a process.
  *
@@ -405,7 +409,8 @@ enum s3k_excpt s3k_mgetcap(uint64_t i, uint64_t pid, uint64_t j, union s3k_cap *
  * @param dst Destination of capability
  * @return TODO
  */
-enum s3k_excpt s3k_mgivecap(uint64_t i, uint64_t pid, uint64_t src, uint64_t dst);
+enum s3k_excpt s3k_mgivecap(uint64_t i, uint64_t pid, uint64_t src,
+			    uint64_t dst);
 /**
  * @brief Monitor take a capability from a process.
  *
@@ -415,7 +420,8 @@ enum s3k_excpt s3k_mgivecap(uint64_t i, uint64_t pid, uint64_t src, uint64_t dst
  * @param dst Destination of capability
  * @return TODO
  */
-enum s3k_excpt s3k_mtakecap(uint64_t i, uint64_t pid, uint64_t src, uint64_t dst);
+enum s3k_excpt s3k_mtakecap(uint64_t i, uint64_t pid, uint64_t src,
+			    uint64_t dst);
 /// @}
 
 /**************************** API UTILITY *********************************/
@@ -432,7 +438,8 @@ enum s3k_excpt s3k_mtakecap(uint64_t i, uint64_t pid, uint64_t src, uint64_t dst
  * @return The PMP NAPOT representation of the range.
  * @warning If there is not NAPOT representation, then returns 0.
  */
-uint64_t s3k_pmp_napot_addr(uint64_t begin, uint64_t end) __attribute__((const));
+uint64_t s3k_pmp_napot_addr(uint64_t begin, uint64_t end)
+    __attribute__((const));
 /**
  * @brief Returns start of the range of PMP NAPOT address.
  * @param addr The PMP NAPOT address.
@@ -477,7 +484,8 @@ union s3k_cap s3k_time(uint64_t hartid, uint64_t begin, uint64_t end);
  * @param rwx Read, write, and execute permissions.
  * @return A memory slice capability.
  */
-union s3k_cap s3k_memory(uint64_t begin, uint64_t end, uint64_t offset, uint64_t rwx);
+union s3k_cap s3k_memory(uint64_t begin, uint64_t end, uint64_t offset,
+			 uint64_t rwx);
 
 /**
  * @brief Create a PMP NAPOT frame capability

@@ -99,7 +99,8 @@ uint64_t pmp_napot_end(uint64_t addr);
 
 // Constructors
 union cap cap_time(uint64_t hartid, uint64_t begin, uint64_t end);
-union cap cap_memory(uint64_t begin, uint64_t end, uint64_t offset, uint64_t rwx);
+union cap cap_memory(uint64_t begin, uint64_t end, uint64_t offset,
+		     uint64_t rwx);
 union cap cap_pmp(uint64_t cfg, uint64_t addr);
 union cap cap_monitor(uint64_t begin, uint64_t end);
 union cap cap_channel(uint64_t begin, uint64_t end);

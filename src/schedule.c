@@ -23,7 +23,8 @@ static struct sched_entry schedule_get(uint64_t hartid, size_t i)
 	return schedule[hartid][i];
 }
 
-void schedule_update(uint64_t hartid, uint64_t pid, uint64_t begin, uint64_t end)
+void schedule_update(uint64_t hartid, uint64_t pid, uint64_t begin,
+		     uint64_t end)
 {
 	for (uint64_t i = begin; i < end; i++) {
 		schedule[hartid][i] = (struct sched_entry){ pid, end - i };
@@ -50,9 +51,11 @@ retry:
 		proc = &processes[entry.pid];
 		if (proc->sleep > time_get())
 			continue;
-	} while (!__sync_bool_compare_and_swap(&proc->state, PS_READY, PS_RUNNING));
+	} while (
+	    !__sync_bool_compare_and_swap(&proc->state, PS_READY, PS_RUNNING));
 	proc_load_pmp(proc);
-	if (!csrr_pmpcfg0()) { // Temporary fix. QEMU does not allow this to be zero.
+	if (!csrr_pmpcfg0()) {
+		// Temporary fix. QEMU does not allow this to be zero.
 		__atomic_fetch_and(&proc->state, ~PS_RUNNING, __ATOMIC_RELEASE);
 		goto retry;
 	}

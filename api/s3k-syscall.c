@@ -117,7 +117,8 @@ enum s3k_excpt s3k_mresume(uint64_t i, uint64_t pid)
 	return a0;
 }
 
-enum s3k_excpt s3k_mgetreg(uint64_t i, uint64_t pid, enum s3k_reg reg, uint64_t *val)
+enum s3k_excpt s3k_mgetreg(uint64_t i, uint64_t pid, enum s3k_reg reg,
+			   uint64_t *val)
 {
 	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_MGETREG;
 	register uint64_t a1 __asm__("a1") = i;
@@ -129,18 +130,22 @@ enum s3k_excpt s3k_mgetreg(uint64_t i, uint64_t pid, enum s3k_reg reg, uint64_t 
 	return a0;
 }
 
-enum s3k_excpt s3k_msetreg(uint64_t i, uint64_t pid, enum s3k_reg reg, uint64_t val)
+enum s3k_excpt s3k_msetreg(uint64_t i, uint64_t pid, enum s3k_reg reg,
+			   uint64_t val)
 {
 	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_MSETREG;
 	register uint64_t a1 __asm__("a1") = i;
 	register uint64_t a2 __asm__("a2") = pid;
 	register uint64_t a3 __asm__("a3") = reg;
 	register uint64_t a4 __asm__("a4") = val;
-	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1), "r"(a2), "r"(a3), "r"(a4));
+	__asm__ volatile("ecall"
+			 : "+r"(a0)
+			 : "r"(a1), "r"(a2), "r"(a3), "r"(a4));
 	return a0;
 }
 
-enum s3k_excpt s3k_mgetcap(uint64_t i, uint64_t pid, uint64_t j, union s3k_cap *cap)
+enum s3k_excpt s3k_mgetcap(uint64_t i, uint64_t pid, uint64_t j,
+			   union s3k_cap *cap)
 {
 	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_MGETCAP;
 	register uint64_t a1 __asm__("a1") = i;
@@ -152,25 +157,31 @@ enum s3k_excpt s3k_mgetcap(uint64_t i, uint64_t pid, uint64_t j, union s3k_cap *
 	return a0;
 }
 
-enum s3k_excpt s3k_mtakecap(uint64_t i, uint64_t pid, uint64_t src, uint64_t dst)
+enum s3k_excpt s3k_mtakecap(uint64_t i, uint64_t pid, uint64_t src,
+			    uint64_t dst)
 {
 	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_MTAKECAP;
 	register uint64_t a1 __asm__("a1") = i;
 	register uint64_t a2 __asm__("a2") = pid;
 	register uint64_t a3 __asm__("a3") = src;
 	register uint64_t a4 __asm__("a4") = dst;
-	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1), "r"(a2), "r"(a3), "r"(a4));
+	__asm__ volatile("ecall"
+			 : "+r"(a0)
+			 : "r"(a1), "r"(a2), "r"(a3), "r"(a4));
 	return a0;
 }
 
-enum s3k_excpt s3k_mgivecap(uint64_t i, uint64_t pid, uint64_t src, uint64_t dst)
+enum s3k_excpt s3k_mgivecap(uint64_t i, uint64_t pid, uint64_t src,
+			    uint64_t dst)
 {
 	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_MGIVECAP;
 	register uint64_t a1 __asm__("a1") = i;
 	register uint64_t a2 __asm__("a2") = pid;
 	register uint64_t a3 __asm__("a3") = src;
 	register uint64_t a4 __asm__("a4") = dst;
-	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1), "r"(a2), "r"(a3), "r"(a4));
+	__asm__ volatile("ecall"
+			 : "+r"(a0)
+			 : "r"(a1), "r"(a2), "r"(a3), "r"(a4));
 	return a0;
 }
 
