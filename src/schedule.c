@@ -51,12 +51,11 @@ retry:
 		proc = &processes[entry.pid];
 		if (proc->sleep > time_get())
 			continue;
-	} while (
-	    !__sync_bool_compare_and_swap(&proc->state, PS_READY, PS_RUNNING));
+	} while (proc_acquire(proc, PS_READY));
 	proc_load_pmp(proc);
 	if (!csrr_pmpcfg0()) {
 		// Temporary fix. QEMU does not allow this to be zero.
-		__atomic_fetch_and(&proc->state, ~PS_RUNNING, __ATOMIC_RELEASE);
+		proc_release(proc);
 		goto retry;
 	}
 	timeout_set(hartid, quantum * NTICK);
@@ -69,7 +68,7 @@ retry:
 
 struct proc *schedule_yield(struct proc *proc)
 {
-	__atomic_fetch_and(&proc->state, ~PS_RUNNING, __ATOMIC_RELEASE);
+	proc_release(proc);
 	return schedule_next();
 }
 

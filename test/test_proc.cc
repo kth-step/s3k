@@ -29,6 +29,7 @@ class ProcTest : public ::testing::Test
 			cnode_handle_t handle = cnode_get_handle(0, i);
 			cnode_insert(handle, caps[i], root);
 		}
+		processes[0] = { .pid = 0, .state = PS_READY };
 	}
 
 	~ProcTest() override
@@ -64,4 +65,23 @@ TEST_F(ProcTest, LoadPmp)
 	EXPECT_EQ(csrr_pmpaddr5(), 0x205FFFull);
 	EXPECT_EQ(csrr_pmpaddr6(), 0x205FFFull);
 	EXPECT_EQ(csrr_pmpaddr7(), 0x205FFFull);
+}
+
+TEST_F(ProcTest, ProcAcqRel)
+{
+	EXPECT_TRUE(proc_acquire(&processes[0], PS_READY));
+	EXPECT_EQ(processes[0].state, PS_RUNNING);
+	proc_release(&processes[0]);
+	EXPECT_EQ(processes[0].state, PS_READY);
+}
+
+TEST_F(ProcTest, ProcAcqSupRel)
+{
+	EXPECT_TRUE(proc_acquire(&processes[0], PS_READY));
+	EXPECT_EQ(processes[0].state, PS_RUNNING);
+	proc_suspend(&processes[0]);
+	EXPECT_EQ(processes[0].state, PS_SUSPENDED_BUSY);
+	proc_release(&processes[0]);
+	EXPECT_EQ(processes[0].state, PS_SUSPENDED);
+	EXPECT_FALSE(proc_acquire(&processes[0], PS_READY));
 }

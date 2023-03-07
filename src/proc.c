@@ -6,6 +6,35 @@
 
 struct proc processes[NPROC];
 
+bool proc_acquire(struct proc *proc, uint64_t expected)
+{
+	assert(!(expected & PSF_BUSY));
+	// Set the busy flag if expected state
+	uint64_t desired = expected | PSF_BUSY;
+	return __atomic_compare_exchange_n(&proc->state, &expected, desired,
+					   false /* not weak */,
+					   __ATOMIC_ACQUIRE /* succ */,
+					   __ATOMIC_RELAXED /* fail */);
+}
+
+void proc_release(struct proc *proc)
+{
+	// Unset the busy flag
+	__atomic_fetch_and(&proc->state, ~PSF_BUSY, __ATOMIC_RELEASE);
+}
+
+void proc_suspend(struct proc *proc)
+{
+	// Set the suspend flag
+	__atomic_fetch_or(&proc->state, PSF_SUSPEND, __ATOMIC_ACQUIRE);
+}
+
+void proc_resume(struct proc *proc)
+{
+	// Unset the suspend flag
+	__atomic_fetch_and(&proc->state, ~PSF_SUSPEND, __ATOMIC_RELEASE);
+}
+
 void proc_load_pmp(const struct proc *proc)
 {
 	uint64_t pmp = proc->regs[REG_PMP];

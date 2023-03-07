@@ -39,7 +39,10 @@ class SyscallTest : public ::testing::Test
 		for (int i = 0; i < NPROC; ++i) {
 			processes[i] = { 0 };
 			processes[i].pid = i;
+			processes[i].state = PS_SUSPENDED;
 		}
+		processes[0].state = PS_RUNNING;
+
 		cnode_init();
 		cnode_handle_t root = cnode_get_root_handle();
 		for (cnode_handle_t i = 0; i < ARRAY_SIZE(caps); ++i) {

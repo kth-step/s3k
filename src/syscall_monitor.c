@@ -32,7 +32,7 @@ struct proc *syscall_msuspend(struct proc *proc, uint64_t mon_idx, uint64_t pid)
 		proc->regs[REG_A0] = EXCPT_EMPTY;
 		return proc;
 	}
-	__sync_fetch_and_or(&other_proc->state, PSF_SUSPEND);
+	proc_suspend(other_proc);
 	syscall_unlock();
 	proc->regs[REG_A0] = EXCPT_NONE;
 	return proc;
@@ -62,7 +62,7 @@ struct proc *syscall_mresume(struct proc *proc, uint64_t mon_idx, uint64_t pid)
 		proc->regs[REG_A0] = EXCPT_EMPTY;
 		return proc;
 	}
-	__sync_fetch_and_and(&other_proc->state, ~PSF_SUSPEND);
+	proc_resume(other_proc);
 	syscall_unlock();
 	proc->regs[REG_A0] = EXCPT_NONE;
 	return proc;
@@ -93,13 +93,13 @@ struct proc *syscall_mgetreg(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 	}
 
 	struct proc *other_proc = &processes[pid];
-	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED,
-					  PS_SUSPENDED_BUSY)) {
+	if (!proc_acquire(other_proc, PS_SUSPENDED)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;
 		return proc;
 	}
 	proc->regs[REG_A1] = other_proc->regs[reg % REG_COUNT];
+	proc_release(other_proc);
 	__sync_fetch_and_and(&other_proc->state, ~PSF_BUSY);
 	syscall_unlock();
 	proc->regs[REG_A0] = EXCPT_NONE;
@@ -131,14 +131,13 @@ struct proc *syscall_msetreg(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 		return proc;
 	}
 	struct proc *other_proc = &processes[pid];
-	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED,
-					  PS_SUSPENDED_BUSY)) {
+	if (!proc_acquire(other_proc, PS_SUSPENDED)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;
 		return proc;
 	}
 	other_proc->regs[reg % REG_COUNT] = val;
-	__sync_fetch_and_and(&other_proc->state, ~PSF_BUSY);
+	proc_release(other_proc);
 	syscall_unlock();
 	proc->regs[REG_A0] = EXCPT_NONE;
 	return proc;
@@ -169,8 +168,7 @@ struct proc *syscall_mgetcap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 	}
 
 	struct proc *other_proc = &processes[pid];
-	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED,
-					  PS_SUSPENDED_BUSY)) {
+	if (!proc_acquire(other_proc, PS_SUSPENDED)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;
 		return proc;
@@ -178,7 +176,7 @@ struct proc *syscall_mgetcap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 	cnode_handle_t node_handle = cnode_get_handle(pid, node_idx);
 	union cap node_cap = cnode_get_cap(node_handle);
 	proc->regs[REG_A1] = node_cap.raw;
-	__sync_fetch_and_and(&other_proc->state, ~PSF_BUSY);
+	proc_release(other_proc);
 	syscall_unlock();
 	proc->regs[REG_A0] = EXCPT_NONE;
 	return proc;
@@ -208,8 +206,7 @@ struct proc *syscall_mtakecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 		return proc;
 	}
 	struct proc *other_proc = &processes[pid];
-	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED,
-					  PS_SUSPENDED_BUSY)) {
+	if (!proc_acquire(other_proc, PS_SUSPENDED)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;
 		return proc;
@@ -224,7 +221,7 @@ struct proc *syscall_mtakecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 					src_cap.time.free, src_cap.time.end);
 		}
 	}
-	__sync_fetch_and_and(&other_proc->state, ~PSF_BUSY);
+	proc_release(other_proc);
 	syscall_unlock();
 	proc->regs[REG_A0] = EXCPT_NONE;
 	return proc;
@@ -255,8 +252,7 @@ struct proc *syscall_mgivecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 	}
 
 	struct proc *other_proc = &processes[pid];
-	if (!__sync_bool_compare_and_swap(&other_proc->state, PS_SUSPENDED,
-					  PS_SUSPENDED_BUSY)) {
+	if (!proc_acquire(other_proc, PS_SUSPENDED)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;
 		return proc;
@@ -272,7 +268,7 @@ struct proc *syscall_mgivecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 					src_cap.time.free, src_cap.time.end);
 		}
 	}
-	__sync_fetch_and_and(&other_proc->state, ~PSF_BUSY);
+	proc_release(other_proc);
 	syscall_unlock();
 	proc->regs[REG_A0] = EXCPT_NONE;
 	return proc;

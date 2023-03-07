@@ -81,6 +81,11 @@ struct proc {
 /// An array of all processes control blocks.
 extern struct proc processes[NPROC];
 
+bool proc_acquire(struct proc *proc, uint64_t expected);
+void proc_release(struct proc *proc);
+void proc_suspend(struct proc *proc);
+void proc_resume(struct proc *proc);
+
 /**
  * Loads the PMP settings of the process to the hardware.
  * @param proc Process for which we load PMP settings.
