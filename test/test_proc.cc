@@ -1,5 +1,3 @@
-#define NPROC 4
-#define NCAPS 32
 #include <assert.h>
 #include <gtest/gtest.h>
 
