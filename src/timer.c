@@ -8,6 +8,11 @@ uint64_t time_get(void)
 	return _mtime;
 }
 
+void time_set(uint64_t time)
+{
+	_mtime = time;
+}
+
 uint64_t timeout_get(uint64_t i)
 {
 	return _mtimecmp[i];

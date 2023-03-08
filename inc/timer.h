@@ -10,6 +10,7 @@
 #include <stdint.h>
 
 uint64_t time_get(void);
+void time_set(uint64_t time);
 uint64_t timeout_get(uint64_t i);
 void timeout_set(uint64_t i, uint64_t val);
 

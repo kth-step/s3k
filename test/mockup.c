@@ -13,7 +13,8 @@
 
 struct proc *current;
 static uint64_t _mhartid;
-static uint64_t _timeout;
+static uint64_t _time;
+static uint64_t _timeout[8];
 static uint64_t _pmpcfg0;
 static uint64_t _pmpaddr[8];
 
@@ -35,19 +36,23 @@ void wfi(void)
 
 uint64_t time_get(void)
 {
-	struct timeval tv;
-	gettimeofday(&tv, NULL);
-	return tv.tv_sec * 1000000ull + tv.tv_usec;
+	_time += 10;
+	return _time;
+}
+
+void time_set(uint64_t time)
+{
+	_time = time;
 }
 
 uint64_t timeout_get(uint64_t i)
 {
-	return _timeout;
+	return _timeout[i];
 }
 
 void timeout_set(uint64_t i, uint64_t val)
 {
-	_timeout = val;
+	_timeout[i] = val;
 }
 
 uint64_t csrr_mhartid(void)
@@ -57,7 +62,7 @@ uint64_t csrr_mhartid(void)
 
 uint64_t csrr_mip(void)
 {
-	if (time_get() < _timeout)
+	if (time_get() < _timeout[_mhartid])
 		return 0;
 	return (1 << 7);
 }

@@ -12,14 +12,9 @@
 
 #define NONE_PID 0xFF
 
-struct sched_entry {
-	uint8_t pid;
-	uint8_t len;
-};
-
 static volatile struct sched_entry schedule[4][NSLICE];
 
-static struct sched_entry schedule_get(uint64_t hartid, size_t i)
+struct sched_entry schedule_get(uint64_t hartid, size_t i)
 {
 	return schedule[hartid][i];
 }

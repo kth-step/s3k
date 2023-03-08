@@ -14,6 +14,13 @@
 
 #include <stdint.h>
 
+struct sched_entry {
+	uint8_t pid;
+	uint8_t len;
+};
+
+struct sched_entry schedule_get(uint64_t hartid, size_t i);
+
 /// Yield the current time slice.
 void schedule_yield(struct proc *proc);
 /// Find the next process to schedule.
