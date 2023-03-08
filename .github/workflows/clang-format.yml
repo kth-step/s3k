@@ -4,7 +4,6 @@ jobs:
   clang-format-checking:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: RafikFarhad/clang-format-github-action@v3
-        with:
-          sources: "api/*.h,api/*.c,inc/*.h,src/*.c,test/*.cc"
+      - uses: actions/checkout@v3
+      - run: sudo apt install clang-format
+      - run: clang-format -Werror --dry-run $(find -regextype sed -regex ".*\.\(c\|cc\|h\)")
