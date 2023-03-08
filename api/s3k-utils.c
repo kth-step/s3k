@@ -63,8 +63,7 @@ bool s3k_time_derive_time(struct s3k_time parent, struct s3k_time child)
 {
 	return parent.free <= child.begin && child.end <= parent.end
 	       && child.begin == child.free && child.begin < child.end
-	       && child.hartid == parent.hartid
-	       && child._padd == 0;
+	       && child.hartid == parent.hartid && child._padd == 0;
 }
 
 bool s3k_memory_derive_memory(struct s3k_memory parent, struct s3k_memory child)

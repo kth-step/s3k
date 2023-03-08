@@ -9,5 +9,5 @@
 #include "proc.h"
 
 void current_set(struct proc *proc);
-void current_get(struct proc *proc);
+struct proc *current_get();
 #endif /* __CURRENT_H__ */

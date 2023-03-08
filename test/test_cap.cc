@@ -150,14 +150,14 @@ TEST_F(CapTest, MemoryDerive)
 				      cap_memory(0x100, 0x200, 8, S3K_RWX)));
 	// Larger
 	EXPECT_FALSE(cap_memory_derive(cap_memory(0x100, 0x3000, 8, S3K_RWX),
-				      cap_memory(0x0, 0x2000, 8, S3K_RWX)));
+				       cap_memory(0x0, 0x2000, 8, S3K_RWX)));
 	EXPECT_FALSE(cap_memory_derive(cap_memory(0x100, 0x3000, 8, S3K_RWX),
-				      cap_memory(0x100, 0x3001, 8, S3K_RWX)));
+				       cap_memory(0x100, 0x3001, 8, S3K_RWX)));
 	EXPECT_FALSE(cap_memory_derive(cap_memory(0x100, 0x3000, 8, S3K_RWX),
-				      cap_memory(0x99, 0x3001, 8, S3K_RWX)));
+				       cap_memory(0x99, 0x3001, 8, S3K_RWX)));
 	// OFFSET NOT EQ
 	EXPECT_FALSE(cap_memory_derive(cap_memory(0x100, 0x200, 8, S3K_RWX),
-				      cap_memory(0x100, 0x200, 7, S3K_RWX)));
+				       cap_memory(0x100, 0x200, 7, S3K_RWX)));
 }
 
 TEST_F(CapTest, PmpAddr)

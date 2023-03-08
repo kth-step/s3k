@@ -22,9 +22,9 @@ void current_set(struct proc *proc)
 	current = proc;
 }
 
-void current_get(struct proc *proc)
+struct proc *current_get(void)
 {
-	current = proc;
+	return current;
 }
 
 void wfi(void)
