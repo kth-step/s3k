@@ -63,6 +63,7 @@ bool s3k_time_derive_time(struct s3k_time parent, struct s3k_time child)
 {
 	return parent.free <= child.begin && child.end <= parent.end
 	       && child.begin == child.free && child.begin < child.end
+	       && child.hartid == parent.hartid
 	       && child._padd == 0;
 }
 
@@ -165,14 +166,15 @@ bool s3k_can_derive(union s3k_cap parent, union s3k_cap child)
 
 bool s3k_time_parent_time(struct s3k_time parent, struct s3k_time child)
 {
-	return parent.begin <= child.begin && child.end <= parent.free;
+	return parent.begin <= child.begin && child.end <= parent.end
+	       && child.hartid == parent.hartid;
 }
 
 static bool s3k_memory_parent_memory(struct s3k_memory parent,
 				     struct s3k_memory child)
 {
 	return parent.offset == child.offset && parent.begin <= child.begin
-	       && child.end <= parent.free;
+	       && child.end <= parent.end;
 }
 
 static bool s3k_memory_parent_pmp(struct s3k_memory parent,
@@ -191,19 +193,19 @@ static bool s3k_memory_parent_pmp(struct s3k_memory parent,
 bool s3k_monitor_parent_monitor(struct s3k_monitor parent,
 				struct s3k_monitor child)
 {
-	return parent.begin <= child.begin && child.end <= parent.free;
+	return parent.begin <= child.begin && child.end <= parent.end;
 }
 
 bool s3k_channel_parent_channel(struct s3k_channel parent,
 				struct s3k_channel child)
 {
-	return parent.begin <= child.begin && child.end <= parent.free;
+	return parent.begin <= child.begin && child.end <= parent.end;
 }
 
 bool s3k_channel_parent_socket(struct s3k_channel parent,
 			       struct s3k_socket child)
 {
-	return parent.begin <= child.channel && child.channel <= parent.free;
+	return parent.begin <= child.channel && child.channel <= parent.end;
 }
 
 bool s3k_socket_parent_socket(struct s3k_socket parent, struct s3k_socket child)

@@ -25,6 +25,12 @@ union cap cap_time(uint64_t hartid, uint64_t begin, uint64_t end)
 union cap cap_memory(uint64_t begin, uint64_t end, uint64_t offset,
 		     uint64_t rwx)
 {
+	assert(begin <= end);
+	assert(rwx == CAP_RWX || rwx == CAP_RW || rwx == CAP_RX
+	       || rwx == CAP_R);
+	assert(begin <= 0x8000);
+	assert(end <= 0x8000);
+	assert(offset <= 255);
 	return (union cap){
 		.memory
 		= {CAPTY_MEMORY, false, rwx, offset, begin, begin, end}
@@ -63,7 +69,7 @@ static bool cap_time_derive_time(struct time parent, struct time child)
 {
 	return parent.free <= child.begin && child.end <= parent.end
 	       && child.begin == child.free && child.begin < child.end
-	       && child._padd == 0;
+	       && parent.hartid == child.hartid && child._padd == 0;
 }
 
 static bool cap_memory_derive_memory(struct memory parent, struct memory child)
@@ -153,13 +159,14 @@ bool cap_socket_derive(union cap parent, union cap child)
 
 static bool cap_time_parent_time(struct time parent, struct time child)
 {
-	return parent.begin <= child.begin && child.end <= parent.free;
+	return parent.begin <= child.begin && child.end <= parent.end
+	       && child.hartid == parent.hartid;
 }
 
 static bool cap_memory_parent_memory(struct memory parent, struct memory child)
 {
 	return parent.offset == child.offset && parent.begin <= child.begin
-	       && child.end <= parent.free;
+	       && child.end <= parent.end;
 }
 
 static bool cap_memory_parent_pmp(struct memory parent, struct pmp child)
@@ -177,19 +184,19 @@ static bool cap_memory_parent_pmp(struct memory parent, struct pmp child)
 static bool cap_monitor_parent_monitor(struct monitor parent,
 				       struct monitor child)
 {
-	return parent.begin <= child.begin && child.end <= parent.free;
+	return parent.begin <= child.begin && child.end <= parent.end;
 }
 
 static bool cap_channel_parent_channel(struct channel parent,
 				       struct channel child)
 {
-	return parent.begin <= child.begin && child.end <= parent.free;
+	return parent.begin <= child.begin && child.end <= parent.end;
 }
 
 static bool cap_channel_parent_socket(struct channel parent,
 				      struct socket child)
 {
-	return parent.begin <= child.channel && child.channel <= parent.free;
+	return parent.begin <= child.channel && child.channel < parent.end;
 }
 
 static bool cap_socket_parent_socket(struct socket parent, struct socket child)
