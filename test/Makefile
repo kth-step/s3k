@@ -1,6 +1,7 @@
 
 vpath %.c ../src
-SRCS=cap.c cnode.c exception.c lock.c proc.c schedule.c syscall.c syscall_monitor.c mockup.c
+SRCS=cap.c cnode.c exception.c lock.c proc.c schedule.c syscall.c \
+     syscall_monitor.c mockup.c
 TEST_SRCS=$(wildcard test_*.cc)
 
 OBJS=$(patsubst %.c,obj/%.o, $(SRCS))

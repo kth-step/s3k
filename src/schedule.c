@@ -4,6 +4,7 @@
 
 #include "consts.h"
 #include "csr.h"
+#include "current.h"
 #include "proc.h"
 #include "timer.h"
 #include "trap.h"
@@ -36,7 +37,7 @@ void schedule_delete(uint64_t hartid, uint64_t begin, uint64_t end)
 	schedule_update(hartid, NONE_PID, begin, end);
 }
 
-struct proc *schedule_next()
+void schedule_next()
 {
 	uint64_t hartid = csrr_mhartid();
 	uint64_t quantum;
@@ -63,13 +64,13 @@ retry:
 		wfi();
 	}
 	timeout_set(hartid, (quantum + entry.len) * NTICK - NSLACK);
-	return proc;
+	current_set(proc);
 }
 
-struct proc *schedule_yield(struct proc *proc)
+void schedule_yield(struct proc *proc)
 {
 	proc_release(proc);
-	return schedule_next();
+	schedule_next();
 }
 
 void schedule_init(void)

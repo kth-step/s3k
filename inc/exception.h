@@ -8,8 +8,11 @@
 #ifndef __EXCEPTION_H__
 #define __EXCEPTION_H__
 
+#include "proc.h"
+
 #include <stdint.h>
-struct proc *handle_exception(struct proc *proc, uint64_t mcause, uint64_t mepc,
-			      uint64_t mtval);
+
+void handle_exception(struct proc *proc, uint64_t mcause, uint64_t mepc,
+		      uint64_t mtval);
 
 #endif /* __EXCEPTION_H__ */

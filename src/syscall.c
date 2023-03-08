@@ -25,7 +25,7 @@ void syscall_unlock(void)
 }
 
 /*** System call handlers ***/
-struct proc *syscall_getinfo(struct proc *proc, uint64_t info)
+void syscall_getinfo(struct proc *proc, uint64_t info)
 {
 	switch (info) {
 	case 0:
@@ -44,41 +44,37 @@ struct proc *syscall_getinfo(struct proc *proc, uint64_t info)
 		proc->regs[REG_A0] = 0;
 		break;
 	}
-	return proc;
 }
 
-struct proc *syscall_getreg(struct proc *proc, uint64_t regIdx)
+void syscall_getreg(struct proc *proc, uint64_t regIdx)
 {
 	uint64_t *regs = (uint64_t *)&proc->regs;
 	regIdx %= REG_COUNT;
 	proc->regs[REG_A0] = regs[regIdx];
-	return proc;
 }
 
-struct proc *syscall_setreg(struct proc *proc, uint64_t regIdx, uint64_t val)
+void syscall_setreg(struct proc *proc, uint64_t regIdx, uint64_t val)
 {
 	uint64_t *regs = (uint64_t *)&proc->regs;
 	regIdx %= REG_COUNT;
 	regs[regIdx] = val;
 	if (regIdx == REG_PMP)
 		proc_load_pmp(proc);
-	return proc;
 }
 
-struct proc *syscall_yield(struct proc *proc)
+void syscall_yield(struct proc *proc)
 {
 	proc->sleep = timeout_get(csrr_mhartid());
-	return schedule_yield(proc);
+	schedule_yield(proc);
 }
 
-struct proc *syscall_getcap(struct proc *proc, uint64_t idx)
+void syscall_getcap(struct proc *proc, uint64_t idx)
 {
 	cnode_handle_t handle = cnode_get_handle(proc->pid, idx);
 	proc->regs[REG_A0] = cnode_get_cap(handle).raw;
-	return proc;
 }
 
-struct proc *syscall_movcap(struct proc *proc, uint64_t srcIdx, uint64_t dstIdx)
+void syscall_movcap(struct proc *proc, uint64_t srcIdx, uint64_t dstIdx)
 {
 	// Get handles
 	cnode_handle_t src_handle = cnode_get_handle(proc->pid, srcIdx);
@@ -86,11 +82,11 @@ struct proc *syscall_movcap(struct proc *proc, uint64_t srcIdx, uint64_t dstIdx)
 
 	if (!cnode_contains(src_handle)) {
 		proc->regs[REG_A0] = EXCPT_EMPTY;
-		return proc;
+		return;
 	}
 	if (cnode_contains(dst_handle)) {
 		proc->regs[REG_A0] = EXCPT_COLLISION;
-		return proc;
+		return;
 	}
 	syscall_lock();
 	if (cnode_contains(src_handle)) {
@@ -100,16 +96,15 @@ struct proc *syscall_movcap(struct proc *proc, uint64_t srcIdx, uint64_t dstIdx)
 		proc->regs[REG_A0] = EXCPT_EMPTY;
 	}
 	syscall_unlock();
-	return proc;
 }
 
-struct proc *syscall_delcap(struct proc *proc, uint64_t idx)
+void syscall_delcap(struct proc *proc, uint64_t idx)
 {
 	cnode_handle_t handle = cnode_get_handle(proc->pid, idx);
 	union cap cap = cnode_get_cap(handle);
 	if (!cnode_contains(handle)) {
 		proc->regs[REG_A0] = EXCPT_EMPTY;
-		return proc;
+		return;
 	}
 	syscall_lock();
 	if (cnode_contains(handle)) {
@@ -122,7 +117,6 @@ struct proc *syscall_delcap(struct proc *proc, uint64_t idx)
 		proc->regs[REG_A0] = EXCPT_EMPTY;
 	}
 	syscall_unlock();
-	return proc;
 }
 
 static void _revoke_time_hook(cnode_handle_t handle, union cap cap,
@@ -195,7 +189,7 @@ static void _revoke_socket_post_hook(cnode_handle_t handle, union cap cap)
 	/* This should be empty */
 }
 
-struct proc *syscall_revcap(struct proc *proc, uint64_t idx)
+void syscall_revcap(struct proc *proc, uint64_t idx)
 {
 	// Get handle
 	cnode_handle_t handle = cnode_get_handle(proc->pid, idx);
@@ -204,7 +198,7 @@ struct proc *syscall_revcap(struct proc *proc, uint64_t idx)
 	// If empty slot
 	if (cnode_contains(handle)) {
 		proc->regs[REG_A0] = EXCPT_EMPTY;
-		return proc;
+		return;
 	}
 
 	bool (*is_parent)(union cap, union cap);
@@ -238,7 +232,7 @@ struct proc *syscall_revcap(struct proc *proc, uint64_t idx)
 		break;
 	default:
 		proc->regs[REG_A0] = EXCPT_NONE;
-		return proc;
+		return;
 	}
 
 	cnode_handle_t next_handle;
@@ -256,7 +250,7 @@ struct proc *syscall_revcap(struct proc *proc, uint64_t idx)
 
 	if (!cnode_contains(handle)) {
 		proc->regs[REG_A0] = EXCPT_EMPTY;
-		return proc;
+		return;
 	}
 	syscall_lock();
 	if (cnode_contains(handle)) {
@@ -266,7 +260,6 @@ struct proc *syscall_revcap(struct proc *proc, uint64_t idx)
 		proc->regs[REG_A0] = EXCPT_EMPTY;
 	}
 	syscall_unlock();
-	return proc;
 }
 
 static void _derive_time(cnode_handle_t orig_handle, union cap orig_cap,
@@ -314,8 +307,8 @@ static void _derive_socket(cnode_handle_t orig_handle, union cap orig_cap,
 	/* This should be empty */
 }
 
-struct proc *syscall_drvcap(struct proc *proc, uint64_t orig_idx,
-			    uint64_t drv_idx, union cap drv_cap)
+void syscall_drvcap(struct proc *proc, uint64_t orig_idx, uint64_t drv_idx,
+		    union cap drv_cap)
 {
 	// Get handle
 	cnode_handle_t orig_handle = cnode_get_handle(proc->pid, orig_idx);
@@ -324,10 +317,10 @@ struct proc *syscall_drvcap(struct proc *proc, uint64_t orig_idx,
 
 	if (!cnode_contains(orig_handle)) { // If empty slot
 		proc->regs[REG_A0] = EXCPT_EMPTY;
-		return proc;
+		return;
 	} else if (cnode_contains(drv_handle)) { // If destination occupied
 		proc->regs[REG_A0] = EXCPT_COLLISION;
-		return proc;
+		return;
 	}
 
 	void (*hook)(cnode_handle_t, union cap, cnode_handle_t, union cap);
@@ -368,24 +361,19 @@ struct proc *syscall_drvcap(struct proc *proc, uint64_t orig_idx,
 		}
 		syscall_unlock();
 	}
-	return proc;
 }
 
-struct proc *syscall_recv(struct proc *proc, uint64_t recv_idx)
+void syscall_recv(struct proc *proc, uint64_t recv_idx)
 {
-	return proc;
 }
 
-struct proc *syscall_send(struct proc *proc, uint64_t send_idx, uint64_t msg0,
-			  uint64_t msg1, uint64_t cap0, uint64_t cap1,
-			  uint64_t yield)
+void syscall_send(struct proc *proc, uint64_t send_idx, uint64_t msg0,
+		  uint64_t msg1, uint64_t cap0, uint64_t cap1, uint64_t yield)
 {
-	return proc;
 }
 
-struct proc *syscall_sendrecv(struct proc *proc, uint64_t send_idx,
-			      uint64_t recv_idx, uint64_t msg0, uint64_t msg1,
-			      uint64_t cap0, uint64_t cap1)
+void syscall_sendrecv(struct proc *proc, uint64_t send_idx, uint64_t recv_idx,
+		      uint64_t msg0, uint64_t msg1, uint64_t cap0,
+		      uint64_t cap1)
 {
-	return proc;
 }

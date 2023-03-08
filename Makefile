@@ -7,7 +7,8 @@ vpath %.c src
 vpath %.S src
 
 ASSRC=head.S trap.S stack.S
-CSRC=cap.c cnode.c csr.c exception.c init.c lock.c proc.c schedule.c syscall.c syscall_monitor.c timer.c wfi.c
+CSRC=cap.c cnode.c current.c csr.c exception.c init.c lock.c proc.c schedule.c \
+     syscall.c syscall_monitor.c timer.c wfi.c
 OBJ=${addprefix obj/, ${ASSRC:.S=.o} ${CSRC:.c=.o}}
 DEP=${OBJ:.o=.d}
 

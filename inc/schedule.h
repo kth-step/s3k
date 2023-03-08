@@ -10,13 +10,14 @@
 #define __SCHED_H__
 
 #include "common.h"
+#include "proc.h"
 
 #include <stdint.h>
 
 /// Yield the current time slice.
-struct proc *schedule_yield(struct proc *proc);
+void schedule_yield(struct proc *proc);
 /// Find the next process to schedule.
-struct proc *schedule_next(void);
+void schedule_next(void);
 /// Initialize scheduler.
 void schedule_init(void);
 

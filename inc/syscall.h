@@ -59,59 +59,56 @@ void syscall_unlock(void);
 
 // Simple system calls
 /// Get process ID.
-struct proc *syscall_getinfo(struct proc *proc, uint64_t info);
+void syscall_getinfo(struct proc *proc, uint64_t info);
 /// Get register value.
-struct proc *syscall_getreg(struct proc *proc, uint64_t reg);
+void syscall_getreg(struct proc *proc, uint64_t reg);
 /// Get register value.
-struct proc *syscall_setreg(struct proc *proc, uint64_t reg, uint64_t val);
+void syscall_setreg(struct proc *proc, uint64_t reg, uint64_t val);
 /// Yield.
-struct proc *syscall_yield(struct proc *proc);
+void syscall_yield(struct proc *proc);
 
 // Capability system calls
 /// Get capability description.
-struct proc *syscall_getcap(struct proc *proc, uint64_t i);
+void syscall_getcap(struct proc *proc, uint64_t i);
 /// Get move capability.
-struct proc *syscall_movcap(struct proc *proc, uint64_t i, uint64_t j);
+void syscall_movcap(struct proc *proc, uint64_t i, uint64_t j);
 /// Delete capability.
-struct proc *syscall_delcap(struct proc *proc, uint64_t i);
+void syscall_delcap(struct proc *proc, uint64_t i);
 /// Revoke capability.
-struct proc *syscall_revcap(struct proc *proc, uint64_t i);
+void syscall_revcap(struct proc *proc, uint64_t i);
 /// Derive capability.
-struct proc *syscall_drvcap(struct proc *proc, uint64_t i, uint64_t j,
-			    union cap cap);
+void syscall_drvcap(struct proc *proc, uint64_t i, uint64_t j, union cap cap);
 
 // Monitor capability system calls
 /// Suspend a process
-struct proc *syscall_msuspend(struct proc *proc, uint64_t mon, uint64_t pid);
+void syscall_msuspend(struct proc *proc, uint64_t mon, uint64_t pid);
 /// Resume a process
-struct proc *syscall_mresume(struct proc *proc, uint64_t mon, uint64_t pid);
+void syscall_mresume(struct proc *proc, uint64_t mon, uint64_t pid);
 /// Get a register of a process
-struct proc *syscall_mgetreg(struct proc *proc, uint64_t mon, uint64_t pid,
-			     uint64_t reg);
+void syscall_mgetreg(struct proc *proc, uint64_t mon, uint64_t pid,
+		     uint64_t reg);
 /// Set a register of a process
-struct proc *syscall_msetreg(struct proc *proc, uint64_t mon, uint64_t pid,
-			     uint64_t reg, uint64_t val);
+void syscall_msetreg(struct proc *proc, uint64_t mon, uint64_t pid,
+		     uint64_t reg, uint64_t val);
 /// Read a capability of a process
-struct proc *syscall_mgetcap(struct proc *proc, uint64_t mon, uint64_t pid,
-			     uint64_t i);
+void syscall_mgetcap(struct proc *proc, uint64_t mon, uint64_t pid, uint64_t i);
 /// Take a capability from a process
-struct proc *syscall_mtakecap(struct proc *proc, uint64_t mon, uint64_t pid,
-			      uint64_t i, uint64_t j);
+void syscall_mtakecap(struct proc *proc, uint64_t mon, uint64_t pid, uint64_t i,
+		      uint64_t j);
 /// Give a capability to a process
-struct proc *syscall_mgivecap(struct proc *proc, uint64_t mon, uint64_t pid,
-			      uint64_t i, uint64_t j);
+void syscall_mgivecap(struct proc *proc, uint64_t mon, uint64_t pid, uint64_t i,
+		      uint64_t j);
 
 // IPC capability system calls
 /// Receive a message.
-struct proc *syscall_recv(struct proc *proc, uint64_t recv_idx);
+void syscall_recv(struct proc *proc, uint64_t recv_idx);
 /// Send a message.
-struct proc *syscall_send(struct proc *proc, uint64_t send_idx, uint64_t msg0,
-			  uint64_t msg1, uint64_t cap0, uint64_t cap1,
-			  uint64_t yield);
+void syscall_send(struct proc *proc, uint64_t send_idx, uint64_t msg0,
+		  uint64_t msg1, uint64_t cap0, uint64_t cap1, uint64_t yield);
 /// Send then receive a message.
-struct proc *syscall_sendrecv(struct proc *proc, uint64_t recv_idx,
-			      uint64_t send_idx, uint64_t msg0, uint64_t msg1,
-			      uint64_t cap0, uint64_t cap1);
+void syscall_sendrecv(struct proc *proc, uint64_t recv_idx, uint64_t send_idx,
+		      uint64_t msg0, uint64_t msg1, uint64_t cap0,
+		      uint64_t cap1);
 /// @}
 
 #endif /* __SYSCALL_H__ */

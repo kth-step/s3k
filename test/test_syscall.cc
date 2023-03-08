@@ -64,7 +64,7 @@ class SyscallTest : public ::testing::Test
 TEST_F(SyscallTest, GetPid)
 {
 	for (int i = 0; i < NPROC; ++i) {
-		EXPECT_EQ(syscall_getinfo(&processes[i], 0), &processes[i]);
+		syscall_getinfo(&processes[i], 0);
 		EXPECT_EQ(processes[i].regs[REG_A0], i);
 	}
 }
@@ -72,7 +72,7 @@ TEST_F(SyscallTest, GetPid)
 TEST_F(SyscallTest, GetHartID)
 {
 	for (int i = 0; i < NPROC; ++i) {
-		EXPECT_EQ(syscall_getinfo(&processes[i], 1), &processes[i]);
+		syscall_getinfo(&processes[i], 1);
 		EXPECT_EQ(processes[i].regs[REG_A0], 0);
 	}
 }
@@ -81,7 +81,7 @@ TEST_F(SyscallTest, GetTime)
 {
 	for (int i = 0; i < NPROC; ++i) {
 		uint64_t before = time_get();
-		EXPECT_EQ(syscall_getinfo(&processes[i], 2), &processes[i]);
+		syscall_getinfo(&processes[i], 2);
 		uint64_t after = time_get();
 		EXPECT_GE(processes[i].regs[REG_A0], before);
 		EXPECT_LE(processes[i].regs[REG_A0], after);
@@ -93,7 +93,7 @@ TEST_F(SyscallTest, GetTimeout)
 	for (int i = 0; i < NPROC; ++i) {
 		uint64_t timeout = time_get();
 		timeout_set(0, timeout);
-		EXPECT_EQ(syscall_getinfo(&processes[i], 3), &processes[i]);
+		syscall_getinfo(&processes[i], 3);
 		EXPECT_EQ(processes[i].regs[REG_A0], timeout);
 	}
 }
