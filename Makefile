@@ -14,8 +14,9 @@ DEP=${OBJ:.o=.d}
 
 CONFIG_H?=config.h
 PLATFORM_H?=plat/${PLATFORM}/platform.h
+INC+=-include ${CONFIG_H} -include ${PLATFORM_H}
 
-all: options test kernel
+all: options test kernel dasm
 
 options:
 	@printf "build options:\n"
@@ -25,21 +26,8 @@ options:
 	@printf "CFLAGS   = ${CFLAGS}\n"
 	@printf "CONFIG_H = ${abspath ${CONFIG_H}}\n"
 
-kernel: s3k.elf s3k.da
-
-obj/%.o: %.S
-	@mkdir -p ${@D}
-	${CC} ${ASFLAGS} -include ${CONFIG_H} -include ${PLATFORM_H} ${INC} -MMD -c -o $@ $<
-
-obj/%.o: %.c
-	@mkdir -p ${@D}
-	${CC} ${CFLAGS} -include ${CONFIG_H} -include ${PLATFORM_H} ${INC}  -MMD -c -o $@ $<
-
-s3k.elf: ${OBJ}
-	${CC} ${LDFLAGS} -o $@ ${OBJ}
-
-s3k.da:	s3k.elf
-	${OBJDUMP} -d $< > $@
+kernel: s3k.elf 
+dasm: s3k.da
 
 docs:
 	doxygen
@@ -53,6 +41,20 @@ format:
 clean:
 	git clean -fdX
 
+obj/%.o: %.S
+	@mkdir -p ${@D}
+	${CC} ${ASFLAGS} ${INC} -MMD -c -o $@ $<
+
+obj/%.o: %.c
+	@mkdir -p ${@D}
+	${CC} ${CFLAGS} ${INC}  -MMD -c -o $@ $<
+
+s3k.elf: ${OBJ}
+	${CC} ${LDFLAGS} -o $@ ${OBJ}
+
+s3k.da:	s3k.elf
+	${OBJDUMP} -d $< > $@
+
 -include ${DEP}
 
-.PHONY: all options clean docs test kernel
+.PHONY: all options clean dasm docs test kernel
