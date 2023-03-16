@@ -36,7 +36,7 @@ test:
 	$(MAKE) -C test
 
 format:
-	clang-format -i $(shell find -regextype sed -regex ".*\.\(c\|cc\|h\)")
+	clang-format --dry-run --Werror $(shell find -regextype sed -regex ".*\.\(c\|cc\|h\)" -not -path '*/.*')
 
 clean:
 	git clean -fdX

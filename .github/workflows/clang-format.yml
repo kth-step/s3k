@@ -6,4 +6,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt install clang-format
-      - run: clang-format -Werror --dry-run $(find -regextype sed -regex ".*\.\(c\|cc\|h\)")
+      - run: clang-format --dry-run --Werror $(shell find -regextype sed -regex ".*\.\(c\|cc\|h\)" -not -path '*/.*')
