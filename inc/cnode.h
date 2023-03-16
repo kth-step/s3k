@@ -28,7 +28,7 @@ typedef unsigned long cnode_handle_t;
 /**
  * @brief Initialize the cnode structure.
  */
-void cnode_init(const union cap *caps);
+void cnode_init(const union cap *caps, size_t size);
 
 /**
  * @brief Get the handle for capability i of a process.

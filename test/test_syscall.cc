@@ -24,8 +24,7 @@ class SyscallTest : public ::testing::Test
 		CAP_TIME(2, 0, NSLICE),
 		CAP_TIME(3, 0, NSLICE),
 		CAP_MONITOR(0, NPROC),
-		CAP_CHANNEL(0, NCHANNEL),
-		CAP_NULL };
+		CAP_CHANNEL(0, NCHANNEL) };
 
       protected:
 	SyscallTest()
@@ -38,7 +37,7 @@ class SyscallTest : public ::testing::Test
 
 	void SetUp() override
 	{
-		cnode_init(caps);
+		cnode_init(caps, ARRAY_SIZE(caps));
 		proc_init(0);
 	}
 

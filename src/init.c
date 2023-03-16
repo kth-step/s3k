@@ -18,7 +18,7 @@ void init_kernel(uint64_t payload)
 	tl_lock(&lock);
 	if (!done) {
 		proc_init(payload);
-		cnode_init(init_caps);
+		cnode_init(init_caps, ARRAY_SIZE(init_caps));
 		schedule_init();
 		__sync_synchronize();
 		done = 1;

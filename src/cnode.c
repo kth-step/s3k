@@ -49,7 +49,7 @@ static void _move(uint32_t src, uint32_t dst)
 	cnodes[src].next = 0;
 }
 
-void cnode_init(const union cap *caps)
+void cnode_init(const union cap *caps, size_t size)
 {
 	// zero cnodes
 	for (int i = 0; i < NPROC * NCAP; ++i)
@@ -60,7 +60,7 @@ void cnode_init(const union cap *caps)
 	cnodes[root].next = root;
 	cnodes[root].raw_cap = -1;
 	// Add initial nodes
-	for (cnode_handle_t i = 0; caps[i].raw != 0; i++) {
+	for (cnode_handle_t i = 0; i < size; i++) {
 		_insert(i, caps[i].raw, root);
 	}
 }

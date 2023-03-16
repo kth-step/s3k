@@ -2,8 +2,6 @@
 #include <gtest/gtest.h>
 
 extern "C" {
-#include "cap.h"
-#include "cnode.h"
 #include "csr.h"
 #include "proc.h"
 #include "schedule.h"
@@ -14,13 +12,6 @@ namespace
 class SchedTest : public ::testing::Test
 {
       private:
-	static constexpr union cap caps[4] = {
-		CAP_PMP(0x205fff, CAP_RWX),
-		CAP_PMP(0x305fff, CAP_RX),
-		CAP_PMP(0x405fff, CAP_RW),
-		CAP_PMP(0x505fff, CAP_R),
-	};
-
       protected:
 	SchedTest()
 	{
