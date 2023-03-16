@@ -14,7 +14,7 @@ DEP=${OBJ:.o=.d}
 
 CONFIG_H?=config.h
 PLATFORM_H?=plat/${PLATFORM}/platform.h
-INC+=-include ${CONFIG_H} -include ${PLATFORM_H}
+INC+=-include ${CONFIG_H} -Iplat/${PLATFORM}
 
 all: options test kernel dasm
 
@@ -36,7 +36,7 @@ test:
 	$(MAKE) -C test
 
 format:
-	clang-format -i $(wildcard **/*.h) $(wildcard **/*.c) $(wildcard **/*.cc)
+	clang-format -i $(shell find -regextype sed -regex ".*\.\(c\|cc\|h\)")
 
 clean:
 	git clean -fdX

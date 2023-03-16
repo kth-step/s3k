@@ -26,7 +26,7 @@ void syscall_msuspend(struct proc *proc, uint64_t mon_idx, uint64_t pid)
 		return;
 	}
 
-	struct proc *other_proc = &processes[pid];
+	struct proc *other_proc = proc_get(pid);
 	syscall_lock();
 	if (!cnode_contains(mon_handle)) {
 		proc->regs[REG_A0] = EXCPT_EMPTY;
@@ -55,7 +55,7 @@ void syscall_mresume(struct proc *proc, uint64_t mon_idx, uint64_t pid)
 		return;
 	}
 
-	struct proc *other_proc = &processes[pid];
+	struct proc *other_proc = proc_get(pid);
 	syscall_lock();
 	if (!cnode_contains(mon_handle)) {
 		proc->regs[REG_A0] = EXCPT_EMPTY;
@@ -90,7 +90,7 @@ void syscall_mgetreg(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 		return;
 	}
 
-	struct proc *other_proc = &processes[pid];
+	struct proc *other_proc = proc_get(pid);
 	if (!proc_acquire(other_proc, PS_SUSPENDED)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;
@@ -127,7 +127,7 @@ void syscall_msetreg(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 		proc->regs[REG_A0] = EXCPT_EMPTY;
 		return;
 	}
-	struct proc *other_proc = &processes[pid];
+	struct proc *other_proc = proc_get(pid);
 	if (!proc_acquire(other_proc, PS_SUSPENDED)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;
@@ -163,7 +163,7 @@ void syscall_mgetcap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 		return;
 	}
 
-	struct proc *other_proc = &processes[pid];
+	struct proc *other_proc = proc_get(pid);
 	if (!proc_acquire(other_proc, PS_SUSPENDED)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;
@@ -200,7 +200,7 @@ void syscall_mtakecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 		proc->regs[REG_A0] = EXCPT_EMPTY;
 		return;
 	}
-	struct proc *other_proc = &processes[pid];
+	struct proc *other_proc = proc_get(pid);
 	if (!proc_acquire(other_proc, PS_SUSPENDED)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;
@@ -245,7 +245,7 @@ void syscall_mgivecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 		return;
 	}
 
-	struct proc *other_proc = &processes[pid];
+	struct proc *other_proc = proc_get(pid);
 	if (!proc_acquire(other_proc, PS_SUSPENDED)) {
 		syscall_unlock();
 		proc->regs[REG_A0] = EXCPT_MBUSY;

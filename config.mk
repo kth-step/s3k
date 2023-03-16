@@ -14,12 +14,13 @@ CFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany\
 	 -Wno-unused-parameter\
 	 -Wshadow -fno-common\
 	 -ffunction-sections -fdata-sections\
+	 -ffreestanding\
 	 -Wno-builtin-declaration-mismatch\
 	 -flto -fwhole-program --specs=nosys.specs\
 	 -Os -g3
 ASFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany
 LDFLAGS = -march=rv64imac -mabi=lp64 -mcmodel=medany\
-	  -nostartfiles -nostdlib\
+	  -nostartfiles -ffreestanding\
 	  -Wstack-usage=256 -fstack-usage\
 	  -Wl,--gc-sections\
 	  -flto\

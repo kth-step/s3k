@@ -13,33 +13,19 @@ namespace
 class ProcTest : public ::testing::Test
 {
       private:
-	const union cap caps[4] = {
-		cap_pmp(0x205fff, CAP_RWX),
-		cap_pmp(0x305fff, CAP_RX),
-		cap_pmp(0x405fff, CAP_RW),
-		cap_pmp(0x505fff, CAP_R),
-	};
+	static constexpr union cap caps[]
+	    = { CAP_PMP(0x205fff, CAP_RWX), CAP_PMP(0x305fff, CAP_RX),
+		CAP_PMP(0x405fff, CAP_RW), CAP_PMP(0x505fff, CAP_R), CAP_NULL };
 
       protected:
 	ProcTest()
 	{
-		cnode_init();
-		cnode_handle_t root = cnode_get_root_handle();
-		for (int i = 0; i < ARRAY_SIZE(caps); ++i) {
-			cnode_handle_t handle = cnode_get_handle(0, i);
-			cnode_insert(handle, caps[i], root);
-		}
-		processes[0] = { .pid = 0, .state = PS_READY };
+		cnode_init(caps);
+		proc_init(0);
 	}
 
 	~ProcTest() override
 	{
-		cnode_init();
-		cnode_handle_t root = cnode_get_root_handle();
-		for (int i = 0; i < ARRAY_SIZE(caps); ++i) {
-			cnode_handle_t handle = cnode_get_handle(0, i);
-			cnode_delete(handle);
-		}
 	}
 
 	void SetUp() override
@@ -54,8 +40,9 @@ class ProcTest : public ::testing::Test
 
 TEST_F(ProcTest, LoadPmp)
 {
-	processes[0].regs[REG_PMP] = 0x03020100ull;
-	proc_load_pmp(&processes[0]);
+	struct proc *proc = proc_get(0);
+	proc->regs[REG_PMP] = 0x03020100ull;
+	proc_load_pmp(proc);
 	EXPECT_EQ(csrr_pmpcfg0(), 0x1F1F1F1F191B1D1Full);
 	EXPECT_EQ(csrr_pmpaddr0(), 0x205FFFull);
 	EXPECT_EQ(csrr_pmpaddr1(), 0x305FFFull);
@@ -69,19 +56,21 @@ TEST_F(ProcTest, LoadPmp)
 
 TEST_F(ProcTest, ProcAcqRel)
 {
-	EXPECT_TRUE(proc_acquire(&processes[0], PS_READY));
-	EXPECT_EQ(processes[0].state, PS_RUNNING);
-	proc_release(&processes[0]);
-	EXPECT_EQ(processes[0].state, PS_READY);
+	struct proc *proc = proc_get(0);
+	EXPECT_TRUE(proc_acquire(proc, PS_READY));
+	EXPECT_EQ(proc->state, PS_RUNNING);
+	proc_release(proc);
+	EXPECT_EQ(proc->state, PS_READY);
 }
 
 TEST_F(ProcTest, ProcAcqSupRel)
 {
-	EXPECT_TRUE(proc_acquire(&processes[0], PS_READY));
-	EXPECT_EQ(processes[0].state, PS_RUNNING);
-	proc_suspend(&processes[0]);
-	EXPECT_EQ(processes[0].state, PS_SUSPENDED_BUSY);
-	proc_release(&processes[0]);
-	EXPECT_EQ(processes[0].state, PS_SUSPENDED);
-	EXPECT_FALSE(proc_acquire(&processes[0], PS_READY));
+	struct proc *proc = proc_get(0);
+	EXPECT_TRUE(proc_acquire(proc, PS_READY));
+	EXPECT_EQ(proc->state, PS_RUNNING);
+	proc_suspend(proc);
+	EXPECT_EQ(proc->state, PS_SUSPENDED_BUSY);
+	proc_release(proc);
+	EXPECT_EQ(proc->state, PS_SUSPENDED);
+	EXPECT_FALSE(proc_acquire(proc, PS_READY));
 }

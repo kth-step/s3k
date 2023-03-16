@@ -12,12 +12,57 @@ struct cnode {
 
 static volatile struct cnode cnodes[NPROC * NCAP + 1];
 
-void cnode_init(void)
+static void _insert(uint32_t curr, uint64_t raw_cap, uint32_t prev)
 {
-	cnode_handle_t root = cnode_get_root_handle();
+	uint32_t next = cnodes[prev].next;
+	cnodes[curr].prev = prev;
+	cnodes[curr].next = next;
+	cnodes[prev].next = curr;
+	cnodes[next].prev = curr;
+	cnodes[curr].raw_cap = raw_cap;
+}
+
+void _delete(uint32_t curr)
+{
+	uint32_t prev = cnodes[curr].prev;
+	uint32_t next = cnodes[curr].next;
+	cnodes[next].prev = prev;
+	cnodes[prev].next = next;
+
+	cnodes[curr].raw_cap = 0;
+	cnodes[curr].prev = 0;
+	cnodes[curr].next = 0;
+}
+
+static void _move(uint32_t src, uint32_t dst)
+{
+	uint32_t prev = cnodes[src].prev;
+	uint64_t raw_cap = cnodes[src].raw_cap;
+	uint32_t next = cnodes[src].next;
+
+	cnodes[dst].prev = prev;
+	cnodes[dst].raw_cap = raw_cap;
+	cnodes[dst].next = next;
+
+	cnodes[src].raw_cap = 0;
+	cnodes[src].prev = 0;
+	cnodes[src].next = 0;
+}
+
+void cnode_init(const union cap *caps)
+{
+	// zero cnodes
+	for (int i = 0; i < NPROC * NCAP; ++i)
+		cnodes[i] = (struct cnode){ 0 };
+	// Initialize root node
+	cnode_handle_t root = NPROC * NCAP;
 	cnodes[root].prev = root;
 	cnodes[root].next = root;
 	cnodes[root].raw_cap = -1;
+	// Add initial nodes
+	for (cnode_handle_t i = 0; caps[i].raw != 0; i++) {
+		_insert(i, caps[i].raw, root);
+	}
 }
 
 // Handle is just index to corresponding element in cnodes
@@ -25,11 +70,6 @@ cnode_handle_t cnode_get_handle(cnode_handle_t pid, cnode_handle_t idx)
 {
 	assert(pid < NPROC);
 	return pid * NCAP + (idx % NCAP);
-}
-
-cnode_handle_t cnode_get_root_handle(void)
-{
-	return NPROC * NCAP;
 }
 
 cnode_handle_t cnode_get_pid(cnode_handle_t handle)
@@ -59,66 +99,43 @@ void cnode_set_cap(cnode_handle_t handle, union cap cap)
 
 bool cnode_contains(cnode_handle_t handle)
 {
-	assert(handle <= NPROC * NCAP);
+	assert(handle < NPROC * NCAP);
 	return cnodes[handle].raw_cap != 0;
 }
 
-void cnode_insert(cnode_handle_t handle, union cap cap,
-		  cnode_handle_t prev_handle)
+void cnode_insert(cnode_handle_t curr, union cap cap, cnode_handle_t prev)
 {
-	assert(handle < NPROC * NCAP);
-	assert(prev_handle <= NPROC * NCAP);
+	assert(curr < NPROC * NCAP);
+	assert(prev < NPROC * NCAP);
 	assert(cap.raw != 0);
-	assert(!cnode_contains(handle));
-	assert(cnode_contains(prev_handle));
+	assert(!cnode_contains(curr));
+	assert(cnode_contains(prev));
 
-	cnode_handle_t next_handle = cnodes[prev_handle].next;
-	cnodes[handle].prev = prev_handle;
-	cnodes[handle].next = next_handle;
-	cnodes[prev_handle].next = handle;
-	cnodes[next_handle].prev = handle;
-	cnodes[handle].raw_cap = cap.raw;
+	_insert(curr, cap.raw, prev);
 }
 
-void cnode_move(cnode_handle_t src_handle, cnode_handle_t dst_handle)
+void cnode_move(cnode_handle_t src, cnode_handle_t dst)
 {
-	assert(src_handle < NPROC * NCAP);
-	assert(dst_handle < NPROC * NCAP);
-	assert(cnode_contains(src_handle));
-	assert(!cnode_contains(dst_handle));
-
-	cnodes[dst_handle].raw_cap = cnodes[src_handle].raw_cap;
-	cnodes[dst_handle].prev = cnodes[src_handle].prev;
-	cnodes[dst_handle].next = cnodes[src_handle].next;
-	cnodes[src_handle].raw_cap = 0;
-	cnodes[src_handle].prev = 0;
-	cnodes[src_handle].next = 0;
+	assert(src < NPROC * NCAP);
+	assert(dst < NPROC * NCAP);
+	assert(cnode_contains(src));
+	assert(!cnode_contains(dst));
+	_move(src, dst);
 }
 
-void cnode_delete(cnode_handle_t handle)
+void cnode_delete(cnode_handle_t curr)
 {
-	assert(handle < NPROC * NCAP);
-	assert(cnode_contains(handle));
+	assert(curr < NPROC * NCAP);
+	assert(cnode_contains(curr));
 
-	cnode_handle_t prev_handle = cnodes[handle].prev;
-	cnode_handle_t next_handle = cnodes[handle].next;
-	cnodes[prev_handle].next = next_handle;
-	cnodes[next_handle].prev = prev_handle;
-	cnodes[handle].raw_cap = 0;
-	cnodes[handle].prev = 0;
-	cnodes[handle].next = 0;
+	_delete(curr);
 }
 
-bool cnode_delete_if(cnode_handle_t handle, cnode_handle_t prev_handle)
+bool cnode_delete_if(cnode_handle_t curr, cnode_handle_t prev)
 {
-	assert(handle < NPROC * NCAP);
-	if (!cnode_contains(handle) || cnodes[handle].prev != prev_handle)
+	assert(curr < NPROC * NCAP);
+	if (!cnode_contains(curr) || cnodes[curr].prev != prev)
 		return false;
-	cnode_handle_t next_handle = cnodes[handle].next;
-	cnodes[prev_handle].next = next_handle;
-	cnodes[next_handle].prev = prev_handle;
-	cnodes[handle].raw_cap = 0;
-	cnodes[handle].prev = 0;
-	cnodes[handle].next = 0;
+	_delete(curr);
 	return true;
 }

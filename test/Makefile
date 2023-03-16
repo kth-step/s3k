@@ -8,8 +8,8 @@ OBJS=$(patsubst %.c,obj/%.o, $(SRCS))
 DEPS=$(patsubst %.d,obj/%.o, $(SRCS))
 TEST_OBJS=$(patsubst %.cc,obj/%.o, $(TEST_SRCS))
 
-CFLAGS=-I../inc -MMD -include config.h
-CXXFLAGS=-I../inc -include config.h
+CFLAGS=-I../inc -I. -MMD -include config.h
+CXXFLAGS=-I../inc -I. -include config.h
 
 all: test
 

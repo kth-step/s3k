@@ -30,7 +30,7 @@ class CapTest : public ::testing::Test
 TEST_F(CapTest, MakeTest)
 {
 	uint64_t hartid = 3, begin = 0x5, end = 0x12;
-	union cap cap = cap_time(hartid, begin, end);
+	union cap cap = CAP_TIME(hartid, begin, end);
 	EXPECT_EQ(cap.type, CAPTY_TIME);
 	EXPECT_EQ(cap.time.hartid, hartid);
 	EXPECT_EQ(cap.time.begin, begin);
@@ -43,7 +43,7 @@ TEST_F(CapTest, MakeTest)
 TEST_F(CapTest, MakeMemory)
 {
 	uint64_t begin = 0x100, end = 0x200, offset = 0x3, rwx = CAP_RWX;
-	union cap cap = cap_memory(begin, end, offset, rwx);
+	union cap cap = CAP_MEMORY(begin, end, offset, rwx);
 	EXPECT_EQ(cap.type, CAPTY_MEMORY);
 	EXPECT_EQ(cap.memory.begin, begin);
 	EXPECT_EQ(cap.memory.free, begin);
@@ -55,7 +55,7 @@ TEST_F(CapTest, MakeMemory)
 TEST_F(CapTest, MakePMP)
 {
 	uint64_t addr = 0x85fff, rwx = CAP_RWX;
-	union cap cap = cap_pmp(addr, rwx);
+	union cap cap = CAP_PMP(addr, rwx);
 	EXPECT_EQ(cap.type, CAPTY_PMP);
 	EXPECT_EQ(cap.pmp.addr, addr);
 	EXPECT_EQ(cap.pmp.cfg, 0x18 | rwx);
@@ -64,7 +64,7 @@ TEST_F(CapTest, MakePMP)
 TEST_F(CapTest, MakeMonitor)
 {
 	uint64_t begin = 0x1, end = 0x20;
-	union cap cap = cap_monitor(begin, end);
+	union cap cap = CAP_MONITOR(begin, end);
 	EXPECT_EQ(cap.type, CAPTY_MONITOR);
 	EXPECT_EQ(cap.monitor.begin, begin);
 	EXPECT_EQ(cap.monitor.free, begin);
@@ -76,7 +76,7 @@ TEST_F(CapTest, MakeMonitor)
 TEST_F(CapTest, MakeChannel)
 {
 	uint64_t begin = 0x1, end = 0x20;
-	union cap cap = cap_channel(begin, end);
+	union cap cap = CAP_CHANNEL(begin, end);
 	EXPECT_EQ(cap.type, CAPTY_CHANNEL);
 	EXPECT_EQ(cap.channel.begin, begin);
 	EXPECT_EQ(cap.channel.free, begin);
@@ -88,7 +88,7 @@ TEST_F(CapTest, MakeChannel)
 TEST_F(CapTest, MakeSocket)
 {
 	uint64_t channel = 0x3, tag = 0x20;
-	union cap cap = cap_socket(channel, tag);
+	union cap cap = CAP_SOCKET(channel, tag);
 	EXPECT_EQ(cap.type, CAPTY_SOCKET);
 	EXPECT_EQ(cap.socket.channel, channel);
 	EXPECT_EQ(cap.socket.tag, tag);
@@ -98,66 +98,66 @@ TEST_F(CapTest, MakeSocket)
 
 TEST_F(CapTest, TimeDerive)
 {
-	EXPECT_FALSE(cap_time_derive(cap_time(3, 1, 20), cap_time(3, 0, 20)));
-	EXPECT_FALSE(cap_time_derive(cap_time(2, 1, 20), cap_time(3, 1, 20)));
-	for (int i = 0; i < 255; i++) {
+	EXPECT_FALSE(cap_time_derive(CAP_TIME(3, 1, 20), CAP_TIME(3, 0, 20)));
+	EXPECT_FALSE(cap_time_derive(CAP_TIME(2, 1, 20), CAP_TIME(3, 1, 20)));
+	for (unsigned int i = 0; i < 255; i++) {
 		EXPECT_TRUE(
-		    cap_time_derive(cap_time(i, 1, 20), cap_time(i, 1, 20)));
+		    cap_time_derive(CAP_TIME(i, 1, 20), CAP_TIME(i, 1, 20)));
 		EXPECT_FALSE(
-		    cap_time_derive(cap_time(i, 5, 20), cap_time(i, 4, 10)));
+		    cap_time_derive(CAP_TIME(i, 5, 20), CAP_TIME(i, 4, 10)));
 	}
 }
 
 TEST_F(CapTest, TimeParent)
 {
-	EXPECT_FALSE(cap_time_parent(cap_time(3, 1, 20), cap_time(3, 0, 20)));
-	EXPECT_FALSE(cap_time_parent(cap_time(2, 1, 20), cap_time(3, 1, 20)));
-	for (int i = 0; i < 255; i++) {
+	EXPECT_FALSE(cap_time_parent(CAP_TIME(3, 1, 20), CAP_TIME(3, 0, 20)));
+	EXPECT_FALSE(cap_time_parent(CAP_TIME(2, 1, 20), CAP_TIME(3, 1, 20)));
+	for (unsigned int i = 0; i < 255; i++) {
 		EXPECT_TRUE(
-		    cap_time_parent(cap_time(i, 1, 20), cap_time(i, 1, 20)));
+		    cap_time_parent(CAP_TIME(i, 1, 20), CAP_TIME(i, 1, 20)));
 		EXPECT_FALSE(
-		    cap_time_parent(cap_time(i, 5, 20), cap_time(i, 4, 10)));
+		    cap_time_parent(CAP_TIME(i, 5, 20), CAP_TIME(i, 4, 10)));
 	}
 }
 
 TEST_F(CapTest, MemoryDerive)
 {
 	// RWX
-	EXPECT_TRUE(cap_memory_derive(cap_memory(0x0, 0x3000, 8, S3K_RWX),
-				      cap_memory(0x100, 0x2000, 8, S3K_RWX)));
-	EXPECT_TRUE(cap_memory_derive(cap_memory(0x0, 0x3000, 8, S3K_RWX),
-				      cap_memory(0x100, 0x2000, 8, S3K_RX)));
-	EXPECT_TRUE(cap_memory_derive(cap_memory(0x0, 0x3000, 8, S3K_RWX),
-				      cap_memory(0x100, 0x2000, 8, S3K_RW)));
-	EXPECT_TRUE(cap_memory_derive(cap_memory(0x0, 0x3000, 8, S3K_RWX),
-				      cap_memory(0x100, 0x2000, 8, S3K_R)));
+	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RWX),
+				      CAP_MEMORY(0x100, 0x2000, 8, CAP_RWX)));
+	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RWX),
+				      CAP_MEMORY(0x100, 0x2000, 8, CAP_RX)));
+	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RWX),
+				      CAP_MEMORY(0x100, 0x2000, 8, CAP_RW)));
+	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RWX),
+				      CAP_MEMORY(0x100, 0x2000, 8, CAP_R)));
 	// RX
-	EXPECT_TRUE(cap_memory_derive(cap_memory(0x0, 0x3000, 8, S3K_RX),
-				      cap_memory(0x100, 0x2000, 8, S3K_RX)));
-	EXPECT_TRUE(cap_memory_derive(cap_memory(0x0, 0x3000, 8, S3K_RX),
-				      cap_memory(0x100, 0x2000, 8, S3K_R)));
+	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RX),
+				      CAP_MEMORY(0x100, 0x2000, 8, CAP_RX)));
+	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RX),
+				      CAP_MEMORY(0x100, 0x2000, 8, CAP_R)));
 	// RW
-	EXPECT_TRUE(cap_memory_derive(cap_memory(0x0, 0x3000, 8, S3K_RW),
-				      cap_memory(0x100, 0x2000, 8, S3K_RW)));
-	EXPECT_TRUE(cap_memory_derive(cap_memory(0x0, 0x3000, 8, S3K_RW),
-				      cap_memory(0x100, 0x2000, 8, S3K_R)));
+	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RW),
+				      CAP_MEMORY(0x100, 0x2000, 8, CAP_RW)));
+	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RW),
+				      CAP_MEMORY(0x100, 0x2000, 8, CAP_R)));
 	// R
-	EXPECT_TRUE(cap_memory_derive(cap_memory(0x0, 0x3000, 8, S3K_R),
-				      cap_memory(0x100, 0x2000, 8, S3K_R)));
+	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_R),
+				      CAP_MEMORY(0x100, 0x2000, 8, CAP_R)));
 
 	// EQ
-	EXPECT_TRUE(cap_memory_derive(cap_memory(0x100, 0x200, 8, S3K_RWX),
-				      cap_memory(0x100, 0x200, 8, S3K_RWX)));
+	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x100, 0x200, 8, CAP_RWX),
+				      CAP_MEMORY(0x100, 0x200, 8, CAP_RWX)));
 	// Larger
-	EXPECT_FALSE(cap_memory_derive(cap_memory(0x100, 0x3000, 8, S3K_RWX),
-				       cap_memory(0x0, 0x2000, 8, S3K_RWX)));
-	EXPECT_FALSE(cap_memory_derive(cap_memory(0x100, 0x3000, 8, S3K_RWX),
-				       cap_memory(0x100, 0x3001, 8, S3K_RWX)));
-	EXPECT_FALSE(cap_memory_derive(cap_memory(0x100, 0x3000, 8, S3K_RWX),
-				       cap_memory(0x99, 0x3001, 8, S3K_RWX)));
+	EXPECT_FALSE(cap_memory_derive(CAP_MEMORY(0x100, 0x3000, 8, CAP_RWX),
+				       CAP_MEMORY(0x0, 0x2000, 8, CAP_RWX)));
+	EXPECT_FALSE(cap_memory_derive(CAP_MEMORY(0x100, 0x3000, 8, CAP_RWX),
+				       CAP_MEMORY(0x100, 0x3001, 8, CAP_RWX)));
+	EXPECT_FALSE(cap_memory_derive(CAP_MEMORY(0x100, 0x3000, 8, CAP_RWX),
+				       CAP_MEMORY(0x99, 0x3001, 8, CAP_RWX)));
 	// OFFSET NOT EQ
-	EXPECT_FALSE(cap_memory_derive(cap_memory(0x100, 0x200, 8, S3K_RWX),
-				       cap_memory(0x100, 0x200, 7, S3K_RWX)));
+	EXPECT_FALSE(cap_memory_derive(CAP_MEMORY(0x100, 0x200, 8, CAP_RWX),
+				       CAP_MEMORY(0x100, 0x200, 7, CAP_RWX)));
 }
 
 TEST_F(CapTest, PmpAddr)
@@ -176,19 +176,19 @@ TEST_F(CapTest, MatchAPICap)
 {
 	union cap cap;
 	union s3k_cap s3k_cap;
-	cap = cap_time(0x1, 0x1, 0x20);
+	cap = CAP_TIME(0x1, 0x1, 0x20);
 	s3k_cap = s3k_time(0x1, 0x1, 0x20);
 	EXPECT_EQ(cap.raw, s3k_cap.raw);
 
-	cap = cap_memory(0x100, 0x200, 0x3, CAP_RWX);
+	cap = CAP_MEMORY(0x100, 0x200, 0x3, CAP_RWX);
 	s3k_cap = s3k_memory(0x100, 0x200, 0x3, CAP_RWX);
 	EXPECT_EQ(cap.raw, s3k_cap.raw);
 
-	cap = cap_pmp(0x100, CAP_RWX);
+	cap = CAP_PMP(0x100, CAP_RWX);
 	s3k_cap = s3k_pmp(0x100, CAP_RWX);
 	EXPECT_EQ(cap.raw, s3k_cap.raw);
 
-	cap = cap_monitor(0x1, 0x10);
+	cap = CAP_MONITOR(0x1, 0x10);
 	s3k_cap = s3k_monitor(0x1, 0x10);
 	EXPECT_EQ(cap.raw, s3k_cap.raw);
 }

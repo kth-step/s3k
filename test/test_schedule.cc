@@ -14,34 +14,22 @@ namespace
 class SchedTest : public ::testing::Test
 {
       private:
-	const union cap caps[4] = {
-		cap_pmp(0x205fff, CAP_RWX),
-		cap_pmp(0x305fff, CAP_RX),
-		cap_pmp(0x405fff, CAP_RW),
-		cap_pmp(0x505fff, CAP_R),
+	static constexpr union cap caps[4] = {
+		CAP_PMP(0x205fff, CAP_RWX),
+		CAP_PMP(0x305fff, CAP_RX),
+		CAP_PMP(0x405fff, CAP_RW),
+		CAP_PMP(0x505fff, CAP_R),
 	};
 
       protected:
 	SchedTest()
 	{
-		cnode_init();
-		cnode_handle_t root = cnode_get_root_handle();
-		for (int i = 0; i < ARRAY_SIZE(caps); ++i) {
-			cnode_handle_t handle = cnode_get_handle(0, i);
-			cnode_insert(handle, caps[i], root);
-		}
-		processes[0] = { .pid = 0, .state = PS_READY };
+		proc_init(0);
 		schedule_init();
 	}
 
 	~SchedTest() override
 	{
-		cnode_init();
-		cnode_handle_t root = cnode_get_root_handle();
-		for (int i = 0; i < ARRAY_SIZE(caps); ++i) {
-			cnode_handle_t handle = cnode_get_handle(0, i);
-			cnode_delete(handle);
-		}
 	}
 
 	void SetUp() override

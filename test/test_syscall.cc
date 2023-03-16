@@ -15,15 +15,17 @@ namespace
 class SyscallTest : public ::testing::Test
 {
       private:
-	const union cap caps[9] = { cap_pmp(0x20005fff, CAP_RWX),
-				    cap_memory(0x0020, 0x8000, 0x10, CAP_RWX),
-				    cap_memory(0x0000, 0x0001, 0x2, CAP_RW),
-				    cap_time(0, 0, NSLICE),
-				    cap_time(1, 0, NSLICE),
-				    cap_time(2, 0, NSLICE),
-				    cap_time(3, 0, NSLICE),
-				    cap_monitor(0, NPROC),
-				    cap_channel(0, NCHANNEL) };
+	static constexpr union cap caps[]
+	    = { CAP_PMP(0x20005FFF, CAP_RWX),
+		CAP_MEMORY(0x0020, 0X8000, 0x10, CAP_RWX),
+		CAP_MEMORY(0x0000, 0X0001, 0x2, CAP_RW),
+		CAP_TIME(0, 0, NSLICE),
+		CAP_TIME(1, 0, NSLICE),
+		CAP_TIME(2, 0, NSLICE),
+		CAP_TIME(3, 0, NSLICE),
+		CAP_MONITOR(0, NPROC),
+		CAP_CHANNEL(0, NCHANNEL),
+		CAP_NULL };
 
       protected:
 	SyscallTest()
@@ -36,27 +38,12 @@ class SyscallTest : public ::testing::Test
 
 	void SetUp() override
 	{
-		for (int i = 0; i < NPROC; ++i) {
-			processes[i] = { 0 };
-			processes[i].pid = i;
-			processes[i].state = PS_SUSPENDED;
-		}
-		processes[0].state = PS_RUNNING;
-
-		cnode_init();
-		cnode_handle_t root = cnode_get_root_handle();
-		for (cnode_handle_t i = 0; i < ARRAY_SIZE(caps); ++i) {
-			cnode_insert(i, caps[i], root);
-		}
+		cnode_init(caps);
+		proc_init(0);
 	}
 
 	void TearDown() override
 	{
-		for (cnode_handle_t i = 0; i < NPROC * NCAP; ++i) {
-			if (cnode_contains(i)) {
-				cnode_delete(i);
-			}
-		}
 	}
 };
 } // namespace
@@ -64,36 +51,40 @@ class SyscallTest : public ::testing::Test
 TEST_F(SyscallTest, GetPid)
 {
 	for (int i = 0; i < NPROC; ++i) {
-		syscall_getinfo(&processes[i], 0);
-		EXPECT_EQ(processes[i].regs[REG_A0], i);
+		struct proc *proc = proc_get(i);
+		syscall_getinfo(proc, 0);
+		EXPECT_EQ(proc->regs[REG_A0], i);
 	}
 }
 
 TEST_F(SyscallTest, GetHartID)
 {
 	for (int i = 0; i < NPROC; ++i) {
-		syscall_getinfo(&processes[i], 1);
-		EXPECT_EQ(processes[i].regs[REG_A0], 0);
+		struct proc *proc = proc_get(i);
+		syscall_getinfo(proc, 1);
+		EXPECT_EQ(proc->regs[REG_A0], 0);
 	}
 }
 
 TEST_F(SyscallTest, GetTime)
 {
 	for (int i = 0; i < NPROC; ++i) {
+		struct proc *proc = proc_get(i);
 		uint64_t before = time_get();
-		syscall_getinfo(&processes[i], 2);
+		syscall_getinfo(proc, 2);
 		uint64_t after = time_get();
-		EXPECT_GE(processes[i].regs[REG_A0], before);
-		EXPECT_LE(processes[i].regs[REG_A0], after);
+		EXPECT_GE(proc->regs[REG_A0], before);
+		EXPECT_LE(proc->regs[REG_A0], after);
 	}
 }
 
 TEST_F(SyscallTest, GetTimeout)
 {
 	for (int i = 0; i < NPROC; ++i) {
+		struct proc *proc = proc_get(i);
 		uint64_t timeout = time_get();
 		timeout_set(0, timeout);
-		syscall_getinfo(&processes[i], 3);
-		EXPECT_EQ(processes[i].regs[REG_A0], timeout);
+		syscall_getinfo(proc, 3);
+		EXPECT_EQ(proc->regs[REG_A0], timeout);
 	}
 }

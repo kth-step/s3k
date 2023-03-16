@@ -6,6 +6,7 @@
  */
 #ifndef __STACK_H__
 #define __STACK_H__
+#include "platform.h"
 
 /// Stack size of 1 KiB
 #define LOG_STACK_SIZE 10

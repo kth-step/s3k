@@ -78,9 +78,8 @@ struct proc {
 	uint64_t sleep;
 };
 
-/// An array of all processes control blocks.
-extern struct proc processes[NPROC];
-
+void proc_init(uint64_t payload);
+struct proc *proc_get(uint64_t pid);
 bool proc_acquire(struct proc *proc, uint64_t expected);
 void proc_release(struct proc *proc);
 void proc_suspend(struct proc *proc);

@@ -18,6 +18,68 @@
 #define CAP_RX 0x5
 #define CAP_R 0x1
 
+#define CAP_NULL         \
+	{                \
+		.raw = 0 \
+	}
+
+#define CAP_TIME(_hartid, _begin, _end)    \
+	{                                  \
+		.time                      \
+		    = {.type = CAPTY_TIME, \
+		       ._padd = 0,         \
+		       .hartid = _hartid,  \
+		       .begin = _begin,    \
+		       .free = _begin,     \
+		       .end = _end }       \
+	}
+
+#define CAP_MEMORY(_begin, _end, _offset, _rwx) \
+	{                                       \
+		.memory                         \
+		    = {.type = CAPTY_MEMORY,    \
+		       .lock = 0,               \
+		       .rwx = _rwx,             \
+		       .offset = _offset,       \
+		       .begin = _begin,         \
+		       .free = _begin,          \
+		       .end = _end }            \
+	}
+
+#define CAP_PMP(_addr, _cfg)                                                   \
+	{                                                                      \
+		.pmp = {.type = CAPTY_PMP, .addr = _addr, .cfg = 0x18 | _cfg } \
+	}
+
+#define CAP_MONITOR(_begin, _end)             \
+	{                                     \
+		.monitor                      \
+		    = {.type = CAPTY_MONITOR, \
+		       ._padd = 0,            \
+		       .begin = _begin,       \
+		       .free = _begin,        \
+		       .end = _end }          \
+	}
+
+#define CAP_CHANNEL(_begin, _end)             \
+	{                                     \
+		.channel                      \
+		    = {.type = CAPTY_CHANNEL, \
+		       ._padd = 0,            \
+		       .begin = _begin,       \
+		       .free = _begin,        \
+		       .end = _end }          \
+	}
+
+#define CAP_SOCKET(_channel, _tag)           \
+	{                                    \
+		.socket                      \
+		    = {.type = CAPTY_SOCKET, \
+		       ._padd = 0,           \
+		       .channel = _channel,  \
+		       .tag = _tag }         \
+	}
+
 enum capty {
 	CAPTY_NONE,    ///< No capability
 	CAPTY_TIME,    ///< Time Slice capability
@@ -96,15 +158,6 @@ _Static_assert(sizeof(union cap) == 8, "union cap size != 8 bytes");
 uint64_t pmp_napot_addr(uint64_t begin, uint64_t end);
 uint64_t pmp_napot_begin(uint64_t addr);
 uint64_t pmp_napot_end(uint64_t addr);
-
-// Constructors
-union cap cap_time(uint64_t hartid, uint64_t begin, uint64_t end);
-union cap cap_memory(uint64_t begin, uint64_t end, uint64_t offset,
-		     uint64_t rwx);
-union cap cap_pmp(uint64_t cfg, uint64_t addr);
-union cap cap_monitor(uint64_t begin, uint64_t end);
-union cap cap_channel(uint64_t begin, uint64_t end);
-union cap cap_socket(uint64_t channel, uint64_t tag);
 
 // Derivation check
 bool cap_time_derive(union cap parent, union cap child);

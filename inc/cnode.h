@@ -28,7 +28,7 @@ typedef unsigned long cnode_handle_t;
 /**
  * @brief Initialize the cnode structure.
  */
-void cnode_init(void);
+void cnode_init(const union cap *caps);
 
 /**
  * @brief Get the handle for capability i of a process.
@@ -44,12 +44,6 @@ cnode_handle_t cnode_get_handle(cnode_handle_t pid, cnode_handle_t idx);
  * @return PID of handle
  */
 cnode_handle_t cnode_get_pid(cnode_handle_t handle);
-
-/**
- * @brief Get handle of the root node.
- * @return handle to the root node.
- */
-cnode_handle_t cnode_get_root_handle(void);
 
 /**
  * @brief Get the next node after n.

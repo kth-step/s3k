@@ -4,7 +4,22 @@
 #include "cnode.h"
 #include "csr.h"
 
-struct proc processes[NPROC];
+static struct proc processes[NPROC];
+
+void proc_init(uint64_t payload)
+{
+	for (int i = 1; i < NPROC; i++) {
+		processes[i] = (struct proc){ .pid = i, .state = PS_SUSPENDED };
+	}
+	processes[0] = (struct proc){ .pid = 0, .state = PS_READY };
+	processes[0].regs[REG_PC] = payload;
+}
+
+struct proc *proc_get(uint64_t pid)
+{
+	assert(pid < NPROC);
+	return &processes[pid];
+}
 
 bool proc_acquire(struct proc *proc, uint64_t expected)
 {

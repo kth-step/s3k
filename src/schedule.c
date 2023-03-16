@@ -5,6 +5,7 @@
 #include "consts.h"
 #include "csr.h"
 #include "current.h"
+#include "platform.h"
 #include "proc.h"
 #include "timer.h"
 #include "trap.h"
@@ -44,7 +45,7 @@ retry:
 		entry = schedule_get(hartid, quantum % NSLICE);
 		if (entry.pid == NONE_PID)
 			continue;
-		proc = &processes[entry.pid];
+		proc = proc_get(entry.pid);
 		if (proc->sleep > time_get())
 			continue;
 	} while (proc_acquire(proc, PS_READY));
