@@ -28,7 +28,7 @@ enum excpt {
 			    ///< capability.
 };
 
-enum s3k_syscall {
+enum syscall_nr {
 	// Capabilityless syscalls
 	SYSCALL_GETINFO, ///< Get information about current execution.
 	SYSCALL_GETREG,	 ///< Get register value

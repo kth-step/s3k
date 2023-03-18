@@ -213,7 +213,7 @@ _Static_assert(sizeof(union s3k_cap) == 8, "sizeof(union s3k_cap) != 8");
  */
 
 /// S3K Syscall Numbers
-enum s3k_syscall {
+enum s3k_syscall_nr {
 	// Capabilityless syscalls
 	S3K_SYSCALL_GETINFO, ///< Get information about current execution.
 	S3K_SYSCALL_GETREG,  ///< Get register value
