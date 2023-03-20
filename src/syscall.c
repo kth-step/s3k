@@ -265,7 +265,7 @@ void syscall_revcap(struct proc *proc, uint64_t idx)
 static void _derive_time(cnode_handle_t orig_handle, union cap orig_cap,
 			 cnode_handle_t drv_handle, union cap drv_cap)
 {
-	orig_cap.time.free = drv_cap.time.begin;
+	orig_cap.time.free = drv_cap.time.end;
 	cnode_set_cap(orig_handle, orig_cap);
 	schedule_update(drv_cap.time.hartid, cnode_get_pid(orig_handle),
 			drv_cap.time.begin, drv_cap.time.end);
@@ -275,7 +275,7 @@ static void _derive_memory(cnode_handle_t orig_handle, union cap orig_cap,
 			   cnode_handle_t drv_handle, union cap drv_cap)
 {
 	if (drv_cap.type == CAPTY_MEMORY) { // Memory
-		orig_cap.memory.free = drv_cap.memory.begin;
+		orig_cap.memory.free = drv_cap.memory.end;
 	} else { // PMP
 		orig_cap.memory.lock = true;
 	}
@@ -285,7 +285,7 @@ static void _derive_memory(cnode_handle_t orig_handle, union cap orig_cap,
 static void _derive_monitor(cnode_handle_t orig_handle, union cap orig_cap,
 			    cnode_handle_t drv_handle, union cap drv_cap)
 {
-	orig_cap.monitor.free = drv_cap.monitor.begin;
+	orig_cap.monitor.free = drv_cap.monitor.end;
 	cnode_set_cap(orig_handle, orig_cap);
 }
 
@@ -294,7 +294,7 @@ static void _derive_channel(cnode_handle_t orig_handle, union cap orig_cap,
 {
 	// Update free pointer.
 	if (drv_cap.type == CAPTY_CHANNEL) {
-		orig_cap.channel.free = drv_cap.channel.begin;
+		orig_cap.channel.free = drv_cap.channel.end;
 	} else {
 		orig_cap.channel.free = drv_cap.socket.channel + 1;
 	}
@@ -347,6 +347,9 @@ void syscall_drvcap(struct proc *proc, uint64_t orig_idx, uint64_t drv_idx,
 		hook = _derive_socket;
 		can_derive = cap_socket_derive;
 		break;
+	default:
+		proc->regs[REG_A0] = EXCPT_UNIMPLEMENTED;
+		return;
 	}
 	if (!can_derive(orig_cap, drv_cap)) {
 		proc->regs[REG_A0] = EXCPT_DERIVATION;
