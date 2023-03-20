@@ -9,7 +9,7 @@
 // Number of slices per period
 #define NSLICE 64
 // Number of ticks per slice
-#define NTICK 1000
+#define NTICK 100000000
 // Number of slack ticks per slice
-#define NSLACK 100
+#define NSLACK 10000
 #define NDEBUG 0

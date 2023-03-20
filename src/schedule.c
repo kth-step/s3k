@@ -13,7 +13,7 @@
 
 #define NONE_PID 0xFF
 
-static volatile struct sched_entry schedule[4][NSLICE];
+static volatile struct sched_entry schedule[NHART][NSLICE];
 
 struct sched_entry schedule_get(uint64_t hartid, size_t i)
 {
@@ -40,7 +40,7 @@ void schedule_next()
 	struct proc *proc;
 	struct sched_entry entry;
 retry:
-	do {
+	for (;;) {
 		quantum = (time_get() + NSLACK) / NTICK;
 		entry = schedule_get(hartid, quantum % NSLICE);
 		if (entry.pid == NONE_PID)
@@ -48,7 +48,9 @@ retry:
 		proc = proc_get(entry.pid);
 		if (proc->sleep > time_get())
 			continue;
-	} while (proc_acquire(proc, PS_READY));
+		if (proc_acquire(proc, PS_READY))
+			break;
+	}
 	proc_load_pmp(proc);
 	if (!csrr_pmpcfg0()) {
 		// Temporary fix. QEMU does not allow this to be zero.
