@@ -7,19 +7,19 @@
 
 struct cnode {
 	uint32_t prev, next;
-	uint64_t raw_cap;
+	union cap cap;
 };
 
 static volatile struct cnode cnodes[NPROC * NCAP + 1];
 
-static void _insert(uint32_t curr, uint64_t raw_cap, uint32_t prev)
+static void _insert(uint32_t curr, union cap cap, uint32_t prev)
 {
 	uint32_t next = cnodes[prev].next;
 	cnodes[curr].prev = prev;
 	cnodes[curr].next = next;
 	cnodes[prev].next = curr;
 	cnodes[next].prev = curr;
-	cnodes[curr].raw_cap = raw_cap;
+	cnodes[curr].cap = cap;
 }
 
 void _delete(uint32_t curr)
@@ -29,7 +29,7 @@ void _delete(uint32_t curr)
 	cnodes[next].prev = prev;
 	cnodes[prev].next = next;
 
-	cnodes[curr].raw_cap = 0;
+	cnodes[curr].cap.raw = 0;
 	cnodes[curr].prev = 0;
 	cnodes[curr].next = 0;
 }
@@ -37,14 +37,14 @@ void _delete(uint32_t curr)
 static void _move(uint32_t src, uint32_t dst)
 {
 	uint32_t prev = cnodes[src].prev;
-	uint64_t raw_cap = cnodes[src].raw_cap;
+	union cap cap = cnodes[src].cap;
 	uint32_t next = cnodes[src].next;
 
 	cnodes[dst].prev = prev;
-	cnodes[dst].raw_cap = raw_cap;
+	cnodes[dst].cap = cap;
 	cnodes[dst].next = next;
 
-	cnodes[src].raw_cap = 0;
+	cnodes[src].cap.raw = 0;
 	cnodes[src].prev = 0;
 	cnodes[src].next = 0;
 }
@@ -58,10 +58,9 @@ void cnode_init(const union cap *caps, size_t size)
 	cnode_handle_t root = NPROC * NCAP;
 	cnodes[root].prev = root;
 	cnodes[root].next = root;
-	cnodes[root].raw_cap = -1;
 	// Add initial nodes
 	for (cnode_handle_t i = 0; i < size; i++) {
-		_insert(i, caps[i].raw, root);
+		_insert(i, caps[i], root);
 	}
 }
 
@@ -87,20 +86,20 @@ cnode_handle_t cnode_get_next(cnode_handle_t handle)
 union cap cnode_get_cap(cnode_handle_t handle)
 {
 	assert(handle < NPROC * NCAP);
-	return (union cap){ .raw = cnodes[handle].raw_cap };
+	return cnodes[handle].cap;
 }
 
 void cnode_set_cap(cnode_handle_t handle, union cap cap)
 {
 	assert(cap.raw != 0);
 	assert(cnode_contains(handle));
-	cnodes[handle].raw_cap = cap.raw;
+	cnodes[handle].cap = cap;
 }
 
 bool cnode_contains(cnode_handle_t handle)
 {
 	assert(handle < NPROC * NCAP);
-	return cnodes[handle].raw_cap != 0;
+	return cnodes[handle].cap.raw != 0;
 }
 
 void cnode_insert(cnode_handle_t curr, union cap cap, cnode_handle_t prev)
@@ -111,7 +110,7 @@ void cnode_insert(cnode_handle_t curr, union cap cap, cnode_handle_t prev)
 	assert(!cnode_contains(curr));
 	assert(cnode_contains(prev));
 
-	_insert(curr, cap.raw, prev);
+	_insert(curr, cap, prev);
 }
 
 void cnode_move(cnode_handle_t src, cnode_handle_t dst)
