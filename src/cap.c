@@ -17,14 +17,14 @@ uint64_t pmp_napot_end(uint64_t addr)
 
 static bool cap_time_derive_time(struct time parent, struct time child)
 {
-	return parent.free <= child.begin && child.end <= parent.end
+	return parent.free == child.begin && child.end <= parent.end
 	       && child.begin == child.free && child.begin < child.end
 	       && parent.hartid == child.hartid && child._padd == 0;
 }
 
 static bool cap_memory_derive_memory(struct memory parent, struct memory child)
 {
-	return parent.free <= child.begin && child.end <= parent.end
+	return parent.free == child.begin && child.end <= parent.end
 	       && child.begin == child.free && parent.offset == child.offset
 	       && child.begin <= child.end
 	       && (parent.rwx & child.rwx) == child.rwx && parent.lock == 0;
@@ -47,7 +47,7 @@ static bool cap_memory_derive_pmp(struct memory parent, struct pmp child)
 static bool cap_monitor_derive_monitor(struct monitor parent,
 				       struct monitor child)
 {
-	return parent.free <= child.begin && child.end <= parent.end
+	return parent.free == child.begin && child.end <= parent.end
 	       && child.begin == child.free && child.begin < child.end
 	       && child._padd == 0;
 }
@@ -55,7 +55,7 @@ static bool cap_monitor_derive_monitor(struct monitor parent,
 static bool cap_channel_derive_channel(struct channel parent,
 				       struct channel child)
 {
-	return parent.free <= child.begin && child.end <= parent.end
+	return parent.free == child.begin && child.end <= parent.end
 	       && child.begin == child.free && child.begin < child.end
 	       && child._padd == 0;
 }
@@ -63,7 +63,7 @@ static bool cap_channel_derive_channel(struct channel parent,
 static bool cap_channel_derive_socket(struct channel parent,
 				      struct socket child)
 {
-	return parent.free <= child.channel && child.channel < parent.end
+	return parent.free == child.channel && child.channel < parent.end
 	       && child.tag == 0 && child._padd == 0;
 }
 
