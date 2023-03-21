@@ -12,11 +12,6 @@ CSRC=cap.c cnode.c current.c csr.c exception.c init.c lock.c proc.c schedule.c \
 OBJ=${addprefix obj/, ${ASSRC:.S=.o} ${CSRC:.c=.o}}
 DEP=${OBJ:.o=.d}
 
-CONFIG_H?=config.h
-INC+=-include ${CONFIG_H} -Iplat/${PLATFORM}
-ASFLAGS+=${INC}
-CFLAGS+=${INC}
-
 all: options kernel dasm
 
 options:
@@ -25,9 +20,11 @@ options:
 	@printf "LDFLAGS  = ${LDFLAGS}\n"
 	@printf "ASFLAGS  = ${ASFLAGS}\n"
 	@printf "CFLAGS   = ${CFLAGS}\n"
+	@printf "INC      = ${INC}\n"
 	@printf "CONFIG_H = ${abspath ${CONFIG_H}}\n"
 
 kernel: s3k.elf 
+
 dasm: s3k.da
 
 docs:
@@ -44,17 +41,21 @@ clean:
 
 obj/%.o: %.S
 	@mkdir -p ${@D}
-	${CC} ${ASFLAGS} -MMD -c -o $@ $<
+	@printf "CC $@\n"
+	@${CC} ${ASFLAGS} ${INC} -MMD -c -o $@ $<
 
 obj/%.o: %.c
 	@mkdir -p ${@D}
-	${CC} ${CFLAGS}  -MMD -c -o $@ $<
+	@printf "CC $@\n"
+	@${CC} ${CFLAGS} ${INC} -MMD -c -o $@ $<
 
-s3k.elf: ${OBJ}
-	${CC} ${LDFLAGS} -o $@ ${OBJ}
+%.elf: ${OBJ}
+	@printf "CC $@\n"
+	@${CC} ${LDFLAGS} -o $@ ${OBJ}
 
-s3k.da:	s3k.elf
-	${OBJDUMP} -d $< > $@
+%.da:	%.elf
+	@printf "OBJDUMP $< $@\n"
+	@${OBJDUMP} -d $< > $@
 
 -include ${DEP}
 
