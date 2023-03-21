@@ -105,6 +105,8 @@ TEST_F(CapTest, TimeDerive)
 		    cap_time_derive(CAP_TIME(i, 1, 20), CAP_TIME(i, 1, 20)));
 		EXPECT_FALSE(
 		    cap_time_derive(CAP_TIME(i, 5, 20), CAP_TIME(i, 4, 10)));
+		EXPECT_FALSE(
+		    cap_time_derive(CAP_TIME(i, 5, 20), CAP_TIME(i, 6, 10)));
 	}
 }
 
@@ -124,26 +126,26 @@ TEST_F(CapTest, MemoryDerive)
 {
 	// RWX
 	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RWX),
-				      CAP_MEMORY(0x100, 0x2000, 8, CAP_RWX)));
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_RWX)));
 	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RWX),
-				      CAP_MEMORY(0x100, 0x2000, 8, CAP_RX)));
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_RX)));
 	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RWX),
-				      CAP_MEMORY(0x100, 0x2000, 8, CAP_RW)));
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_RW)));
 	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RWX),
-				      CAP_MEMORY(0x100, 0x2000, 8, CAP_R)));
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_R)));
 	// RX
 	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RX),
-				      CAP_MEMORY(0x100, 0x2000, 8, CAP_RX)));
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_RX)));
 	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RX),
-				      CAP_MEMORY(0x100, 0x2000, 8, CAP_R)));
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_R)));
 	// RW
 	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RW),
-				      CAP_MEMORY(0x100, 0x2000, 8, CAP_RW)));
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_RW)));
 	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RW),
-				      CAP_MEMORY(0x100, 0x2000, 8, CAP_R)));
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_R)));
 	// R
 	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_R),
-				      CAP_MEMORY(0x100, 0x2000, 8, CAP_R)));
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_R)));
 
 	// EQ
 	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x100, 0x200, 8, CAP_RWX),
