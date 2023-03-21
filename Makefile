@@ -13,10 +13,11 @@ OBJ=${addprefix obj/, ${ASSRC:.S=.o} ${CSRC:.c=.o}}
 DEP=${OBJ:.o=.d}
 
 CONFIG_H?=config.h
-PLATFORM_H?=plat/${PLATFORM}/platform.h
 INC+=-include ${CONFIG_H} -Iplat/${PLATFORM}
+ASFLAGS+=${INC}
+CFLAGS+=${INC}
 
-all: options test kernel dasm
+all: options kernel dasm
 
 options:
 	@printf "build options:\n"
@@ -43,11 +44,11 @@ clean:
 
 obj/%.o: %.S
 	@mkdir -p ${@D}
-	${CC} ${ASFLAGS} ${INC} -MMD -c -o $@ $<
+	${CC} ${ASFLAGS} -MMD -c -o $@ $<
 
 obj/%.o: %.c
 	@mkdir -p ${@D}
-	${CC} ${CFLAGS} ${INC}  -MMD -c -o $@ $<
+	${CC} ${CFLAGS}  -MMD -c -o $@ $<
 
 s3k.elf: ${OBJ}
 	${CC} ${LDFLAGS} -o $@ ${OBJ}

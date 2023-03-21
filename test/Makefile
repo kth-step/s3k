@@ -1,4 +1,5 @@
 
+$(info Unit tests requires Google Test to be installed)
 vpath %.c ../src
 SRCS=cap.c cnode.c exception.c lock.c proc.c schedule.c syscall.c \
      syscall_monitor.c mockup.c
@@ -11,7 +12,7 @@ TEST_OBJS=$(patsubst %.cc,obj/%.o, $(TEST_SRCS))
 CFLAGS=-I../inc -I. -MMD -include config.h
 CXXFLAGS=-I../inc -I. -include config.h
 
-all: test
+test: test_detail.json
 
 obj/%.o : %.c
 	@mkdir -p $(@D)
@@ -26,8 +27,6 @@ run_tests.out: $(OBJS) $(TEST_OBJS)
 
 test_detail.json: run_tests.out
 	./run_tests.out --gtest_output=json
-
-test: test_detail.json
 
 .PHONY: test
 
