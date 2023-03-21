@@ -1,6 +1,7 @@
 docs
 test_detail.json
 *.elf
+*.a
 *.da
 *.o
 *.d
