@@ -6,11 +6,10 @@ include config.mk
 vpath %.c src
 vpath %.S src
 
-ASSRC=head.S trap.S stack.S
-CSRC=cap.c cnode.c current.c csr.c exception.c init.c lock.c proc.c schedule.c \
-     syscall.c syscall_monitor.c timer.c wfi.c
-OBJ=${addprefix obj/, ${ASSRC:.S=.o} ${CSRC:.c=.o}}
-DEP=${OBJ:.o=.d}
+SRCS=head.S trap.S stack.S cap.c cnode.c current.c csr.c exception.c init.c \
+     lock.c proc.c schedule.c syscall.c syscall_monitor.c timer.c wfi.c
+OBJS=$(patsubst %, $(BUILD)/%.o, ${SRCS})
+DEPS=${OBJS:.o=.d}
 
 all: options kernel dasm
 
@@ -39,24 +38,24 @@ format:
 clean:
 	git clean -fdX
 
-obj/%.o: %.S
+$(BUILD)/%.S.o: %.S
 	@mkdir -p ${@D}
 	@printf "CC $@\n"
 	@${CC} ${ASFLAGS} ${INC} -MMD -c -o $@ $<
 
-obj/%.o: %.c
+$(BUILD)/%.c.o: %.c
 	@mkdir -p ${@D}
 	@printf "CC $@\n"
 	@${CC} ${CFLAGS} ${INC} -MMD -c -o $@ $<
 
-%.elf: ${OBJ}
+%.elf: ${OBJS}
 	@printf "CC $@\n"
-	@${CC} ${LDFLAGS} -o $@ ${OBJ}
+	@${CC} ${LDFLAGS} -o $@ $^
 
-%.da:	%.elf
+%.da: %.elf
 	@printf "OBJDUMP $< $@\n"
 	@${OBJDUMP} -d $< > $@
 
--include ${DEP}
-
 .PHONY: all options clean dasm docs test kernel
+
+-include ${DEPS}

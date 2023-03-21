@@ -1,4 +1,6 @@
 ### Kernel configuration
+# build dir
+BUILD?=build
 # config
 CONFIG_H?=config.h
 # Platform
