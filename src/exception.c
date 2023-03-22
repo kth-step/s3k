@@ -7,6 +7,8 @@
 #define ILLEGAL_INSTRUCTION 0x2
 
 #define MRET 0x30200073
+#define SRET 0x10200073
+#define URET 0x00200073
 
 static void handle_ret(struct proc *proc)
 {
@@ -32,7 +34,8 @@ static void handle_default(struct proc *proc, uint64_t mcause, uint64_t mepc,
 void handle_exception(struct proc *proc, uint64_t mcause, uint64_t mepc,
 		      uint64_t mtval)
 {
-	if (mcause == ILLEGAL_INSTRUCTION && mtval == MRET)
+	if (mcause == ILLEGAL_INSTRUCTION
+	    && (mtval == MRET || mtval == SRET || mtval == URET))
 		handle_ret(proc);
 	else
 		handle_default(proc, mcause, mepc, mtval);
