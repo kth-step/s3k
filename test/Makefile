@@ -3,7 +3,7 @@ $(info Unit tests requires Google Test to be installed)
 vpath %.c ../src
 SRCS=cap.c cnode.c exception.c lock.c proc.c schedule.c syscall.c \
      syscall_monitor.c mockup.c
-TEST_SRCS=$(wildcard test_*.cc)
+TEST_SRCS=$(wildcard test_*.C)
 
 OBJS=$(patsubst %.c,obj/%.o, $(SRCS))
 DEPS=$(patsubst %.d,obj/%.o, $(SRCS))
