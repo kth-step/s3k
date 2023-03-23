@@ -149,6 +149,7 @@ static void _revoke_memory_hook(cnode_handle_t handle, union cap cap,
 static void _revoke_memory_post_hook(cnode_handle_t handle, union cap cap)
 {
 	cap.memory.free = cap.memory.begin;
+	cap.memory.lock = 0;
 	cnode_set_cap(handle, cap);
 }
 
@@ -196,7 +197,7 @@ void syscall_revcap(struct proc *proc, uint64_t idx)
 	union cap cap = cnode_get_cap(handle);
 
 	// If empty slot
-	if (cnode_contains(handle)) {
+	if (!cnode_contains(handle)) {
 		proc->regs[REG_A0] = EXCPT_EMPTY;
 		return;
 	}
