@@ -12,4 +12,4 @@
 #define NTICK 100000000
 // Number of slack ticks per slice
 #define NSLACK 10000
-#define NDEBUG 0
+// #define NDEBUG

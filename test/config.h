@@ -7,4 +7,6 @@
 #define NCHANNEL 128
 #define NTICK 10000
 #define NHART 4
+
+#define NDEBUG
 #endif // __MOCKUP_H__

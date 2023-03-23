@@ -5,16 +5,16 @@
  * @author Henrik Karlsson (henrik10@kth.se)
  */
 
-#ifndef __ASSERT_H__
-#define __ASSERT_H__
+#ifndef __KASSERT_H__
+#define __KASSERT_H__
+
+#ifndef NDEBUG
+
+/* If debug */
 #include "altio.h"
 #include "common.h"
 #include "csr.h"
-
-#ifndef assert
-#ifndef NDEBUG
-/* Check if property holds, if not, halt */
-#define assert(x)                                                        \
+#define kassert(x)                                                       \
 	if (!(x)) {                                                      \
 		alt_printf("s3k(0x%X): %s:%s Assertion `%s' failed.",    \
 			   csrr_mhartid(), __FILE_NAME__, STR(__LINE__), \
@@ -23,11 +23,12 @@
 			;                                                \
 	}
 #else
-/* Assume the property holds */
-#define assert(x) \
-	if (!(x)) \
-	__builtin_unreachable()
-#endif /* NDEBUG */
-#endif /* assert */
 
-#endif /* __ASSERT_H__ */
+/* If no debug */
+#define kassert(x) \
+	if (!(x))  \
+	__builtin_unreachable()
+
+#endif /* NDEBUG */
+
+#endif /* __KASSERT_H__ */

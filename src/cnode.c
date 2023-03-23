@@ -1,10 +1,10 @@
 /* See LICENSE file for copyright and license details. */
 #include "cnode.h"
 
-#include "assert.h"
 #include "cap.h"
 #include "common.h"
 #include "consts.h"
+#include "kassert.h"
 
 struct cnode {
 	uint32_t prev, next;
@@ -68,72 +68,72 @@ void cnode_init(const union cap *caps, size_t size)
 // Handle is just index to corresponding element in cnodes
 cnode_handle_t cnode_get_handle(cnode_handle_t pid, cnode_handle_t idx)
 {
-	assert(pid < NPROC);
+	kassert(pid < NPROC);
 	return pid * NCAP + (idx % NCAP);
 }
 
 cnode_handle_t cnode_get_pid(cnode_handle_t handle)
 {
-	assert(handle < NPROC * NCAP);
+	kassert(handle < NPROC * NCAP);
 	return handle / NCAP;
 }
 
 cnode_handle_t cnode_get_next(cnode_handle_t handle)
 {
-	assert(handle < NPROC * NCAP);
+	kassert(handle < NPROC * NCAP);
 	return cnodes[handle].next;
 }
 
 union cap cnode_get_cap(cnode_handle_t handle)
 {
-	assert(handle < NPROC * NCAP);
+	kassert(handle < NPROC * NCAP);
 	return cnodes[handle].cap;
 }
 
 void cnode_set_cap(cnode_handle_t handle, union cap cap)
 {
-	assert(cap.raw != 0);
-	assert(cnode_contains(handle));
+	kassert(cap.raw != 0);
+	kassert(cnode_contains(handle));
 	cnodes[handle].cap = cap;
 }
 
 bool cnode_contains(cnode_handle_t handle)
 {
-	assert(handle < NPROC * NCAP);
+	kassert(handle < NPROC * NCAP);
 	return cnodes[handle].cap.raw != 0;
 }
 
 void cnode_insert(cnode_handle_t curr, union cap cap, cnode_handle_t prev)
 {
-	assert(curr < NPROC * NCAP);
-	assert(prev < NPROC * NCAP);
-	assert(cap.raw != 0);
-	assert(!cnode_contains(curr));
-	assert(cnode_contains(prev));
+	kassert(curr < NPROC * NCAP);
+	kassert(prev < NPROC * NCAP);
+	kassert(cap.raw != 0);
+	kassert(!cnode_contains(curr));
+	kassert(cnode_contains(prev));
 
 	_insert(curr, cap, prev);
 }
 
 void cnode_move(cnode_handle_t src, cnode_handle_t dst)
 {
-	assert(src < NPROC * NCAP);
-	assert(dst < NPROC * NCAP);
-	assert(cnode_contains(src));
-	assert(!cnode_contains(dst));
+	kassert(src < NPROC * NCAP);
+	kassert(dst < NPROC * NCAP);
+	kassert(cnode_contains(src));
+	kassert(!cnode_contains(dst));
 	_move(src, dst);
 }
 
 void cnode_delete(cnode_handle_t curr)
 {
-	assert(curr < NPROC * NCAP);
-	assert(cnode_contains(curr));
+	kassert(curr < NPROC * NCAP);
+	kassert(cnode_contains(curr));
 
 	_delete(curr);
 }
 
 bool cnode_delete_if(cnode_handle_t curr, cnode_handle_t prev)
 {
-	assert(curr < NPROC * NCAP);
+	kassert(curr < NPROC * NCAP);
 	if (!cnode_contains(curr) || cnodes[curr].prev != prev)
 		return false;
 	_delete(curr);

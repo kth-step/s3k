@@ -1,9 +1,9 @@
 /* See LICENSE file for copyright and license details. */
 #include "proc.h"
 
-#include "assert.h"
 #include "cnode.h"
 #include "csr.h"
+#include "kassert.h"
 
 static struct proc processes[NPROC];
 
@@ -18,13 +18,13 @@ void proc_init(uint64_t payload)
 
 struct proc *proc_get(uint64_t pid)
 {
-	assert(pid < NPROC);
+	kassert(pid < NPROC);
 	return &processes[pid];
 }
 
 bool proc_acquire(struct proc *proc, uint64_t expected)
 {
-	assert(!(expected & PSF_BUSY));
+	kassert(!(expected & PSF_BUSY));
 	// Set the busy flag if expected state
 	uint64_t desired = expected | PSF_BUSY;
 	return __atomic_compare_exchange_n(&proc->state, &expected, desired,
