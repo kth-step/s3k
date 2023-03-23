@@ -31,6 +31,6 @@ LDFLAGS=-march=rv64imac -mabi=lp64 -mcmodel=medany\
 	-Wstack-usage=256 -fstack-usage\
 	-Wl,--gc-sections\
 	-flto\
-	-T${PLATFORM}/linker.lds
+	-T${PLATFORM}/linker.ld
 
 #	-Wl,--no-warn-rwx-segments\ <== this option is not supported by all linkers

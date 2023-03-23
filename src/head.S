@@ -16,17 +16,15 @@ _start:
 	.option pop
 	load_sp t0
 
+
 	// zero bss section
 	la t0, _bss
 	la t1, _end
 	j  2f
-
-1:
-	sd   zero, (t0)
+1: 	sd zero, (t0)
 	addi t0, t0, 8
+2: 	bne t0, t1, 1b
 
-2:
-	bne t0, t1, 1b
 
 	// set trap entry
 	la   t0, trap_entry

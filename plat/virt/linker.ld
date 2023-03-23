@@ -10,20 +10,20 @@ _payload = _kernel_base + 0x10000;
 SECTIONS {
 	. = _kernel_base;
 	.text : {
-		*(.init)
-		*(.text .text.*)
+		*( .init )
+		*( .text .text.* )
 	}
 
 	.data : {
-		_data = .;
-		*(.data .data.*)
-		*(.rodata .rodata.*)
-		_sdata = .;
-		*(.sdata .sdata.*)
-		*(.srodata .srodata.*)
+		_data = . ;
+		*( .data .data.* )
+		*( .rodata .rodata.* )
+		_sdata = . ;
+		*( .sdata .sdata.* )
+		*( .srodata .srodata.* )
 	}
 
-	.bss : {
+	.bss : ALIGN(8) {
 		_bss = .;
 		_sbss = .;
 		*(.sbss .sbss.*)

@@ -145,7 +145,7 @@ TEST_F(CapTest, MemoryDerive)
 				      CAP_MEMORY(0x0, 0x2000, 8, CAP_R)));
 	// R
 	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_R),
-				      CAP_MEMORY(0x1, 0x2000, 8, CAP_R)));
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_R)));
 
 	// EQ
 	EXPECT_TRUE(cap_memory_derive(CAP_MEMORY(0x100, 0x200, 8, CAP_RWX),
