@@ -11,7 +11,7 @@ trap_entry:
 	csrrw tp, mscratch, tp
 
 	// if scratch was 0, then exception/interrupt in kernel
-	beqz tp, _hang
+	beqz tp, _machine_interrupt
 
 	// save user registers (except tp and pc)
 	sd ra, (1*8)(tp)
@@ -45,7 +45,7 @@ trap_entry:
 	sd t5, (30*8)(tp)
 	sd t6, (31*8)(tp)
 
-	csrrw t0, mepc, zero     // load user pc to t0
+	csrr  t0, mepc     // load user pc to t0
 	csrrw t1, mscratch, zero // load user tp to t1
 	sd    t0, (0*8)(tp)      // save pc
 	sd    t1, (4*8)(tp)      // save tp
@@ -71,6 +71,13 @@ _exception:
 	call handle_exception
 	j    trap_exit
 
+_machine_interrupt:
+	csrrw	tp,mscratch,zero
+	.option push
+	.option norelax
+	la      gp, __global_pointer$
+	.option pop
+	load_sp t1
 _interrupt:
 	mv   a0, tp         // Save a0 (pcb pointer) so we know the process in context
 	call schedule_yield
@@ -98,11 +105,10 @@ _syscall:
 	jalr  ra, %pcrel_lo(1b)(ra)
 
 trap_exit:
+	csrw mstatus,0x8
 	// Load pc and a0
-	ld   t0, (0*8)(tp) // load user pc
-	ld   t1, (4*8)(tp) // load user tp
-	csrw mepc, t0      // set user pc
-	csrw mscratch, t1  // save user tp to scratch
+	ld t0, (0*8)(tp)
+	csrw mepc,t0      // set user pc
 
 	// Load other user registers
 	ld ra, (1*8)(tp)
@@ -136,8 +142,9 @@ trap_exit:
 	ld t5, (30*8)(tp)
 	ld t6, (31*8)(tp)
 
-	// Save PCB pointer, load user a0
-	csrrw tp, mscratch, tp
+	csrw mstatus,0
+	csrw mscratch, tp
+	ld   tp,(4*8)(tp) // load user tp
 	mret
 
 _hang:
