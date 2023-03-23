@@ -41,9 +41,14 @@ static void _move(uint32_t src, uint32_t dst)
 	union cap cap = cnodes[src].cap;
 	uint32_t next = cnodes[src].next;
 
+	// update destination node
 	cnodes[dst].prev = prev;
 	cnodes[dst].cap = cap;
 	cnodes[dst].next = next;
+
+	// update previous and next node
+	cnodes[prev].next = dst;
+	cnodes[next].prev = dst;
 
 	cnodes[src].cap.raw = 0;
 	cnodes[src].prev = 0;

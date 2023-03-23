@@ -14,13 +14,12 @@
 #include "altio.h"
 #include "common.h"
 #include "csr.h"
-#define kassert(x)                                                       \
-	if (!(x)) {                                                      \
-		alt_printf("s3k(0x%X): %s:%s Assertion `%s' failed.",    \
-			   csrr_mhartid(), __FILE__, STR(__LINE__), \
-			   STR(x));                                      \
-		while (1)                                                \
-			;                                                \
+#define kassert(x)                                                           \
+	if (!(x)) {                                                          \
+		alt_printf("s3k(0x%X): %s:%s Assertion `%s' failed.",        \
+			   csrr_mhartid(), __FILE__, STR(__LINE__), STR(x)); \
+		while (1)                                                    \
+			;                                                    \
 	}
 #else
 
