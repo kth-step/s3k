@@ -8,19 +8,8 @@
 #ifndef __COMMON_H__
 #define __COMMON_H__
 
-#ifndef assert
-#ifndef NDEBUG
-/* Check if property holds, if not, halt */
-#define assert(x)    \
-	while (!(x)) \
-		;
-#else
-/* Assume the property holds */
-#define assert(x) \
-	if (!(x)) \
-	__builtin_unreachable()
-#endif /* NDEBUG */
-#endif /* assert */
+#define _STR_(x) #x
+#define STR(x) _STR_(x)
 
 /* Do not inline the function. */
 #define NOINLINE __attribute__((noinline))

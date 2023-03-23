@@ -51,18 +51,21 @@ retry:
 		if (proc_acquire(proc, PS_READY))
 			break;
 	}
+	current_set(proc);
 	proc_load_pmp(proc);
 	if (!csrr_pmpcfg0()) {
 		// Temporary fix. QEMU does not allow this to be zero.
 		proc_release(proc);
 		goto retry;
 	}
-	timeout_set(hartid, quantum * NTICK);
+	uint64_t start_time = quantum * NTICK;
+	uint64_t end_time = start_time + entry.len * NTICK - NSLACK;
+
+	timeout_set(hartid, start_time);
 	while (!(csrr_mip() & (1 << 7))) {
 		wfi();
 	}
-	timeout_set(hartid, (quantum + entry.len) * NTICK - NSLACK);
-	current_set(proc);
+	timeout_set(hartid, end_time);
 }
 
 void schedule_yield(struct proc *proc)

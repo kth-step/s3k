@@ -1,6 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 #include "proc.h"
 
+#include "assert.h"
 #include "cnode.h"
 #include "csr.h"
 

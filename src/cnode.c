@@ -1,6 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 #include "cnode.h"
 
+#include "assert.h"
 #include "cap.h"
 #include "common.h"
 #include "consts.h"

@@ -25,7 +25,7 @@ static void handle_default(struct proc *proc, uint64_t mcause, uint64_t mepc,
 {
 	proc->regs[REG_ECAUSE] = mcause;
 	proc->regs[REG_EVAL] = mtval;
-	proc->regs[REG_EPC] = mepc;
+	proc->regs[REG_EPC] = proc->regs[REG_PC];
 	proc->regs[REG_ESP] = proc->regs[REG_SP];
 	proc->regs[REG_PC] = proc->regs[REG_TPC];
 	proc->regs[REG_SP] = proc->regs[REG_TSP];
