@@ -17,7 +17,7 @@
 #define kassert(x)                                                       \
 	if (!(x)) {                                                      \
 		alt_printf("s3k(0x%X): %s:%s Assertion `%s' failed.",    \
-			   csrr_mhartid(), __FILE_NAME__, STR(__LINE__), \
+			   csrr_mhartid(), __FILE__, STR(__LINE__), \
 			   STR(x));                                      \
 		while (1)                                                \
 			;                                                \
