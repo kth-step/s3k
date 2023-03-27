@@ -5,21 +5,21 @@
 #include "csr.h"
 #include "kassert.h"
 
-static struct proc processes[NPROC];
+static struct proc _processes[NPROC];
 
 void proc_init(uint64_t payload)
 {
 	for (int i = 1; i < NPROC; i++) {
-		processes[i] = (struct proc){ .pid = i, .state = PS_SUSPENDED };
+		_processes[i] = (struct proc){ .pid = i, .state = PS_SUSPENDED };
 	}
-	processes[0] = (struct proc){ .pid = 0, .state = PS_READY };
-	processes[0].regs[REG_PC] = payload;
+	_processes[0] = (struct proc){ .pid = 0, .state = PS_READY };
+	_processes[0].regs[REG_PC] = payload;
 }
 
 struct proc *proc_get(uint64_t pid)
 {
 	kassert(pid < NPROC);
-	return &processes[pid];
+	return &_processes[pid];
 }
 
 bool proc_acquire(struct proc *proc, uint64_t expected)

@@ -13,18 +13,18 @@
 
 #define NONE_PID 0xFF
 
-static volatile struct sched_entry schedule[NHART][NSLICE];
+static volatile struct sched_entry _schedule[NHART][NSLICE];
 
-struct sched_entry schedule_get(uint64_t hartid, size_t i)
+static struct sched_entry _schedule_get(uint64_t hartid, size_t i)
 {
-	return schedule[hartid][i];
+	return _schedule[hartid][i];
 }
 
 void schedule_update(uint64_t hartid, uint64_t pid, uint64_t begin,
 		     uint64_t end)
 {
 	for (uint64_t i = begin; i < end; i++) {
-		schedule[hartid][i] = (struct sched_entry){ pid, end - i };
+		_schedule[hartid][i] = (struct sched_entry){ pid, end - i };
 	}
 }
 
@@ -42,7 +42,7 @@ void schedule_next()
 retry:
 	for (;;) {
 		quantum = (time_get() + NSLACK) / NTICK;
-		entry = schedule_get(hartid, quantum % NSLICE);
+		entry = _schedule_get(hartid, quantum % NSLICE);
 		if (entry.pid == NONE_PID)
 			continue;
 		proc = proc_get(entry.pid);
