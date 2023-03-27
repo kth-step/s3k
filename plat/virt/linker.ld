@@ -10,7 +10,7 @@ _payload = _kernel_base + 0x10000;
 SECTIONS {
 	. = _kernel_base;
 	.text : {
-		*( .init )
+		*( .text.init )
 		*( .text .text.* )
 	}
 

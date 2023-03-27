@@ -7,9 +7,10 @@
 .extern trap_entry
 .extern trap_exit
 
-.section .init
+.section .text.init
 
 _start:
+	// Load the global and stack pointers.
 	.option push
 	.option norelax
 	la      gp, __global_pointer$
@@ -17,7 +18,7 @@ _start:
 	load_sp t0
 
 
-	// zero bss section
+	// write zeros to be bss section
 	la t0, _bss
 	la t1, _end
 	j  2f
@@ -26,20 +27,20 @@ _start:
 2: 	bne t0, t1, 1b
 
 
-	// set trap entry
+	// Set trap entry/handler.
 	la   t0, trap_entry
 	csrw mtvec, t0
 
-	csrw pmpcfg0, 0x0F
-	li   t0, -1
-	csrw pmpaddr0, t0
-
+	// Disable interrupts in machine mode.
 	csrw mstatus, 0
+	// Enable timer interrupts for user mode.
 	li   t0, (1<<7)
 	csrw mie, t0
 
-	// initialize the kernel
+	// Initialize the kernel.
 	la a0,_payload
 	call init_kernel
+	// Schedule the boot process.
 	call schedule_next
+	// Load the boot process.
 	tail trap_exit
