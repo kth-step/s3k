@@ -9,20 +9,7 @@
 #include "timer.h"
 #include "trap.h"
 
-// Lock used for capability operations.
-static struct ticket_lock cap_lock;
-
 // static struct proc *listeners[NCHANNEL];
-
-void syscall_lock(void)
-{
-	tl_lock(&cap_lock);
-}
-
-void syscall_unlock(void)
-{
-	tl_unlock(&cap_lock);
-}
 
 /*** System call handlers ***/
 void syscall_getinfo(struct proc *proc, uint64_t info)

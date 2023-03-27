@@ -6,8 +6,9 @@ include config.mk
 vpath %.c src
 vpath %.S src
 
-SRCS=head.S trap.S stack.S cap.c cnode.c current.c csr.c exception.c init.c \
-     lock.c proc.c schedule.c syscall.c syscall_monitor.c timer.c wfi.c
+SRCS=head.S stack.S trap.S cap.c cnode.c current.c csr.c exception.c init.c \
+     proc.c schedule.c syscall.c syscall_lock.c syscall_monitor.c \
+     ticket_lock.c timer.c wfi.c kassert.c
 OBJS=$(patsubst %, $(BUILD)/%.o, ${SRCS})
 DEPS=${OBJS:.o=.d}
 

@@ -5,5 +5,5 @@
 .section .bss.stack
 
 stack:
-.space(STACK_SIZE *NHART) 
+.space (STACK_SIZE * NHART) 
 stack_top:

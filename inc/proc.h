@@ -1,6 +1,11 @@
 /**
  * @file proc.h
- * @brief Process control block.
+ * @brief Defines the process control block and its associated functions.
+ *
+ * This file contains the definition of the `struct proc` data structure, which
+ * represents a process control block (PCB) in the operating system. It also
+ * contains the declarations of functions for manipulating the PCB.
+ *
  * @copyright MIT License
  * @author Henrik Karlsson (henrik10@kth.se)
  */
@@ -8,7 +13,6 @@
 #define __PROC_H__
 
 #include "cnode.h"
-#include "lock.h"
 
 #include <stdint.h>
 
@@ -78,16 +82,71 @@ struct proc {
 	uint64_t sleep;
 };
 
+/**
+ * Initializes all processes in the system.
+ *
+ * @param payload A pointer to the boot loader's code.
+ *
+ * @note This function should be called only once during system startup.
+ */
 void proc_init(uint64_t payload);
+
+/**
+ * @brief Gets the process corresponding to a given process ID.
+ *
+ * @param pid The process ID to look for.
+ * @return A pointer to the process corresponding to the given PID.
+ */
 struct proc *proc_get(uint64_t pid);
+
+/**
+ * @brief Attempt to acquire the lock for a process.
+ *
+ * The process's lock is embedded in its state. This function attempts to
+ * acquire the lock by atomically setting the LSB of the state to 1 if it
+ * currently has the value 'expected'. If the lock is already held by another
+ * process, this function will return false.
+ *
+ * @param proc Pointer to the process to acquire the lock for.
+ * @param expected The expected value of the process's state.
+ * @return True if the lock was successfully acquired, false otherwise.
+ */
 bool proc_acquire(struct proc *proc, uint64_t expected);
+
+/**
+ * @brief Release the lock on a process.
+ *
+ * The process's lock is embedded in its state. This function sets the LSB of
+ * the state to 0 to unlock the process.
+ *
+ * @param proc Pointer to the process to release the lock for.
+ */
 void proc_release(struct proc *proc);
+
+/**
+ * Set the process to a suspended state without locking it. The process may
+ * still be running, but it will not resume after its timeslice has ended.
+ *
+ * @param proc Pointer to process to suspend.
+ */
 void proc_suspend(struct proc *proc);
+
+/**
+ * Resumes a process from its suspend state without locking it.
+ *
+ * @param proc Pointer to process to be resumed.
+ */
 void proc_resume(struct proc *proc);
 
 /**
- * Loads the PMP settings of the process to the hardware.
- * @param proc Process for which we load PMP settings.
+ * @brief Loads the PMP settings of the process to the hardware.
+ *
+ * This function loads the PMP settings of the process to the hardware. The PMP
+ * settings specify the memory regions that the process can access. This
+ * function loads the PMP settings to the hardware so that the hardware enforces
+ * the process's memory access permissions.
+ *
+ * @param proc Pointer to the process for which we load PMP settings.
  */
 void proc_load_pmp(const struct proc *proc);
 

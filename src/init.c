@@ -6,16 +6,16 @@
 #include "common.h"
 #include "csr.h"
 #include "init_caps.h"
-#include "lock.h"
 #include "proc.h"
 #include "schedule.h"
+#include "ticket_lock.h"
 
 void init_kernel(uint64_t payload)
 {
 	static struct ticket_lock lock;
 	static volatile int done = 0;
 
-	tl_lock(&lock);
+	tl_acq(&lock);
 	if (!done) {
 		alt_printf("s3k(0x%X): Setting up.\n", csrr_mhartid());
 		proc_init(payload);
@@ -26,5 +26,5 @@ void init_kernel(uint64_t payload)
 		done = 1;
 	}
 	alt_printf("s3k(0x%X): Running.\n", csrr_mhartid());
-	tl_unlock(&lock);
+	tl_rel(&lock);
 }

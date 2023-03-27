@@ -15,7 +15,7 @@
 
 static volatile struct sched_entry _schedule[NHART][NSLICE];
 
-static struct sched_entry _schedule_get(uint64_t hartid, size_t i)
+struct sched_entry schedule_get(uint64_t hartid, size_t i)
 {
 	return _schedule[hartid][i];
 }
@@ -42,7 +42,7 @@ void schedule_next()
 retry:
 	for (;;) {
 		quantum = (time_get() + NSLACK) / NTICK;
-		entry = _schedule_get(hartid, quantum % NSLICE);
+		entry = schedule_get(hartid, quantum % NSLICE);
 		if (entry.pid == NONE_PID)
 			continue;
 		proc = proc_get(entry.pid);

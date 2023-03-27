@@ -21,12 +21,35 @@ struct sched_entry {
 
 struct sched_entry schedule_get(uint64_t hartid, size_t i);
 
-/// Yield the current time slice.
-void schedule_yield(struct proc *proc);
-/// Find the next process to schedule.
-void schedule_next(void);
-/// Initialize scheduler.
+/**
+ * @brief Initialize the scheduler.
+ *
+ * This function initializes the scheduler, which is responsible for managing
+ * the execution of processes on the system. It sets up the necessary data
+ * structures and configurations to support scheduling.
+ */
 void schedule_init(void);
+
+/**
+ * @brief Yield the current time slice for a given process.
+ *
+ * This function yields the current time slice for a given process. It marks
+ * the process as being suspended and schedules the next available process
+ * to run. When the yielded process is scheduled again, it will resume
+ * execution from where it left off.
+ *
+ * @param proc Pointer to the process for which the time slice should be
+ *             yielded.
+ */
+void schedule_yield(struct proc *proc);
+
+/**
+ * @brief Find the next process to schedule.
+ *
+ * This function finds the next process to schedule based on the current
+ * state of the system.
+ */
+void schedule_next(void);
 
 /// Delete scheduling at hartid, begin-end.
 void schedule_delete(uint64_t hartid, uint64_t begin, uint64_t end);

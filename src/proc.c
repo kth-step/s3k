@@ -10,7 +10,8 @@ static struct proc _processes[NPROC];
 void proc_init(uint64_t payload)
 {
 	for (int i = 1; i < NPROC; i++) {
-		_processes[i] = (struct proc){ .pid = i, .state = PS_SUSPENDED };
+		_processes[i]
+		    = (struct proc){ .pid = i, .state = PS_SUSPENDED };
 	}
 	_processes[0] = (struct proc){ .pid = 0, .state = PS_READY };
 	_processes[0].regs[REG_PC] = payload;
