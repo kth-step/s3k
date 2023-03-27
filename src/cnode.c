@@ -65,8 +65,10 @@ void cnode_init(const union cap *caps, size_t size)
 	cnodes[root].prev = root;
 	cnodes[root].next = root;
 	// Add initial nodes
+	int prev = root;
 	for (cnode_handle_t i = 0; i < size; i++) {
-		_insert(i, caps[i], root);
+		_insert(i, caps[i], prev);
+		prev = i;
 	}
 }
 
