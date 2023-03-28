@@ -9,7 +9,7 @@
 #include "platform.h"
 
 /// Stack size of 1 KiB
-#define LOG_STACK_SIZE 10
+#define LOG_STACK_SIZE 12
 #define STACK_SIZE (1ull << LOG_STACK_SIZE)
 
 #endif /* __STACK_H__ */

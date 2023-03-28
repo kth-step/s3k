@@ -170,8 +170,7 @@ void syscall_mgetcap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 		return;
 	}
 	cnode_handle_t node_handle = cnode_get_handle(pid, node_idx);
-	union cap node_cap = cnode_get_cap(node_handle);
-	proc->regs[REG_A1] = node_cap.raw;
+	proc->regs[REG_A1] = cnode_get_cap(node_handle).raw;
 	proc_release(other_proc);
 	syscall_unlock();
 	proc->regs[REG_A0] = EXCPT_NONE;

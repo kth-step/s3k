@@ -15,175 +15,114 @@ uint64_t pmp_napot_end(uint64_t addr)
 	return (((addr + 1) | addr) + 1) << 2;
 }
 
-static bool cap_time_derive_time(struct time parent, struct time child)
-{
-	return parent.free == child.begin && child.end <= parent.end
-	       && child.begin == child.free && child.begin < child.end
-	       && parent.hartid == child.hartid && child._padd == 0;
-}
-
-static bool cap_memory_derive_memory(struct memory parent, struct memory child)
-{
-	return parent.free == child.begin && child.end <= parent.end
-	       && child.begin == child.free && parent.offset == child.offset
-	       && child.begin <= child.end
-	       && (parent.rwx & child.rwx) == child.rwx && parent.lock == 0;
-}
-
-static bool cap_memory_derive_pmp(struct memory parent, struct pmp child)
-{
-	uint64_t pmp_begin = pmp_napot_begin(child.addr);
-	uint64_t pmp_end = pmp_napot_end(child.addr);
-	uint64_t rwx = child.cfg & 0x7;
-	uint64_t mode = child.cfg >> 3;
-	uint64_t mem_free
-	    = ((uint64_t)parent.offset << 27) + ((uint64_t)parent.free << 12);
-	uint64_t mem_end
-	    = ((uint64_t)parent.offset << 27) + ((uint64_t)parent.end << 12);
-	return mem_free <= pmp_begin && pmp_end <= mem_end
-	       && ((parent.rwx & rwx) == rwx) && mode == 0x3;
-}
-
-static bool cap_monitor_derive_monitor(struct monitor parent,
-				       struct monitor child)
-{
-	return parent.free == child.begin && child.end <= parent.end
-	       && child.begin == child.free && child.begin < child.end
-	       && child._padd == 0;
-}
-
-static bool cap_channel_derive_channel(struct channel parent,
-				       struct channel child)
-{
-	return parent.free == child.begin && child.end <= parent.end
-	       && child.begin == child.free && child.begin < child.end
-	       && child._padd == 0;
-}
-
-static bool cap_channel_derive_socket(struct channel parent,
-				      struct socket child)
-{
-	return parent.free == child.channel && child.channel < parent.end
-	       && child.tag == 0 && child._padd == 0;
-}
-
-static bool cap_socket_derive_socket(struct socket parent, struct socket child)
-{
-	return parent.channel == child.channel && parent.tag == 0
-	       && child.tag > 0 && child._padd == 0;
-}
-
-bool cap_time_derive(union cap parent, union cap child)
-{
-	return parent.type == CAPTY_TIME && child.type == CAPTY_TIME
-	       && cap_time_derive_time(parent.time, child.time);
-}
-
-bool cap_memory_derive(union cap parent, union cap child)
-{
-	return (parent.type == CAPTY_MEMORY && child.type == CAPTY_MEMORY
-		&& cap_memory_derive_memory(parent.memory, child.memory))
-	       || (parent.type == CAPTY_MEMORY && child.type == CAPTY_PMP
-		   && cap_memory_derive_pmp(parent.memory, child.pmp));
-}
-
-bool cap_monitor_derive(union cap parent, union cap child)
-{
-	return parent.type == CAPTY_MONITOR && child.type == CAPTY_MONITOR
-	       && cap_monitor_derive_monitor(parent.monitor, child.monitor);
-}
-
-bool cap_channel_derive(union cap parent, union cap child)
-{
-	return (parent.type == CAPTY_CHANNEL && child.type == CAPTY_CHANNEL
-		&& cap_channel_derive_channel(parent.channel, child.channel))
-	       || (parent.type == CAPTY_CHANNEL && child.type == CAPTY_SOCKET
-		   && cap_channel_derive_socket(parent.channel, child.socket));
-}
-
-bool cap_socket_derive(union cap parent, union cap child)
-{
-	return (parent.type == CAPTY_SOCKET && child.type == CAPTY_SOCKET
-		&& cap_socket_derive_socket(parent.socket, child.socket));
-}
-
-static bool cap_time_parent_time(struct time parent, struct time child)
-{
-	return parent.begin <= child.begin && child.end <= parent.end
-	       && child.hartid == parent.hartid;
-}
-
-static bool cap_memory_parent_memory(struct memory parent, struct memory child)
-{
-	return parent.offset == child.offset && parent.begin <= child.begin
-	       && child.end <= parent.end;
-}
-
-static bool cap_memory_parent_pmp(struct memory parent, struct pmp child)
-{
-	uint64_t pmp_begin = pmp_napot_begin(child.addr);
-	uint64_t pmp_end = pmp_napot_end(child.addr);
-	uint64_t rwx = child.cfg & 0x7;
-	uint64_t mem_free
-	    = ((uint64_t)parent.offset << 27) + (parent.free << 12);
-	uint64_t mem_end = ((uint64_t)parent.offset << 27) + (parent.end << 12);
-	return mem_free <= pmp_begin && pmp_end <= mem_end
-	       && ((parent.rwx & rwx) == rwx);
-}
-
-static bool cap_monitor_parent_monitor(struct monitor parent,
-				       struct monitor child)
-{
-	return parent.begin <= child.begin && child.end <= parent.end;
-}
-
-static bool cap_channel_parent_channel(struct channel parent,
-				       struct channel child)
-{
-	return parent.begin <= child.begin && child.end <= parent.end;
-}
-
-static bool cap_channel_parent_socket(struct channel parent,
-				      struct socket child)
-{
-	return parent.begin <= child.channel && child.channel < parent.end;
-}
-
-static bool cap_socket_parent_socket(struct socket parent, struct socket child)
-{
-	return parent.tag == 0 && parent.channel == child.channel;
-}
-
 bool cap_time_parent(union cap parent, union cap child)
 {
 	return parent.type == CAPTY_TIME && child.type == CAPTY_TIME
-	       && cap_time_parent_time(parent.time, child.time);
+	       && parent.time.begin <= child.time.begin
+	       && child.time.end <= parent.time.end
+	       && child.time.hartid == parent.time.hartid;
 }
 
 bool cap_memory_parent(union cap parent, union cap child)
 {
-	return (parent.type == CAPTY_MEMORY && child.type == CAPTY_MEMORY
-		&& cap_memory_parent_memory(parent.memory, child.memory))
-	       || (parent.type == CAPTY_MEMORY && child.type == CAPTY_PMP
-		   && cap_memory_parent_pmp(parent.memory, child.pmp));
+	if (parent.type == CAPTY_MEMORY && child.type == CAPTY_MEMORY) {
+		return parent.memory.offset == child.memory.offset
+		       && parent.memory.begin <= child.memory.begin
+		       && child.memory.end <= parent.memory.end;
+	}
+	if (parent.type == CAPTY_MEMORY && child.type == CAPTY_PMP) {
+		uint64_t pmp_begin = pmp_napot_begin(child.pmp.addr);
+		uint64_t pmp_end = pmp_napot_end(child.pmp.addr);
+		uint64_t mem_begin = ((uint64_t)parent.memory.offset << 27)
+				     + (parent.memory.begin << 12);
+		uint64_t mem_end = ((uint64_t)parent.memory.offset << 27)
+				   + (parent.memory.end << 12);
+		return mem_begin <= pmp_begin && pmp_end <= mem_end;
+	}
+	return false;
 }
 
 bool cap_monitor_parent(union cap parent, union cap child)
 {
 	return parent.type == CAPTY_MONITOR && child.type == CAPTY_MONITOR
-	       && cap_monitor_parent_monitor(parent.monitor, child.monitor);
+	       && parent.monitor.begin <= child.monitor.begin
+	       && child.monitor.end <= parent.monitor.end;
 }
 
 bool cap_channel_parent(union cap parent, union cap child)
 {
-	return (parent.type == CAPTY_CHANNEL && child.type == CAPTY_CHANNEL
-		&& cap_channel_parent_channel(parent.channel, child.channel))
-	       || (parent.type == CAPTY_CHANNEL && child.type == CAPTY_SOCKET
-		   && cap_channel_parent_socket(parent.channel, child.socket));
+	if (parent.type == CAPTY_CHANNEL && child.type == CAPTY_CHANNEL)
+		return parent.channel.begin <= child.channel.begin
+		       && child.channel.end <= parent.channel.end;
+	if (parent.type == CAPTY_CHANNEL && child.type == CAPTY_SOCKET)
+		return parent.channel.begin <= child.socket.channel
+		       && child.socket.channel < parent.channel.end;
+	return false;
 }
 
 bool cap_socket_parent(union cap parent, union cap child)
 {
 	return parent.type == CAPTY_SOCKET && child.type == CAPTY_SOCKET
-	       && cap_socket_parent_socket(parent.socket, child.socket);
+	       && parent.socket.tag == 0
+	       && parent.socket.channel == child.socket.channel;
+}
+
+bool cap_time_derive(union cap parent, union cap child)
+{
+	return parent.type == CAPTY_TIME && child.type == CAPTY_TIME
+	       && parent.time.free == child.time.begin
+	       && parent.time.free == child.time.free
+	       && child.time.end <= parent.time.end
+	       && child.time.hartid == parent.time.hartid;
+}
+
+bool cap_memory_derive(union cap parent, union cap child)
+{
+	if (parent.type == CAPTY_MEMORY && child.type == CAPTY_MEMORY) {
+		return parent.memory.offset == child.memory.offset
+		       && parent.memory.free == child.memory.begin
+		       && parent.memory.free == child.memory.free
+		       && child.memory.end <= parent.memory.end;
+	}
+	if (parent.type == CAPTY_MEMORY && child.type == CAPTY_PMP) {
+		uint64_t pmp_begin = pmp_napot_begin(child.pmp.addr);
+		uint64_t pmp_end = pmp_napot_end(child.pmp.addr);
+		uint64_t pmp_rwx = child.pmp.cfg & 0x7;
+		uint64_t pmp_mode = child.pmp.cfg >> 3;
+		uint64_t mem_free = ((uint64_t)parent.memory.offset << 27)
+				    + (parent.memory.free << 12);
+		uint64_t mem_end = ((uint64_t)parent.memory.offset << 27)
+				   + (parent.memory.end << 12);
+		uint64_t mem_rwx = parent.memory.rwx;
+		return mem_free <= pmp_begin && pmp_end <= mem_end
+		       && pmp_mode == 0x3 && (mem_rwx & pmp_rwx) == pmp_rwx;
+	}
+	return false;
+}
+
+bool cap_monitor_derive(union cap parent, union cap child)
+{
+	return parent.type == CAPTY_MONITOR && child.type == CAPTY_MONITOR
+	       && parent.monitor.free == child.monitor.begin
+	       && parent.monitor.free == child.monitor.free
+	       && child.monitor.end <= parent.monitor.end;
+}
+
+bool cap_channel_derive(union cap parent, union cap child)
+{
+	if (parent.type == CAPTY_CHANNEL && child.type == CAPTY_CHANNEL)
+		return parent.channel.free == child.channel.begin
+		       && parent.channel.free == child.channel.free
+		       && child.channel.end <= parent.channel.end;
+	if (parent.type == CAPTY_CHANNEL && child.type == CAPTY_SOCKET)
+		return parent.channel.free == child.socket.channel
+		       && child.socket.channel < parent.channel.end;
+	return false;
+}
+
+bool cap_socket_derive(union cap parent, union cap child)
+{
+	return parent.type == CAPTY_SOCKET && child.type == CAPTY_SOCKET
+	       && parent.socket.tag == 0 && child.socket.tag > 0
+	       && parent.socket.channel == child.socket.channel;
 }

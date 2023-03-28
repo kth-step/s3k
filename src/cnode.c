@@ -57,7 +57,7 @@ static void _move(cnode_handle_t src, cnode_handle_t dst)
 
 static bool _contains(cnode_handle_t curr)
 {
-	return _cnodes[curr].cap.raw != 0;
+	return _cnodes[curr].cap.type != 0;
 }
 
 void cnode_init(const union cap *caps, size_t size)

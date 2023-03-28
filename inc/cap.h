@@ -27,7 +27,7 @@
 	{                                  \
 		.time                      \
 		    = {.type = CAPTY_TIME, \
-		       ._padd = 0,         \
+		       .unused = 0,        \
 		       .hartid = _hartid,  \
 		       .begin = _begin,    \
 		       .free = _begin,     \
@@ -55,7 +55,7 @@
 	{                                     \
 		.monitor                      \
 		    = {.type = CAPTY_MONITOR, \
-		       ._padd = 0,            \
+		       .unused = 0,           \
 		       .begin = _begin,       \
 		       .free = _begin,        \
 		       .end = _end }          \
@@ -65,7 +65,7 @@
 	{                                     \
 		.channel                      \
 		    = {.type = CAPTY_CHANNEL, \
-		       ._padd = 0,            \
+		       .unused = 0,           \
 		       .begin = _begin,       \
 		       .free = _begin,        \
 		       .end = _end }          \
@@ -75,7 +75,7 @@
 	{                                    \
 		.socket                      \
 		    = {.type = CAPTY_SOCKET, \
-		       ._padd = 0,           \
+		       .unused = 0,          \
 		       .channel = _channel,  \
 		       .tag = _tag }         \
 	}
@@ -90,67 +90,61 @@ enum capty {
 	CAPTY_SOCKET,  ///< IPC Socket capability
 };
 
-struct time {
-	uint64_t type : 4;
-	uint64_t _padd : 4;
-	uint64_t hartid : 8;
-	uint64_t begin : 16;
-	uint64_t free : 16;
-	uint64_t end : 16;
-};
-
-struct memory {
-	uint64_t type : 4;
-	uint64_t lock : 1;
-	uint64_t rwx : 3;
-	uint64_t offset : 8;
-	uint64_t begin : 16;
-	uint64_t free : 16;
-	uint64_t end : 16;
-};
-
-struct pmp {
-	uint64_t type : 4;
-	uint64_t addr : 52;
-	uint64_t cfg : 8;
-};
-
-struct monitor {
-	uint64_t type : 4;
-	uint64_t _padd : 12;
-	uint64_t begin : 16;
-	uint64_t free : 16;
-	uint64_t end : 16;
-};
-
-struct channel {
-	uint64_t type : 4;
-	uint64_t _padd : 12;
-	uint64_t begin : 16;
-	uint64_t free : 16;
-	uint64_t end : 16;
-};
-
-struct socket {
-	uint64_t type : 4;
-	uint64_t _padd : 28;
-	uint64_t channel : 16;
-	uint64_t tag : 16;
-};
-
 /// Capability description
 union cap {
 	uint64_t type : 4;
 	uint64_t raw;
-	struct time time;
-	struct memory memory;
-	struct pmp pmp;
-	struct monitor monitor;
-	struct channel channel;
-	struct socket socket;
+
+	struct {
+		uint64_t type : 4;
+		uint64_t unused : 4;
+		uint64_t hartid : 8;
+		uint64_t begin : 16;
+		uint64_t free : 16;
+		uint64_t end : 16;
+	} time;
+
+	struct {
+		uint64_t type : 4;
+		uint64_t lock : 1;
+		uint64_t rwx : 3;
+		uint64_t offset : 8;
+		uint64_t begin : 16;
+		uint64_t free : 16;
+		uint64_t end : 16;
+	} memory;
+
+	struct {
+		uint64_t type : 4;
+		uint64_t addr : 52;
+		uint64_t cfg : 8;
+	} pmp;
+
+	struct {
+		uint64_t type : 4;
+		uint64_t unused : 12;
+		uint64_t begin : 16;
+		uint64_t free : 16;
+		uint64_t end : 16;
+	} monitor;
+
+	struct {
+		uint64_t type : 4;
+		uint64_t unused : 12;
+		uint64_t begin : 16;
+		uint64_t free : 16;
+		uint64_t end : 16;
+	} channel;
+
+	struct {
+		uint64_t type : 4;
+		uint64_t unused : 28;
+		uint64_t channel : 16;
+		uint64_t tag : 16;
+	} socket;
 };
 
-#ifdef _Static_assert
+#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 _Static_assert(sizeof(union cap) == 8, "union cap size != 8 bytes");
 #endif
 

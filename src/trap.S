@@ -1,8 +1,6 @@
-// See LICENSE file for copyright and license details.
-#include "macro.S"
-.globl trap_entry
-.globl trap_exit
+# See LICENSE file for copyright and license details.
 
+#include "macro.inc"
 #define PC_OFFSET 0
 #define RA_OFFSET 8
 #define SP_OFFSET 16
@@ -37,22 +35,37 @@
 #define T6_OFFSET 248
 
 #define USER_ECALL 8
-
+#define MSTATUS_MIE 8
 #define SYSCALL_COUNT 19
 
-#define MSTATUS_MIE 8
+.globl trap_entry
+.globl trap_exit
 
 .section .text.trap
-.balign  16
 
+# This is a trap handler that saves user registers to the process control
+# block (PCB) and handles system calls and interrupts. It first saves the user
+# thread pointer (TP) to the machine scratch register (mscratch) and loads the
+# PCB for the current thread. If the scratch register is zero, this means that
+# the exception/interrupt occurred in kernel mode. Otherwise, the handler
+# saves the user registers (except TP and PC) to the PCB, using fixed offsets.
+# This allows the kernel to resume the user thread at a later time, restoring
+# its saved state. The handler then loads the user program counter (PC) and
+# thread pointer (TP) and saves them to the PCB. Next, the handler checks the
+# cause of the trap using the mcause register. If mcause < 0, this indicates
+# an interrupt. Otherwise, if mcause = 8, this indicates a system call. The
+# handler then jumps to the appropriate label to handle the trap. Finally, if
+# neither case is true, the handler falls through to the .exception label where
+# the exception is forwarded to the process.
+.balign  16
 trap_entry:
-	// save user tp to scratch, load PCB
+	# save user tp to scratch, load PCB
 	csrrw tp, mscratch, tp
 
-	// if scratch was 0, then exception/interrupt in kernel
+	# scratch == 0, then exception/interrupt in kernel
 	beqz tp, .machine_interrupt
 
-	// save user registers (except tp and pc)
+	# save user registers (except tp and pc)
 	sd ra, (RA_OFFSET)(tp)
 	sd sp, (SP_OFFSET)(tp)
 	sd gp, (GP_OFFSET)(tp)
@@ -60,7 +73,7 @@ trap_entry:
 	sd t1, (T1_OFFSET)(tp)
 	sd t2, (T2_OFFSET)(tp)
 	sd s0, (S0_OFFSET)(tp)
-	sd s1, (S0_OFFSET)(tp)
+	sd s1, (S1_OFFSET)(tp)
 	sd a0, (A0_OFFSET)(tp)
 	sd a1, (A1_OFFSET)(tp)
 	sd a2, (A2_OFFSET)(tp)
@@ -84,14 +97,16 @@ trap_entry:
 	sd t5, (T5_OFFSET)(tp)
 	sd t6, (T6_OFFSET)(tp)
 
-	// load user pc and tp
-	csrr  t0, mepc     
-	csrrw t1, mscratch, zero 
-	// save user pc and tp
+	# load user pc and tp
+	csrr  t0, mepc
+	csrrw t1, mscratch, zero
+	# save user pc and tp
 	sd    t0, (PC_OFFSET)(tp)
 	sd    t1, (TP_OFFSET)(tp)
 
-	// Do not touch t0, t1 as they are used in syscall
+	# Do not touch a0-a8, and t0 as they are used in syscall
+
+	# Load the global pointer and stack pointer of the kernel.
 	.option push
 	.option norelax
 	la      gp, __global_pointer$
@@ -100,86 +115,87 @@ trap_entry:
 
 	csrr t1, mcause
 
-	bltz t1, .interrupt   // mcause < 0 ==> interupt
+	bltz t1, .interrupt   # mcause < 0 ==> interupt
 	li   t2, USER_ECALL
-	beq  t1, t2, .syscall // if mcause = 8, then syscall
+	beq  t1, t2, .syscall # if mcause = 8, then syscall
 
-	// fallthrough
+	# fallthrough to .exception
 
-	// This subroutine handles user exceptions.
-	// We call handle_exception(proc, mcause, mepc, mtval).
-	// Aftwerwards we go to trap exit.
-	.exception:
-		// Save a0 (pcb pointer) so we know the process in context
-		mv   a0, tp
-		csrr a1, mcause
-		csrr a2, mepc
-		csrr a3, mtval
-		call handle_exception
-		j    trap_exit
+# This subroutine handles user exceptions.
+# We call handle_exception(proc, mcause, mepc, mtval).
+# Aftwerwards we go to trap exit.
+.exception:
+	# Save a0 (pcb pointer) so we know the process in context
+	mv   a0, tp
+	csrr a1, mcause
+	csrr a2, mepc
+	csrr a3, mtval
+	call handle_exception
+	j    trap_exit
 
-	// This subroutine handles machine interrupt.
-	// We only have timer interrupts in machine mode.
-	// We fix the thread pointer, global pointer and the stack pointer
-	// before continuing to the interrupt subroutine.
-	.machine_interrupt:
-		csrrw	tp,mscratch,zero
-		.option push
-		.option norelax
-		la      gp, __global_pointer$
-		.option pop
-		load_sp t1
-		// fallthrough
+# This subroutine handles machine interrupt.
+# We only have timer interrupts in machine mode.
+# We fix the thread pointer, global pointer and the stack pointer
+# before continuing to the interrupt subroutine.
+.machine_interrupt:
+	csrrw	tp,mscratch,zero
+	.option push
+	.option norelax
+	la      gp, __global_pointer$
+	.option pop
+	load_sp t1
+	# fallthrough to .interrupt
 
-	// This subroutine handles interrupts.
-	// We only have timer interrupts so we invoke the scheduler
-	// schedule_yield(proc).
-	.interrupt:
-		mv   a0, tp
-		call schedule_yield
-		j    trap_exit
+# This subroutine handles interrupts.
+# We only have timer interrupts so we invoke the scheduler
+# schedule_yield(proc).
+.interrupt:
+	mv   a0, tp
+	call schedule_yield
+	j    trap_exit
 
-	// This subroutine handles syscalls. We check that the syscall number is
-	// valid, if it is invalid we have an exception and jump to the 
-	// exception handler. If the syscall is valid, we increment the PC
-	// with 4 (ecall instruction is 4 bytes wide), calculate the target
-	// address of the trampoline, and jump to the trampoline entry. Syscall
-	// handlers are in a trampoline with 4 byte wide jump instructions.
-	//
-	// We assume that the user process's PC is in register t0, and that the
-	// syscall number is in register a0. After the syscall has been handled,
-	// we go to trap_exit.
-	.syscall:
-		// Check syscall number.
-		li  t1, SYSCALL_COUNT
-		bge a0, t1, .exception
+# This subroutine handles syscalls. We check that the syscall number is
+# valid, if it is invalid we have an exception and jump to the 
+# exception handler. If the syscall is valid, we increment the PC
+# with 4 (ecall instruction is 4 bytes wide), calculate the target
+# address of the trampoline, and jump to the trampoline entry. Syscall
+# handlers are in a trampoline with 4 byte wide jump instructions.
+#
+# We assume that the user process's PC is in register t0, and that the
+# syscall number is in register a0. After the syscall has been handled,
+# we go to trap_exit.
+.syscall:
+	# Check syscall number.
+	li  t1, SYSCALL_COUNT
+	bge a0, t1, .exception
+
+	# increment PC
+	addi t0, t0, 4
+	sd   t0, (PC_OFFSET)(tp)
+
+	# Compute address of desired system call function in jump table
+1:	auipc ra, %pcrel_hi(.syscall_table)   # load high 20 bits of jump table address
+	slli a0, a0, 2                        # multiply index by 4 to get offset
+	add ra, ra, a0                        # add offset to jump table address
 	
-		// increment PC
-		addi t0, t0, 4
-		sd   t0, (PC_OFFSET)(tp)
+	# Call system call handler with PCB address and arguments a1-a7
+	mv a0, tp                             # move PCB address to a0
+	jalr ra, %pcrel_lo(1b)(ra)            # jump to desired system call function
 
-		// compute trampoline address.
-	1:	auipc ra, %pcrel_hi(.syscall_table)
-		slli  a0, a0, 2
-		add   ra, ra, a0
-		// Move tp to a0, so we call handler(proc, a1, a2, ..., a7).
-		mv    a0, tp
-		jalr  ra, %pcrel_lo(1b)(ra)
+	# fallthrough to trap_exit
 
-	// fallthrough
-
-// This function restores the user context.
-// The function is preemptable while the tp points to the PCB.
+# This function restores the user context.
+# The function is preemptable while the tp points to the PCB.
 trap_exit:
-	// Enable preemption by setting the machine interrupt enable bit
-	// in mstatus
-	csrw mstatus,MSTATUS_MIE
+	# Enable preemption by setting the machine interrupt enable bit
+	# in mstatus
+	csrw mstatus, MSTATUS_MIE
 
-	// Load user pc to mepc.
+	# Load user pc to mepc.
 	ld t0, (PC_OFFSET)(tp)
 	csrw mepc,t0
 
-	// Load other user registers
+	# Load other user registers
 	ld ra, (RA_OFFSET)(tp)
 	ld sp, (SP_OFFSET)(tp)
 	ld gp, (GP_OFFSET)(tp)
@@ -211,20 +227,19 @@ trap_exit:
 	ld t5, (T5_OFFSET)(tp)
 	ld t6, (T6_OFFSET)(tp)
 
-	// Disable preemption
+	# Disable preemption
 	csrw mstatus,0
-	// Save the PCB pointer to mscratch.
+	# Save the PCB pointer to mscratch.
 	csrw mscratch, tp
-	// Load the user thread pointer.
-	ld   tp,(TP_OFFSET)(tp) // load user tp
-	// Return to the user.
+	# Load the user thread pointer.
+	ld   tp,(TP_OFFSET)(tp) # load user tp
+	# Return to the user.
 	mret
 
-// This is used for debugging.
-.hang:
-	wfi
-	j .hang
-
+# Table of jump instructions for system call functions. Aligned on 4-byte
+# boundary. The 'norvc' option disables compressed encoding, ensuring each 
+# instruction is exactly 4 bytes wide.
+.balign 4
 .syscall_table:
 	.option push
 	.option norvc

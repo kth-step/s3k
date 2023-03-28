@@ -37,7 +37,7 @@ TEST_F(CapTest, MakeTest)
 	EXPECT_EQ(cap.time.free, begin);
 	EXPECT_EQ(cap.time.end, end);
 
-	EXPECT_EQ(cap.time._padd, 0);
+	EXPECT_EQ(cap.time.unused, 0);
 }
 
 TEST_F(CapTest, MakeMemory)
@@ -70,7 +70,7 @@ TEST_F(CapTest, MakeMonitor)
 	EXPECT_EQ(cap.monitor.free, begin);
 	EXPECT_EQ(cap.monitor.end, end);
 
-	EXPECT_EQ(cap.monitor._padd, 0);
+	EXPECT_EQ(cap.monitor.unused, 0);
 }
 
 TEST_F(CapTest, MakeChannel)
@@ -82,7 +82,7 @@ TEST_F(CapTest, MakeChannel)
 	EXPECT_EQ(cap.channel.free, begin);
 	EXPECT_EQ(cap.channel.end, end);
 
-	EXPECT_EQ(cap.channel._padd, 0);
+	EXPECT_EQ(cap.channel.unused, 0);
 }
 
 TEST_F(CapTest, MakeSocket)
@@ -93,7 +93,7 @@ TEST_F(CapTest, MakeSocket)
 	EXPECT_EQ(cap.socket.channel, channel);
 	EXPECT_EQ(cap.socket.tag, tag);
 
-	EXPECT_EQ(cap.socket._padd, 0);
+	EXPECT_EQ(cap.socket.unused, 0);
 }
 
 TEST_F(CapTest, TimeDerive)
