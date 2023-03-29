@@ -13,6 +13,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#define CNODE_ROOT_HANDLE (NPROC * NCAP)
+
 /// @defgroup cnode Capability Node
 ///
 /// Kernel internal module for handling capability tree.

@@ -139,6 +139,21 @@ void proc_suspend(struct proc *proc);
 void proc_resume(struct proc *proc);
 
 /**
+ * The process is set to wait on a channel atomically if it is not ordered to
+ * suspend. After begin set to wait, schedule_next() should be called. If 
+ * ordered to suspend, schedule_yield() should be called.
+ */
+bool proc_ipc_wait(struct proc *proc, uint64_t channel_id);
+
+/**
+ * The process is waiting for an IPC send, the channel it is waiting on is
+ * included in its state. This function will atomically acquire the process
+ * if its state is waiting on the provided channel id. The processes is
+ * released with proc_release().
+ */
+bool proc_ipc_acquire(struct proc *proc, uint64_t channel_id);
+
+/**
  * @brief Loads the PMP settings of the process to the hardware.
  *
  * This function loads the PMP settings of the process to the hardware. The PMP

@@ -36,7 +36,7 @@
 
 #define USER_ECALL 8
 #define MSTATUS_MIE 8
-#define SYSCALL_COUNT 19
+#define SYSCALL_COUNT 16
 
 .globl trap_entry
 .globl trap_exit
@@ -243,10 +243,7 @@ trap_exit:
 .syscall_table:
 	.option push
 	.option norvc
-	j       syscall_getinfo
-	j       syscall_getreg
-	j       syscall_setreg
-	j       syscall_yield
+	j       syscall_proc
 	j       syscall_getcap
 	j       syscall_movcap
 	j       syscall_delcap

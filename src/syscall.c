@@ -9,50 +9,55 @@
 #include "timer.h"
 #include "trap.h"
 
-// static struct proc *listeners[NCHANNEL];
-
 /*** System call handlers ***/
-void syscall_getinfo(struct proc *proc, uint64_t info)
+
+static void _getreg(struct proc *proc, uint64_t reg)
 {
-	switch (info) {
-	case 0:
+	reg %= REG_COUNT;
+	proc->regs[REG_A0] = proc->regs[reg];
+}
+
+static void _setreg(struct proc *proc, uint64_t reg, uint64_t val)
+{
+	reg %= REG_COUNT;
+	proc->regs[reg] = val;
+	if (reg == REG_PMP)
+		proc_load_pmp(proc);
+}
+
+void syscall_proc(struct proc *proc, uint64_t a1, uint64_t a2, uint64_t a3)
+{
+	switch (a1) {
+	case 0: /* Get process ID */
 		proc->regs[REG_A0] = proc->pid;
 		break;
-	case 1:
+	case 1: /* Read register */
+		_getreg(proc, a2);
+		break;
+	case 2: /* Set register */
+		_setreg(proc, a2, a3);
+		break;
+	case 3: /* Get HartID */
 		proc->regs[REG_A0] = csrr_mhartid();
 		break;
-	case 2:
+	case 4: /* Get RTC */
 		proc->regs[REG_A0] = time_get();
 		break;
-	case 3:
+	case 5: /* Get timeout */
 		proc->regs[REG_A0] = timeout_get(csrr_mhartid());
+		break;
+	case 6: /* Yield the remaining time slice */
+		proc->sleep = timeout_get(csrr_mhartid());
+		schedule_yield(proc);
+		break;
+	case 7: /* Suspend */
+		proc_suspend(proc);
+		schedule_yield(proc);
 		break;
 	default:
 		proc->regs[REG_A0] = 0;
 		break;
 	}
-}
-
-void syscall_getreg(struct proc *proc, uint64_t regIdx)
-{
-	uint64_t *regs = (uint64_t *)&proc->regs;
-	regIdx %= REG_COUNT;
-	proc->regs[REG_A0] = regs[regIdx];
-}
-
-void syscall_setreg(struct proc *proc, uint64_t regIdx, uint64_t val)
-{
-	uint64_t *regs = (uint64_t *)&proc->regs;
-	regIdx %= REG_COUNT;
-	regs[regIdx] = val;
-	if (regIdx == REG_PMP)
-		proc_load_pmp(proc);
-}
-
-void syscall_yield(struct proc *proc)
-{
-	proc->sleep = timeout_get(csrr_mhartid());
-	schedule_yield(proc);
 }
 
 void syscall_getcap(struct proc *proc, uint64_t idx)
@@ -227,6 +232,8 @@ void syscall_revcap(struct proc *proc, uint64_t idx)
 	union cap next_cap;
 	while (cnode_contains(handle)) {
 		next_handle = cnode_get_next(handle);
+		if (next_handle == CNODE_ROOT_HANDLE)
+			break;
 		next_cap = cnode_get_cap(next_handle);
 		if (!is_parent(cap, next_cap))
 			break;

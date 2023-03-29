@@ -52,7 +52,7 @@ $(BUILD_DIR)/s3k.elf: ${OBJS}
 	@${CC} ${LDFLAGS} -o $@ $^
 
 $(BUILD_DIR)/s3k.da: $(BUILD_DIR)/s3k.elf
-	@printf "OBJDUMP ${<F} ${@F}$@\n"
+	@printf "OBJDUMP ${<F} ${@F}\n"
 	@${OBJDUMP} -d $< > $@
 
 .PHONY: all options clean dasm docs test kernel

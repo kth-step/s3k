@@ -30,10 +30,7 @@ enum excpt {
 
 enum syscall_nr {
 	// Capabilityless syscalls
-	SYSCALL_GETINFO, ///< Get information about current execution.
-	SYSCALL_GETREG,	 ///< Get register value
-	SYSCALL_SETREG,	 ///< Set register value
-	SYSCALL_YIELD,	 ///< Yield remaining time slice
+	SYSCALL_PROC, ///< Process local system call.
 	// Capability syscalls
 	SYSCALL_GETCAP, ///< Get capability description
 	SYSCALL_MOVCAP, ///< Move capability
@@ -58,14 +55,8 @@ void syscall_lock(void);
 void syscall_unlock(void);
 
 // Simple system calls
-/// Get process ID.
-void syscall_getinfo(struct proc *proc, uint64_t info);
-/// Get register value.
-void syscall_getreg(struct proc *proc, uint64_t reg);
-/// Get register value.
-void syscall_setreg(struct proc *proc, uint64_t reg, uint64_t val);
-/// Yield.
-void syscall_yield(struct proc *proc);
+/// Process local system call.
+void syscall_proc(struct proc *proc, uint64_t a0, uint64_t a1, uint64_t a2);
 
 // Capability system calls
 /// Get capability description.

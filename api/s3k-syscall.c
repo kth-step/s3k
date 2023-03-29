@@ -3,57 +3,67 @@
 // Syscall
 uint64_t s3k_getpid(void)
 {
-	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_GETINFO;
+	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_PROC;
 	register uint64_t a1 __asm__("a1") = 0;
-	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1));
-	return a0;
-}
-
-uint64_t s3k_gethartid(void)
-{
-	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_GETINFO;
-	register uint64_t a1 __asm__("a1") = 1;
-	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1));
-	return a0;
-}
-
-uint64_t s3k_gettime(void)
-{
-	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_GETINFO;
-	register uint64_t a1 __asm__("a1") = 2;
-	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1));
-	return a0;
-}
-
-uint64_t s3k_gettimeout(void)
-{
-	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_GETINFO;
-	register uint64_t a1 __asm__("a1") = 3;
 	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1));
 	return a0;
 }
 
 uint64_t s3k_getreg(enum s3k_reg reg)
 {
-	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_GETREG;
-	register uint64_t a1 __asm__("a1") = reg;
-	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1));
+	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_PROC;
+	register uint64_t a1 __asm__("a1") = 1;
+	register uint64_t a2 __asm__("a2") = reg;
+	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1), "r"(a2));
 	return a0;
 }
 
 uint64_t s3k_setreg(enum s3k_reg reg, uint64_t val)
 {
-	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_SETREG;
-	register uint64_t a1 __asm__("a1") = reg;
-	register uint64_t a2 __asm__("a2") = val;
-	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1), "r"(a2));
+	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_PROC;
+	register uint64_t a1 __asm__("a1") = 2;
+	register uint64_t a2 __asm__("a2") = reg;
+	register uint64_t a3 __asm__("a3") = val;
+	__asm__ volatile("ecall" ::"r"(a0), "r"(a1), "r"(a2), "r"(a3));
+	return a0;
+}
+
+uint64_t s3k_gethartid(void)
+{
+	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_PROC;
+	register uint64_t a1 __asm__("a1") = 3;
+	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1));
+	return a0;
+}
+
+uint64_t s3k_gettime(void)
+{
+	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_PROC;
+	register uint64_t a1 __asm__("a1") = 4;
+	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1));
+	return a0;
+}
+
+uint64_t s3k_gettimeout(void)
+{
+	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_PROC;
+	register uint64_t a1 __asm__("a1") = 5;
+	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1));
 	return a0;
 }
 
 void s3k_yield(void)
 {
-	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_YIELD;
-	__asm__("ecall" : : "r"(a0));
+	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_PROC;
+	register uint64_t a1 __asm__("a1") = 6;
+	__asm__("ecall" : : "r"(a0), "r"(a1));
+}
+
+void s3k_suspend(void)
+{
+	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_PROC;
+	register uint64_t a1 __asm__("a1") = 7;
+	__asm__("ecall" : : "r"(a0), "r"(a1));
 }
 
 union s3k_cap s3k_getcap(uint64_t i)

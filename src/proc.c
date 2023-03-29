@@ -43,13 +43,41 @@ void proc_release(struct proc *proc)
 void proc_suspend(struct proc *proc)
 {
 	// Set the suspend flag
-	__atomic_fetch_or(&proc->state, PSF_SUSPEND, __ATOMIC_ACQUIRE);
+	uint64_t prev_state
+	    = __atomic_fetch_or(&proc->state, PSF_SUSPEND, __ATOMIC_ACQUIRE);
+
+	// If the process was waiting, we also unset the waiting flag.
+	if ((prev_state & 0xFF) == PSF_WAITING) {
+		proc->state = PSF_SUSPEND;
+		__atomic_thread_fence(__ATOMIC_ACQUIRE);
+	}
 }
 
 void proc_resume(struct proc *proc)
 {
 	// Unset the suspend flag
 	__atomic_fetch_and(&proc->state, ~PSF_SUSPEND, __ATOMIC_RELEASE);
+}
+
+bool proc_ipc_wait(struct proc *proc, uint64_t channel_id)
+{
+	// We expect that the process is running as usual.
+	uint64_t expected = PSF_BUSY;
+	// We set the
+	uint64_t desired = (channel_id << 48) | PSF_WAITING;
+	// This should fail only if the process should be suspended.
+	return __atomic_compare_exchange_n(&proc->state, &expected, desired,
+					   false /* not weak */,
+					   __ATOMIC_SEQ_CST /* succ */,
+					   __ATOMIC_RELAXED /* fail */);
+}
+
+bool proc_ipc_acquire(struct proc *proc, uint64_t channel_id)
+{
+	// We expect that the process is waiting on channel_id.
+	// Channel ID is set to the most significant bytes.
+	uint64_t expected = (channel_id << 48) | PSF_WAITING;
+	return proc_acquire(proc, expected);
 }
 
 void proc_load_pmp(const struct proc *proc)

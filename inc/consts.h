@@ -16,6 +16,7 @@
 #define PSF_BUSY 1
 #define PSF_BLOCK 2
 #define PSF_SUSPEND 4
+#define PSF_WAITING 8
 
 /** Process states
  *
