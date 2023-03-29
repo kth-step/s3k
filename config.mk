@@ -1,6 +1,7 @@
 ### Kernel configuration
 # build dir
 BUILD_DIR?=build
+OBJ_DIR?=$(BUILD_DIR)/obj
 # config
 CONFIG_H?=config.h
 # Platform

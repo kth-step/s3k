@@ -6,10 +6,12 @@ include config.mk
 vpath %.c src
 vpath %.S src
 
-SRCS=head.S trap.S cap.c cnode.c current.c csr.c exception.c init.c \
-     proc.c schedule.c syscall.c syscall_lock.c syscall_monitor.c  syscall_ipc.c\
-     ticket_lock.c timer.c wfi.c altio.c kassert.c
-OBJS=$(patsubst %, $(BUILD_DIR)/obj/%.o, ${SRCS})
+AS_SRCS=head.S trap.S
+C_SRCS=cap.c cnode.c current.c csr.c exception.c init.c proc.c schedule.c \
+       syscall.c syscall_lock.c syscall_monitor.c  syscall_ipc.c ticket_lock.c \
+       timer.c wfi.c altio.c kassert.c
+OBJS=$(patsubst %.S, $(OBJ_DIR)/%.o, ${AS_SRCS}) \
+     $(patsubst %.c, $(OBJ_DIR)/%.o, ${C_SRCS})
 DEPS=${OBJS:.o=.d}
 
 all: options kernel dasm
@@ -37,12 +39,12 @@ format:
 clean:
 	rm -rf $(BUILD_DIR)
 
-$(BUILD_DIR)/obj/%.S.o: %.S
+$(OBJ_DIR)/%.o: %.S
 	@mkdir -p ${@D}
 	@printf "CC ${@F}\n"
 	@${CC} ${ASFLAGS} ${INC} -MMD -c -o $@ $<
 
-$(BUILD_DIR)/obj/%.c.o: %.c
+$(OBJ_DIR)/%.o: %.c
 	@mkdir -p ${@D}
 	@printf "CC ${@F}\n"
 	@${CC} ${CFLAGS} ${INC} -MMD -c -o $@ $<
