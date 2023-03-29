@@ -140,7 +140,7 @@ void proc_resume(struct proc *proc);
 
 /**
  * The process is set to wait on a channel atomically if it is not ordered to
- * suspend. After begin set to wait, schedule_next() should be called. If 
+ * suspend. After begin set to wait, schedule_next() should be called. If
  * ordered to suspend, schedule_yield() should be called.
  */
 bool proc_ipc_wait(struct proc *proc, uint64_t channel_id);
