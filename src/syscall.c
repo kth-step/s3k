@@ -5,12 +5,14 @@
 #include "common.h"
 #include "consts.h"
 #include "csr.h"
+#include "current.h"
 #include "schedule.h"
 #include "timer.h"
 #include "trap.h"
 
-/*** System call handlers ***/
+extern struct proc *_listeners[NCHANNEL];
 
+/*** System call handlers ***/
 static void _getreg(struct proc *proc, uint64_t reg)
 {
 	reg %= REG_COUNT;
@@ -161,8 +163,14 @@ static void _revoke_monitor_post_hook(cnode_handle_t handle, union cap cap)
 static void _revoke_channel_hook(cnode_handle_t handle, union cap cap,
 				 union cap child_cap)
 {
-	cap.channel.free = child_cap.channel.free;
-	cnode_set_cap(handle, cap);
+	if (child_cap.type == CAPTY_CHANNEL) {
+		cap.channel.free = child_cap.channel.free;
+		cnode_set_cap(handle, cap);
+	} else if (child_cap.type == CAPTY_SOCKET
+		   && child_cap.socket.tag == 0) {
+		cap.channel.free = child_cap.socket.channel;
+		_listeners[child_cap.socket.channel] = NULL;
+	}
 }
 
 static void _revoke_channel_post_hook(cnode_handle_t handle, union cap cap)
@@ -292,6 +300,7 @@ static void _derive_channel(cnode_handle_t orig_handle, union cap orig_cap,
 		orig_cap.channel.free = drv_cap.channel.end;
 	} else {
 		orig_cap.channel.free = drv_cap.socket.channel + 1;
+		_listeners[drv_cap.socket.channel] = current_get();
 	}
 	cnode_set_cap(orig_handle, orig_cap);
 }
@@ -359,19 +368,4 @@ void syscall_drvcap(struct proc *proc, uint64_t orig_idx, uint64_t drv_idx,
 		}
 		syscall_unlock();
 	}
-}
-
-void syscall_recv(struct proc *proc, uint64_t recv_idx)
-{
-}
-
-void syscall_send(struct proc *proc, uint64_t send_idx, uint64_t msg0,
-		  uint64_t msg1, uint64_t cap0, uint64_t cap1, uint64_t yield)
-{
-}
-
-void syscall_sendrecv(struct proc *proc, uint64_t send_idx, uint64_t recv_idx,
-		      uint64_t msg0, uint64_t msg1, uint64_t cap0,
-		      uint64_t cap1)
-{
 }

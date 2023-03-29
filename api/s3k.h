@@ -41,6 +41,9 @@ enum s3k_excpt {
 	S3K_EXCPT_SUSPENDED,	///< Process was suspended
 	S3K_EXCPT_MPID,		///< Bad PID for monitor operation.
 	S3K_EXCPT_MBUSY,	///< Process busy.
+	S3K_EXCPT_INVALID_CAP,  ///< Capability used for the system call is invalid.
+	S3K_EXCPT_NO_RECEIVER,  ///< No receiver for the send call.
+	S3K_EXCPT_SEND_CAP,	    ///< Something stops sending of capability.
 	S3K_EXCPT_UNIMPLEMENTED ///< System call not implemented for specified
 				///< capability.
 };
@@ -198,6 +201,8 @@ union s3k_cap {
 	struct s3k_socket socket;   ///< As socket capability
 };
 
+const char *s3k_error2str(enum s3k_excpt code);
+
 #ifdef _Static_assert
 _Static_assert(sizeof(union s3k_cap) == 8, "sizeof(union s3k_cap) != 8");
 #endif /* _Static_assert */
@@ -345,9 +350,11 @@ enum s3k_excpt s3k_revcap(uint64_t i);
  */
 enum s3k_excpt s3k_drvcap(uint64_t i, uint64_t j, union s3k_cap cap);
 
-enum s3k_excpt s3k_recv(void);
-enum s3k_excpt s3k_send(void);
-enum s3k_excpt s3k_sendrecv(void);
+enum s3k_excpt s3k_recv(uint64_t i, uint64_t buf[4], uint64_t cap_dest);
+enum s3k_excpt s3k_send(uint64_t i, uint64_t buf[4], uint64_t cap_src,
+			bool yield);
+enum s3k_excpt s3k_sendrecv(uint64_t i, uint64_t j, uint64_t buf[4],
+			    uint64_t cap_src, uint64_t cap_dest);
 /**
  * @brief Monitor suspends a process.
  *

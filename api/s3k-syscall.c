@@ -195,6 +195,58 @@ enum s3k_excpt s3k_mgivecap(uint64_t i, uint64_t pid, uint64_t src,
 	return a0;
 }
 
-enum s3k_excpt s3k_recv(void);
-enum s3k_excpt s3k_send(void);
-enum s3k_excpt s3k_sendrecv(void);
+enum s3k_excpt s3k_recv(uint64_t i, uint64_t buf[4], uint64_t cap_dest)
+{
+	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_RECV;
+	register uint64_t a1 __asm__("a1") = i;
+	register uint64_t a2 __asm__("a2");
+	register uint64_t a3 __asm__("a3");
+	register uint64_t a4 __asm__("a4");
+	register uint64_t a5 __asm__("a5") = cap_dest;
+	__asm__ volatile("ecall"
+			 : "+r"(a0), "+r"(a1), "=r"(a2), "=r"(a3), "=r"(a4)
+			 : "r"(a5));
+	buf[0] = a1;
+	buf[1] = a2;
+	buf[2] = a3;
+	buf[3] = a4;
+	return a0;
+}
+
+enum s3k_excpt s3k_send(uint64_t i, uint64_t buf[4], uint64_t cap_src,
+			bool yield)
+{
+	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_SEND;
+	register uint64_t a1 __asm__("a1") = i;
+	register uint64_t a2 __asm__("a2") = buf[0];
+	register uint64_t a3 __asm__("a3") = buf[1];
+	register uint64_t a4 __asm__("a4") = buf[2];
+	register uint64_t a5 __asm__("a5") = buf[3];
+	register uint64_t a6 __asm__("a6") = cap_src;
+	register uint64_t a7 __asm__("a7") = yield;
+	__asm__ volatile("ecall"
+			 : "+r"(a0)
+			 : "r"(a1), "r"(a2), "r"(a3), "r"(a4), "r"(a5), "r"(a6),
+			   "r"(a7));
+	return a0;
+}
+enum s3k_excpt s3k_sendrecv(uint64_t i, uint64_t j, uint64_t buf[4],
+			    uint64_t cap_src, uint64_t cap_dest)
+{
+	register uint64_t a0 __asm__("a0") = S3K_SYSCALL_SENDRECV;
+	register uint64_t a1 __asm__("a1") = i << 16 | j;
+	register uint64_t a2 __asm__("a2") = buf[0];
+	register uint64_t a3 __asm__("a3") = buf[1];
+	register uint64_t a4 __asm__("a4") = buf[2];
+	register uint64_t a5 __asm__("a5") = buf[3];
+	register uint64_t a6 __asm__("a6") = cap_src;
+	register uint64_t a7 __asm__("a7") = cap_dest;
+	__asm__ volatile("ecall"
+			 : "+r"(a0), "+r"(a1), "+r"(a2), "+r"(a3), "+r"(a4)
+			 : "r"(a5), "r"(a6), "r"(a7));
+	buf[0] = a1;
+	buf[1] = a2;
+	buf[2] = a3;
+	buf[3] = a4;
+	return a0;
+}

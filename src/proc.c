@@ -36,8 +36,8 @@ bool proc_acquire(struct proc *proc, uint64_t expected)
 
 void proc_release(struct proc *proc)
 {
-	// Unset the busy flag
-	__atomic_fetch_and(&proc->state, ~PSF_BUSY, __ATOMIC_RELEASE);
+	// Unset all flags except suspend flag.
+	__atomic_fetch_and(&proc->state, PSF_SUSPEND, __ATOMIC_RELEASE);
 }
 
 void proc_suspend(struct proc *proc)

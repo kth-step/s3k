@@ -80,6 +80,8 @@ struct proc {
 	uint64_t state;
 	/** Sleep until. */
 	uint64_t sleep;
+	/** Capability destination for receive calls */
+	uint64_t cap_dest;
 };
 
 /**
@@ -149,7 +151,7 @@ bool proc_ipc_wait(struct proc *proc, uint64_t channel_id);
  * The process is waiting for an IPC send, the channel it is waiting on is
  * included in its state. This function will atomically acquire the process
  * if its state is waiting on the provided channel id. The processes is
- * released with proc_release().
+ * released with proc_ipc_release().
  */
 bool proc_ipc_acquire(struct proc *proc, uint64_t channel_id);
 

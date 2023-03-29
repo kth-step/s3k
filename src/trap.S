@@ -130,8 +130,8 @@ trap_entry:
 	csrr a1, mcause
 	csrr a2, mepc
 	csrr a3, mtval
-	call handle_exception
-	j    trap_exit
+	la ra, handle_exception
+	j .call
 
 # This subroutine handles machine interrupt.
 # We only have timer interrupts in machine mode.
@@ -151,8 +151,8 @@ trap_entry:
 # schedule_yield(proc).
 .interrupt:
 	mv   a0, tp
-	call schedule_yield
-	j    trap_exit
+	la ra,schedule_yield
+	j .call
 
 # This subroutine handles syscalls. We check that the syscall number is
 # valid, if it is invalid we have an exception and jump to the 
@@ -174,13 +174,16 @@ trap_entry:
 	sd   t0, (PC_OFFSET)(tp)
 
 	# Compute address of desired system call function in jump table
-1:	auipc ra, %pcrel_hi(.syscall_table)   # load high 20 bits of jump table address
-	slli a0, a0, 2                        # multiply index by 4 to get offset
-	add ra, ra, a0                        # add offset to jump table address
-	
-	# Call system call handler with PCB address and arguments a1-a7
-	mv a0, tp                             # move PCB address to a0
-	jalr ra, %pcrel_lo(1b)(ra)            # jump to desired system call function
+	la ra, .syscall_table
+	slli a0, a0, 2                # multiply index by 4 to get offset
+	add ra, ra, a0                # add offset to jump table address
+
+	# fallthrough to .call
+
+# Sets the pointer to PCB at a0 (first argument) then call function at ra
+.call:
+	mv a0,tp
+	jalr ra,0(ra)
 
 	# fallthrough to trap_exit
 

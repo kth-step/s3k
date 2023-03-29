@@ -7,8 +7,8 @@ vpath %.c src
 vpath %.S src
 
 SRCS=head.S trap.S cap.c cnode.c current.c csr.c exception.c init.c \
-     proc.c schedule.c syscall.c syscall_lock.c syscall_monitor.c \
-     ticket_lock.c timer.c wfi.c kassert.c
+     proc.c schedule.c syscall.c syscall_lock.c syscall_monitor.c  syscall_ipc.c\
+     ticket_lock.c timer.c wfi.c altio.c kassert.c
 OBJS=$(patsubst %, $(BUILD_DIR)/obj/%.o, ${SRCS})
 DEPS=${OBJS:.o=.d}
 

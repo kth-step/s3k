@@ -19,6 +19,15 @@ struct sched_entry {
 	uint8_t len;
 };
 
+/**
+ * @brief Get the scheduling entry.
+ *
+ * Get the schedule entry of the hartid, position i.
+ *
+ * @param hartid The hartid for of the schedule entry.
+ * @param i Index of the schedule entry.
+ * @return Schedule entry (process ID and length of time slice).
+ */
 struct sched_entry schedule_get(uint64_t hartid, size_t i);
 
 /**

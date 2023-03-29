@@ -1,5 +1,36 @@
 #include "s3k.h"
 
+const char *s3k_error2str(enum s3k_excpt code) {
+	switch (code) {
+	case S3K_EXCPT_NONE:
+		return "S3K_EXCPT_NONE";
+	case S3K_EXCPT_EMPTY:
+		return "S3K_EXCPT_EMPTY";
+	case S3K_EXCPT_COLLISION:
+		return "S3K_EXCPT_COLLISION";
+	case S3K_EXCPT_DERIVATION:
+		return "S3K_EXCPT_DERIVATION";
+	case S3K_EXCPT_PREEMPTED:
+		return "S3K_EXCPT_PREEMPETED";
+	case S3K_EXCPT_SUSPENDED:
+		return "S3K_EXCPT_SUSPENDED";
+	case S3K_EXCPT_MPID:
+		return "S3K_EXCPT_MPID";
+	case S3K_EXCPT_MBUSY:
+		return "S3K_EXCPT_MBUSY";
+	case S3K_EXCPT_UNIMPLEMENTED:
+		return "S3K_EXCPT_UNIMPLEMENTED";
+	case S3K_EXCPT_INVALID_CAP:
+		return "S3K_EXCPT_INVALID_CAP";
+	case S3K_EXCPT_NO_RECEIVER:
+		return "S3K_EXCPT_NO_RECEIVER";
+	case S3K_EXCPT_SEND_CAP:
+		return "S3K_EXCPT_SEND_CAP";
+	default:
+		return "UNKNOWN";
+	}
+}
+
 uint64_t s3k_pmp_napot_addr(uint64_t begin, uint64_t end)
 {
 	return (begin | (((end - begin) - 1) >> 1)) >> 2;

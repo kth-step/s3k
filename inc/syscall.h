@@ -24,6 +24,9 @@ enum excpt {
 	EXCPT_SUSPENDED,    ///< Process was suspended
 	EXCPT_MPID,	    ///< Bad PID for monitor operation.
 	EXCPT_MBUSY,	    ///< Process busy.
+	EXCPT_INVALID_CAP,  ///< Capability used for the system call is invalid.
+	EXCPT_NO_RECEIVER,  ///< No receiver for the send call.
+	EXCPT_SEND_CAP,	    ///< Something stops sending of capability.
 	EXCPT_UNIMPLEMENTED ///< System call not implemented for specified
 			    ///< capability.
 };
@@ -92,14 +95,15 @@ void syscall_mgivecap(struct proc *proc, uint64_t mon, uint64_t pid, uint64_t i,
 
 // IPC capability system calls
 /// Receive a message.
-void syscall_recv(struct proc *proc, uint64_t recv_idx);
+void syscall_recv(struct proc *proc, uint64_t recv_idx, uint64_t dest_cap);
 /// Send a message.
 void syscall_send(struct proc *proc, uint64_t send_idx, uint64_t msg0,
-		  uint64_t msg1, uint64_t cap0, uint64_t cap1, uint64_t yield);
+		  uint64_t msg1, uint64_t msg2, uint64_t msg3, uint64_t src_cap,
+		  uint64_t yield);
 /// Send then receive a message.
-void syscall_sendrecv(struct proc *proc, uint64_t recv_idx, uint64_t send_idx,
-		      uint64_t msg0, uint64_t msg1, uint64_t cap0,
-		      uint64_t cap1);
+void syscall_sendrecv(struct proc *proc, uint64_t sendrecv_idx, uint64_t msg0,
+		      uint64_t msg1, uint64_t msg2, uint64_t msg3,
+		      uint64_t src_cap, uint64_t dest_cap);
 /// @}
 
 #endif /* __SYSCALL_H__ */

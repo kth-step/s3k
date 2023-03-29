@@ -8,6 +8,8 @@
 #include "timer.h"
 #include "trap.h"
 
+extern struct proc *_listeners[NCHANNEL];
+
 void syscall_msuspend(struct proc *proc, uint64_t mon_idx, uint64_t pid)
 {
 	cnode_handle_t mon_handle = cnode_get_handle(proc->pid, mon_idx);
@@ -214,6 +216,9 @@ void syscall_mtakecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 			schedule_update(src_cap.time.hartid, proc->pid,
 					src_cap.time.free, src_cap.time.end);
 		}
+		if (src_cap.type == CAPTY_SOCKET && src_cap.socket.tag == 0) {
+			_listeners[src_cap.socket.channel] = proc;
+		}
 	}
 	proc_release(other_proc);
 	syscall_unlock();
@@ -259,6 +264,9 @@ void syscall_mgivecap(struct proc *proc, uint64_t mon_idx, uint64_t pid,
 		if (src_cap.type == CAPTY_TIME) {
 			schedule_update(src_cap.time.hartid, pid,
 					src_cap.time.free, src_cap.time.end);
+		}
+		if (src_cap.type == CAPTY_SOCKET && src_cap.socket.tag == 0) {
+			_listeners[src_cap.socket.channel] = other_proc;
 		}
 	}
 	proc_release(other_proc);
