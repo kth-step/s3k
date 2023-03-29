@@ -1,6 +1,7 @@
 #include "s3k.h"
 
-const char *s3k_error2str(enum s3k_excpt code) {
+const char *s3k_error2str(enum s3k_excpt code)
+{
 	switch (code) {
 	case S3K_EXCPT_NONE:
 		return "S3K_EXCPT_NONE";

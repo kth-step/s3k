@@ -41,9 +41,10 @@ enum s3k_excpt {
 	S3K_EXCPT_SUSPENDED,	///< Process was suspended
 	S3K_EXCPT_MPID,		///< Bad PID for monitor operation.
 	S3K_EXCPT_MBUSY,	///< Process busy.
-	S3K_EXCPT_INVALID_CAP,  ///< Capability used for the system call is invalid.
-	S3K_EXCPT_NO_RECEIVER,  ///< No receiver for the send call.
-	S3K_EXCPT_SEND_CAP,	    ///< Something stops sending of capability.
+	S3K_EXCPT_INVALID_CAP,	///< Capability used for the system call is
+				///< invalid.
+	S3K_EXCPT_NO_RECEIVER,	///< No receiver for the send call.
+	S3K_EXCPT_SEND_CAP,	///< Something stops sending of capability.
 	S3K_EXCPT_UNIMPLEMENTED ///< System call not implemented for specified
 				///< capability.
 };
@@ -350,11 +351,12 @@ enum s3k_excpt s3k_revcap(uint64_t i);
  */
 enum s3k_excpt s3k_drvcap(uint64_t i, uint64_t j, union s3k_cap cap);
 
-enum s3k_excpt s3k_recv(uint64_t i, uint64_t buf[4], uint64_t cap_dest);
+enum s3k_excpt s3k_recv(uint64_t i, uint64_t buf[4], uint64_t cap_dest,
+			uint64_t *tag);
 enum s3k_excpt s3k_send(uint64_t i, uint64_t buf[4], uint64_t cap_src,
 			bool yield);
 enum s3k_excpt s3k_sendrecv(uint64_t i, uint64_t j, uint64_t buf[4],
-			    uint64_t cap_src, uint64_t cap_dest);
+			    uint64_t cap_src, uint64_t cap_dest, uint64_t *tag);
 /**
  * @brief Monitor suspends a process.
  *

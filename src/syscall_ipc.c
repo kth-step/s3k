@@ -93,6 +93,7 @@ void syscall_send(struct proc *proc, uint64_t send_idx, uint64_t msg0,
 	receiver->regs[REG_A2] = msg1;
 	receiver->regs[REG_A3] = msg2;
 	receiver->regs[REG_A4] = msg3;
+	receiver->regs[REG_A5] = send_cap.socket.tag;
 	proc_release(receiver);
 	proc->regs[REG_A0] = EXCPT_NONE;
 	syscall_unlock();
