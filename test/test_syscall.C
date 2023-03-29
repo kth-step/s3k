@@ -51,7 +51,7 @@ TEST_F(SyscallTest, GetPid)
 {
 	for (int i = 0; i < NPROC; ++i) {
 		struct proc *proc = proc_get(i);
-		syscall_getinfo(proc, 0);
+		syscall_proc(proc, 0, 0, 0);
 		EXPECT_EQ(proc->regs[REG_A0], i);
 	}
 }
@@ -60,7 +60,7 @@ TEST_F(SyscallTest, GetHartID)
 {
 	for (int i = 0; i < NPROC; ++i) {
 		struct proc *proc = proc_get(i);
-		syscall_getinfo(proc, 1);
+		syscall_proc(proc, 3, 0, 0);
 		EXPECT_EQ(proc->regs[REG_A0], 0);
 	}
 }
@@ -70,7 +70,7 @@ TEST_F(SyscallTest, GetTime)
 	for (int i = 0; i < NPROC; ++i) {
 		struct proc *proc = proc_get(i);
 		uint64_t before = time_get();
-		syscall_getinfo(proc, 2);
+		syscall_proc(proc, 4, 0, 0);
 		uint64_t after = time_get();
 		EXPECT_GE(proc->regs[REG_A0], before);
 		EXPECT_LE(proc->regs[REG_A0], after);
@@ -83,7 +83,7 @@ TEST_F(SyscallTest, GetTimeout)
 		struct proc *proc = proc_get(i);
 		uint64_t timeout = time_get();
 		timeout_set(0, timeout);
-		syscall_getinfo(proc, 3);
+		syscall_proc(proc, 5, 0, 0);
 		EXPECT_EQ(proc->regs[REG_A0], timeout);
 	}
 }
