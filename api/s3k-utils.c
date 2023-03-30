@@ -90,7 +90,9 @@ bool s3k_memory_parent(union s3k_cap parent, union s3k_cap child)
 	if (parent.type == S3K_CAPTY_MEMORY && child.type == S3K_CAPTY_MEMORY) {
 		return parent.memory.offset == child.memory.offset
 		       && parent.memory.begin <= child.memory.begin
-		       && child.memory.end <= parent.memory.end;
+		       && child.memory.end <= parent.memory.end
+		       && ((parent.memory.rwx & child.memory.rwx)
+			   == child.memory.rwx);
 	}
 	if (parent.type == S3K_CAPTY_MEMORY && child.type == S3K_CAPTY_PMP) {
 		uint64_t pmp_begin = s3k_pmp_napot_begin(child.pmp.addr);
@@ -145,7 +147,9 @@ bool s3k_memory_derive(union s3k_cap parent, union s3k_cap child)
 		return parent.memory.offset == child.memory.offset
 		       && parent.memory.free == child.memory.begin
 		       && parent.memory.free == child.memory.free
-		       && child.memory.end <= parent.memory.end;
+		       && child.memory.end <= parent.memory.end
+		       && ((parent.memory.rwx & child.memory.rwx)
+			   == child.memory.rwx);
 	}
 	if (parent.type == S3K_CAPTY_MEMORY && child.type == S3K_CAPTY_PMP) {
 		uint64_t pmp_begin = s3k_pmp_napot_begin(child.pmp.addr);

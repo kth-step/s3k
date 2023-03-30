@@ -28,7 +28,9 @@ bool cap_memory_parent(union cap parent, union cap child)
 	if (parent.type == CAPTY_MEMORY && child.type == CAPTY_MEMORY) {
 		return parent.memory.offset == child.memory.offset
 		       && parent.memory.begin <= child.memory.begin
-		       && child.memory.end <= parent.memory.end;
+		       && child.memory.end <= parent.memory.end
+		       && ((parent.memory.rwx & child.memory.rwx)
+			   == child.memory.rwx);
 	}
 	if (parent.type == CAPTY_MEMORY && child.type == CAPTY_PMP) {
 		uint64_t pmp_begin = pmp_napot_begin(child.pmp.addr);
@@ -82,7 +84,9 @@ bool cap_memory_derive(union cap parent, union cap child)
 		return parent.memory.offset == child.memory.offset
 		       && parent.memory.free == child.memory.begin
 		       && parent.memory.free == child.memory.free
-		       && child.memory.end <= parent.memory.end;
+		       && child.memory.end <= parent.memory.end
+		       && ((parent.memory.rwx & child.memory.rwx)
+			   == child.memory.rwx);
 	}
 	if (parent.type == CAPTY_MEMORY && child.type == CAPTY_PMP) {
 		uint64_t pmp_begin = pmp_napot_begin(child.pmp.addr);

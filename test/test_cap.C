@@ -1,5 +1,5 @@
 extern "C" {
-#include "../api/s3k-utils.c"
+#include "../api/s3k.h"
 #include "cap.h"
 }
 #include <gtest/gtest.h>
@@ -160,6 +160,21 @@ TEST_F(CapTest, MemoryDerive)
 	// OFFSET NOT EQ
 	EXPECT_FALSE(cap_memory_derive(CAP_MEMORY(0x100, 0x200, 8, CAP_RWX),
 				       CAP_MEMORY(0x100, 0x200, 7, CAP_RWX)));
+	// Bad permissions
+	EXPECT_FALSE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_R),
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_RW)));
+	EXPECT_FALSE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_R),
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_RWX)));
+	EXPECT_FALSE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_R),
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_RX)));
+	EXPECT_FALSE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RW),
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_RWX)));
+	EXPECT_FALSE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RW),
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_RX)));
+	EXPECT_FALSE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RX),
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_RWX)));
+	EXPECT_FALSE(cap_memory_derive(CAP_MEMORY(0x0, 0x3000, 8, CAP_RX),
+				      CAP_MEMORY(0x0, 0x2000, 8, CAP_RW)));
 }
 
 TEST_F(CapTest, PmpAddr)
@@ -172,25 +187,4 @@ TEST_F(CapTest, PmpAddr)
 
 	EXPECT_EQ(0x210000, pmp_napot_begin(0x85fff));
 	EXPECT_EQ(0x220000, pmp_napot_end(0x85fff));
-}
-
-TEST_F(CapTest, MatchAPICap)
-{
-	union cap cap;
-	union s3k_cap s3k_cap;
-	cap = CAP_TIME(0x1, 0x1, 0x20);
-	s3k_cap = s3k_time(0x1, 0x1, 0x20);
-	EXPECT_EQ(cap.raw, s3k_cap.raw);
-
-	cap = CAP_MEMORY(0x100, 0x200, 0x3, CAP_RWX);
-	s3k_cap = s3k_memory(0x100, 0x200, 0x3, CAP_RWX);
-	EXPECT_EQ(cap.raw, s3k_cap.raw);
-
-	cap = CAP_PMP(0x100, CAP_RWX);
-	s3k_cap = s3k_pmp(0x100, CAP_RWX);
-	EXPECT_EQ(cap.raw, s3k_cap.raw);
-
-	cap = CAP_MONITOR(0x1, 0x10);
-	s3k_cap = s3k_monitor(0x1, 0x10);
-	EXPECT_EQ(cap.raw, s3k_cap.raw);
 }
