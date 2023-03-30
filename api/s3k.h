@@ -136,73 +136,65 @@ enum s3k_reg {
 /// @defgroup cap-def S3K Capability Definitions
 /// @{
 
-/// Time slice capability
-struct s3k_time {
-	uint64_t type : 4;   ///< Type of capability, should be S3K_CAPTY_TIME.
-	uint64_t _padd : 4;  ///< Padding, should be zero.
-	uint64_t hartid : 8; ///< Hardware Thread ID.
-	uint64_t begin : 16; ///< Beginning of time slice.
-	uint64_t free : 16;  ///< Beginning of available/unallocated time slice.
-	uint64_t end : 16;   ///< End of time slice.
-};
-
-/// Memory Slice capability
-struct s3k_memory {
-	uint64_t type : 4;   ///< Type of capability, should be S3K_CAPTY_MEMORY
-	uint64_t lock : 1;   ///< Prevents creating of memory capabilities
-	uint64_t rwx : 3;    ///< Read, write and execute (reverse order)
-	uint64_t offset : 8; ///< 128 MiB offset of memory slice
-	uint64_t begin : 16; ///< Beginning of memory slice
-	uint64_t free : 16; ///< Beginning of available/unallocated memory slice
-	uint64_t end : 16;  ///< End of memory slice
-};
-
-/// PMP Frame capability
-struct s3k_pmp {
-	uint64_t type : 4;  ///< Type of capability, should be S3K_CAPTY_PMP
-	uint64_t addr : 52; ///< pmpaddr
-	uint64_t cfg : 8;   ///< pmpcfg
-};
-
-/// Monitor capability
-struct s3k_monitor {
-	uint64_t type : 4; ///< Type of capability, should be S3K_CAPTY_MONITOR
-	uint64_t _padd : 12; ///< Padding, should be zero
-	uint64_t begin : 16; ///< Beginning of monitored PIDs.
-	uint64_t free : 16;  ///< Beginning of available monitored PIDs.
-	uint64_t end : 16;   ///< End of monitred PIDs
-};
-
-/// Channel capability
-struct s3k_channel {
-	uint64_t type : 4;
-	uint64_t _padd : 12;
-	uint64_t begin : 16;
-	uint64_t free : 16;
-	uint64_t end : 16;
-};
-
-/// Socket capability
-struct s3k_socket {
-	uint64_t type : 4;
-	uint64_t _padd : 28;
-	uint64_t channel : 16;
-	uint64_t tag : 16;
-};
-
 /// Capability description
 union s3k_cap {
-	uint64_t type : 4;	    ///< Type of capability
-	uint64_t raw;		    ///< Capability as 64-bit word
-	struct s3k_time time;	    ///< As time slice capability
-	struct s3k_memory memory;   ///< As memory slice capability
-	struct s3k_pmp pmp;	    ///< As PMP frame capability
-	struct s3k_monitor monitor; ///< As monitor slice capability
-	struct s3k_channel channel; ///< As channel slice capability
-	struct s3k_socket socket;   ///< As socket capability
-};
+	uint64_t type : 4; ///< Type of capability
+	uint64_t raw;	   ///< Capability as 64-bit word
 
-const char *s3k_error2str(enum s3k_excpt code);
+	struct {
+		uint64_t type : 4;   ///< Type of capability, should be
+				     ///< S3K_CAPTY_TIME.
+		uint64_t unused : 4; ///< Padding, should be zero.
+		uint64_t hartid : 8; ///< Hardware Thread ID.
+		uint64_t begin : 16; ///< Beginning of time slice.
+		uint64_t free : 16; ///< Beginning of available/unallocated time
+				    ///< slice.
+		uint64_t end : 16;  ///< End of time slice.
+	} time;
+
+	struct {
+		uint64_t type : 4; ///< Type of capability, should be
+				   ///< S3K_CAPTY_MEMORY
+		uint64_t lock : 1; ///< Prevents creating of memory capabilities
+		uint64_t rwx : 3;  ///< Read, write and execute (reverse order)
+		uint64_t offset : 8; ///< 128 MiB offset of memory slice
+		uint64_t begin : 16; ///< Beginning of memory slice
+		uint64_t free : 16;  ///< Beginning of available/unallocated
+				     ///< memory slice
+		uint64_t end : 16;   ///< End of memory slice
+	} memory;
+
+	struct {
+		uint64_t type : 4;  ///< Type of capability, should be
+				    ///< S3K_CAPTY_PMP
+		uint64_t addr : 52; ///< pmpaddr
+		uint64_t cfg : 8;   ///< pmpcfg
+	} pmp;
+
+	struct {
+		uint64_t type : 4;    ///< Type of capability, should be
+				      ///< S3K_CAPTY_MONITOR
+		uint64_t unused : 12; ///< Padding, should be zero
+		uint64_t begin : 16;  ///< Beginning of monitored PIDs.
+		uint64_t free : 16; ///< Beginning of available monitored PIDs.
+		uint64_t end : 16;  ///< End of monitred PIDs
+	} monitor;
+
+	struct {
+		uint64_t type : 4;
+		uint64_t unused : 12;
+		uint64_t begin : 16;
+		uint64_t free : 16;
+		uint64_t end : 16;
+	} channel;
+
+	struct {
+		uint64_t type : 4;
+		uint64_t unused : 28;
+		uint64_t channel : 16;
+		uint64_t tag : 16;
+	} socket;
+};
 
 #ifdef _Static_assert
 _Static_assert(sizeof(union s3k_cap) == 8, "sizeof(union s3k_cap) != 8");
