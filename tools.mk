@@ -1,0 +1,5 @@
+RISCV_PREFIX?=riscv64-unknown-elf-
+CC=${RISCV_PREFIX}gcc
+SIZE=${RISCV_PREFIX}size
+OBJDUMP=${RISCV_PREFIX}objdump
+OBJCOPY=${RISCV_PREFIX}objcopy

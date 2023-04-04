@@ -1,0 +1,41 @@
+#pragma once
+
+/* Register offsets */
+#define TF_PC 0
+#define TF_RA 8
+#define TF_SP 16
+#define TF_GP 24
+#define TF_TP 32
+#define TF_T0 40
+#define TF_T1 48
+#define TF_T2 56
+#define TF_S0 64
+#define TF_S1 72
+#define TF_A0 80
+#define TF_A1 88
+#define TF_A2 96
+#define TF_A3 104
+#define TF_A4 112
+#define TF_A5 120
+#define TF_A6 128
+#define TF_A7 136
+#define TF_S2 144
+#define TF_S3 152
+#define TF_S4 160
+#define TF_S5 168
+#define TF_S6 176
+#define TF_S7 184
+#define TF_S8 196
+#define TF_S9 204
+#define TF_S10 212
+#define TF_S11 220
+#define TF_T3 228
+#define TF_T4 236
+#define TF_T5 244
+#define TF_T6 256
+#define TF_TPC 264
+#define TF_TSP 272
+#define TF_EPC 280
+#define TF_ESP 288
+#define TF_ECAUSE 296
+#define TF_EVAL 304

@@ -1,5 +1,4 @@
 docs
-test_detail.json
 *.elf
 *.a
 *.da
@@ -8,4 +7,5 @@ test_detail.json
 *.su
 *.out
 *.elf
+*.bin
 *.res
