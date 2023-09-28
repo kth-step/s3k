@@ -17,48 +17,48 @@ typedef struct slot_info {
 	uint32_t length;
 } slot_info_t;
 
-static slot_info_t slots[N_HART][N_SLOT];
+static slot_info_t slots[S3K_HART_CNT][S3K_SLOT_CNT];
 static semaphore_t sched_semaphore;
 
 void sched_init(void)
 {
 	uint64_t pid = 0;
-	uint64_t end = N_SLOT;
+	uint64_t end = S3K_SLOT_CNT;
 	uint64_t from = 0;
-	uint64_t to = N_SLOT;
+	uint64_t to = S3K_SLOT_CNT;
 
-	semaphore_init(&sched_semaphore, N_HART);
+	semaphore_init(&sched_semaphore, S3K_HART_CNT);
 
-	for (uint64_t hartid = MIN_HARTID; hartid <= MAX_HARTID; hartid++)
+	for (uint64_t hartid = S3K_MIN_HART; hartid <= S3K_MAX_HART; hartid++)
 		sched_update(pid, end, hartid, from, to);
 }
 
 void sched_update(uint64_t pid, uint64_t end, uint64_t hartid, uint64_t from, uint64_t to)
 {
 	// Acquire all resources, blocking everyone else.
-	semaphore_acquire_n(&sched_semaphore, N_HART);
+	semaphore_acquire_n(&sched_semaphore, S3K_HART_CNT);
 	for (uint64_t i = from; i < to; i++) {
-		slots[hartid - MIN_HARTID][i].pid = pid & 0xFF;
-		slots[hartid - MIN_HARTID][i].length = (end - i) & 0xFF;
+		slots[hartid - S3K_MIN_HART][i].pid = pid & 0xFF;
+		slots[hartid - S3K_MIN_HART][i].length = (end - i) & 0xFF;
 	}
 	// Release the resources.
-	semaphore_release_n(&sched_semaphore, N_HART);
+	semaphore_release_n(&sched_semaphore, S3K_HART_CNT);
 }
 
 void sched_delete(uint64_t hartid, uint64_t from, uint64_t to)
 {
-	semaphore_acquire_n(&sched_semaphore, N_HART);
+	semaphore_acquire_n(&sched_semaphore, S3K_HART_CNT);
 	for (uint64_t i = from; i < to; ++i) {
-		slots[hartid - MIN_HARTID][i].pid = 0;
-		slots[hartid - MIN_HARTID][i].length = 0;
+		slots[hartid - S3K_MIN_HART][i].pid = 0;
+		slots[hartid - S3K_MIN_HART][i].length = 0;
 	}
 	// Release the resources.
-	semaphore_release_n(&sched_semaphore, N_HART);
+	semaphore_release_n(&sched_semaphore, S3K_HART_CNT);
 }
 
 slot_info_t slot_info_get(uint64_t hartid, uint64_t slot)
 {
-	return slots[hartid - MIN_HARTID][slot % N_SLOT];
+	return slots[hartid - S3K_MIN_HART][slot % S3K_SLOT_CNT];
 }
 
 static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time, uint64_t *end_time)
@@ -66,7 +66,7 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time, uint64_t *end_
 	proc_t *p = NULL;
 	semaphore_acquire(&sched_semaphore);
 
-	uint64_t slot = time_get() / SLOT_LENGTH;
+	uint64_t slot = time_get() / S3K_SLOT_LEN;
 	slot_info_t si = slot_info_get(hartid, slot);
 
 	// If length = 0, then slice is deleted.
@@ -75,7 +75,7 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time, uint64_t *end_
 
 	// Have priority over harts with lower ID when scheduling length is
 	// longer.
-	for (uint64_t i = MIN_HARTID; i < hartid; i++) {
+	for (uint64_t i = S3K_MIN_HART; i < hartid; i++) {
 		slot_info_t other_si = slot_info_get(hartid, slot);
 		if (si.pid == other_si.pid && si.length <= other_si.length)
 			goto fail;
@@ -83,7 +83,7 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time, uint64_t *end_
 
 	// Have priority over harts with higher ID when scheduling length is
 	// equal or longer.
-	for (uint64_t i = hartid + 1; i < MAX_HARTID; i++) {
+	for (uint64_t i = hartid + 1; i < S3K_MAX_HART; i++) {
 		slot_info_t other_si = slot_info_get(hartid, slot);
 		if (si.pid == other_si.pid && si.length < other_si.length)
 			goto fail;
@@ -97,8 +97,8 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time, uint64_t *end_
 		p = NULL;
 		goto fail;
 	}
-	*start_time = slot * SLOT_LENGTH;
-	*end_time = (slot + si.length) * SLOT_LENGTH - SCHEDULER_TIME;
+	*start_time = slot * S3K_SLOT_LEN;
+	*end_time = (slot + si.length) * S3K_SLOT_LEN - S3K_SCHED_TIME;
 	p->timeout = *end_time;
 fail:
 	semaphore_release(&sched_semaphore);

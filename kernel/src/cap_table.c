@@ -9,7 +9,7 @@ struct cte {
 	cap_t cap;
 };
 
-static struct cte ctable[N_PROC * N_CAP];
+static struct cte ctable[S3K_PROC_CNT * S3K_CAP_CNT];
 
 static uint32_t offset(cte_t c)
 {
@@ -18,18 +18,17 @@ static uint32_t offset(cte_t c)
 
 void ctable_init(void)
 {
-	const cap_t caps[] = INIT_CAPS;
-
+	cap_t init_caps[] = INIT_CAPS;
 	cte_t prev = ctable;
-	for (unsigned int i = 0; i < ARRAY_SIZE(caps); ++i)
-		cte_insert(&ctable[i], caps[i], prev);
+	for (unsigned int i = 0; i < ARRAY_SIZE(init_caps); ++i)
+		cte_insert(&ctable[i], init_caps[i], prev);
 }
 
 cte_t ctable_get(uint64_t pid, uint64_t index)
 {
-	if (pid >= N_PROC || index >= N_CAP)
+	if (pid >= S3K_PROC_CNT || index >= S3K_CAP_CNT)
 		return NULL;
-	return &ctable[pid * N_CAP + index];
+	return &ctable[pid * S3K_CAP_CNT + index];
 }
 
 bool cte_is_empty(cte_t c)
@@ -69,7 +68,7 @@ cap_t cte_cap(cte_t c)
 
 uint64_t cte_pid(cte_t c)
 {
-	return offset(c) / N_CAP;
+	return offset(c) / S3K_CAP_CNT;
 }
 
 void cte_move(cte_t src, cte_t dst, cap_t *cap)

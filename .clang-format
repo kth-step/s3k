@@ -1,9 +1,13 @@
+---
 Language: Cpp
 UseTab: Always
 TabWidth: 8
 IndentWidth: 8
 ContinuationIndentWidth: 4
 ColumnLimit: 120
+SortIncludes: true
+MaxEmptyLinesToKeep: 1
+
 AlignAfterOpenBracket: Align
 AlignArrayOfStructures: Left
 AlignConsecutiveAssignments: false
@@ -17,6 +21,7 @@ AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
+ArrayInitializerAlignmentStyle: Left
 BinPackArguments: true
 BinPackParameters: true
 BreakBeforeBinaryOperators: true
@@ -25,8 +30,8 @@ BreakBeforeTernaryOperators: false
 BreakStringLiterals: false
 IncludeBlocks: Regroup
 IndentCaseLabels: false
+InitializerList::Pack: Never
 KeepEmptyLinesAtTheStartOfBlocks: false
-MaxEmptyLinesToKeep: 1
 PenaltyBreakAssignment: 10
 PenaltyBreakBeforeFirstCallParameter: 30
 PenaltyBreakComment: 10
@@ -36,7 +41,6 @@ PenaltyExcessCharacter: 100
 PenaltyReturnTypeOnItsOwnLine: 60
 PointerAlignment: Right
 SeparateDefinitionBlocks: Always
-SortIncludes: true
 SpaceAfterCStyleCast: false
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeParens: ControlStatements

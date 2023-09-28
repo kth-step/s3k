@@ -4,13 +4,9 @@
 #include "csr.h"
 
 .globl trap_entry
-.globl trap_syscall_exit
-.globl trap_schedule_exit
 .globl trap_exit
 
 .type trap_entry, @function
-.type trap_syscall_exit, @function
-.type trap_schedule_exit, @function
 .type trap_exit, @function
 
 .section .text.trap

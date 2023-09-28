@@ -12,7 +12,7 @@ typedef struct {
 	cte_t serv_dst, clnt_dst;
 } chan_info_t;
 
-static chan_info_t chan_infos[N_CHAN];
+static chan_info_t chan_infos[S3K_CHAN_CNT];
 
 static err_t validate_client_cap(cap_t cap, ipc_msg_t *msg, bool recv)
 {

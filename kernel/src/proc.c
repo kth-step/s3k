@@ -6,12 +6,12 @@
 #include "kassert.h"
 #include "drivers/timer.h"
 
-static proc_t _processes[N_PROC];
+static proc_t _processes[S3K_PROC_CNT];
 extern unsigned char _payload[];
 
 void proc_init(void)
 {
-	for (uint64_t i = 0; i < N_PROC; i++) {
+	for (uint64_t i = 0; i < S3K_PROC_CNT; i++) {
 		_processes[i].pid = i;
 		_processes[i].state = PSF_SUSPENDED;
 		_processes[i].instrument_wcet = 0;
@@ -23,7 +23,7 @@ void proc_init(void)
 
 proc_t *proc_get(uint64_t pid)
 {
-	KASSERT(pid < N_PROC);
+	KASSERT(pid < S3K_PROC_CNT);
 	KASSERT(_processes[pid].pid == pid);
 	return &_processes[pid];
 }

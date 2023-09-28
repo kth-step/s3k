@@ -17,7 +17,7 @@ typedef enum {
 typedef enum {
 	S3K_IPC_NOYIELD = 0, // Non-Yielding Synchronous
 	S3K_IPC_YIELD = 1,   // Yielding Synchronous
-			   //	S3K_IPC_ASYNC = 2,   // Asynchronous
+			     //	S3K_IPC_ASYNC = 2,   // Asynchronous
 } s3k_ipc_mode_t;
 
 // IPC Permissions

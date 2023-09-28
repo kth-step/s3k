@@ -15,33 +15,33 @@
 
 #include <stdbool.h>
 
-#define N_ARGS 8
+#define ARGS 8
 
-static err_t sys_get_info(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_reg_read(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_reg_write(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_sync(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_sync_mem(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_cap_read(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_cap_move(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_cap_delete(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_cap_revoke(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_cap_derive(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_pmp_load(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_pmp_unload(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_mon_suspend(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_mon_resume(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_mon_reg_read(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_mon_reg_write(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_mon_cap_read(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_mon_cap_move(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_mon_pmp_load(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_mon_pmp_unload(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_sock_send(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_sock_call(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_sock_reply(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_sock_recv(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
-static err_t sys_sock_replyrecv(proc_t *p, reg_t args[N_ARGS], reg_t *ret);
+static err_t sys_get_info(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_reg_read(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_reg_write(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_sync(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_sync_mem(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_cap_read(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_cap_move(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_cap_delete(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_cap_revoke(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_cap_derive(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_pmp_load(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_pmp_unload(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_mon_suspend(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_mon_resume(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_mon_reg_read(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_mon_reg_write(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_mon_cap_read(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_mon_cap_move(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_mon_pmp_load(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_mon_pmp_unload(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_sock_send(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_sock_call(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_sock_reply(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_sock_recv(proc_t *p, reg_t args[ARGS], reg_t *ret);
+static err_t sys_sock_replyrecv(proc_t *p, reg_t args[ARGS], reg_t *ret);
 
 typedef err_t (*sys_handler_t)(proc_t *, reg_t *, reg_t *);
 
@@ -87,7 +87,7 @@ proc_t *handle_syscall(proc_t *p)
 	return p;
 }
 
-err_t sys_get_info(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_get_info(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	switch (args[0]) {
 	case 0:
@@ -105,7 +105,7 @@ err_t sys_get_info(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return SUCCESS;
 }
 
-err_t sys_reg_read(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_reg_read(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	reg_t reg = args[0];
 	reg_t *regs = (reg_t *)&p->tf;
@@ -114,7 +114,7 @@ err_t sys_reg_read(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return SUCCESS;
 }
 
-err_t sys_reg_write(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_reg_write(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	reg_t reg = args[0], val = args[1];
 	reg_t *regs = (reg_t *)&p->tf;
@@ -123,19 +123,19 @@ err_t sys_reg_write(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return JUSTRET;
 }
 
-err_t sys_sync(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_sync(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	return SYNC;
 }
 
-err_t sys_sync_mem(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_sync_mem(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	// In YIELD handling, memory is synced.
 	*ret = p->pid;
 	return YIELD;
 }
 
-err_t sys_cap_read(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_cap_read(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t c = ctable_get(p->pid, args[0]);
 	if (!c)
@@ -143,7 +143,7 @@ err_t sys_cap_read(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return cap_read(c, (cap_t *)ret);
 }
 
-err_t sys_cap_move(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_cap_move(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t src = ctable_get(p->pid, args[0]);
 	cte_t dst = ctable_get(p->pid, args[1]);
@@ -157,7 +157,7 @@ err_t sys_cap_move(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_cap_delete(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_cap_delete(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t c = ctable_get(p->pid, args[0]);
 	if (!c)
@@ -170,7 +170,7 @@ err_t sys_cap_delete(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_cap_revoke(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_cap_revoke(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t c = ctable_get(p->pid, args[0]);
 	if (!c)
@@ -196,7 +196,7 @@ err_t sys_cap_revoke(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_cap_derive(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_cap_derive(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t src = ctable_get(p->pid, args[0]);
 	cte_t dst = ctable_get(p->pid, args[1]);
@@ -211,13 +211,13 @@ err_t sys_cap_derive(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_pmp_load(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_pmp_load(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t pmp = ctable_get(p->pid, args[0]);
 	if (!pmp)
 		return ERR_INVALID_INDEX;
 
-	if (args[1] >= N_PMP)
+	if (args[1] >= S3K_PMP_CNT)
 		return ERR_INVALID_SLOT;
 
 	if (!kernel_lock())
@@ -227,7 +227,7 @@ err_t sys_pmp_load(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_pmp_unload(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_pmp_unload(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t pmp = ctable_get(p->pid, args[0]);
 	if (!pmp)
@@ -240,13 +240,13 @@ err_t sys_pmp_unload(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_mon_suspend(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_mon_suspend(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t mon = ctable_get(p->pid, args[0]);
 	if (!mon)
 		return ERR_INVALID_INDEX;
 
-	if (args[1] >= N_PROC)
+	if (args[1] >= S3K_PROC_CNT)
 		return ERR_INVALID_PID;
 
 	if (!kernel_lock())
@@ -256,13 +256,13 @@ err_t sys_mon_suspend(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_mon_resume(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_mon_resume(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t mon = ctable_get(p->pid, args[0]);
 	if (!mon)
 		return ERR_INVALID_INDEX;
 
-	if (args[1] >= N_PROC)
+	if (args[1] >= S3K_PROC_CNT)
 		return ERR_INVALID_PID;
 
 	if (!kernel_lock())
@@ -272,13 +272,13 @@ err_t sys_mon_resume(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_mon_reg_read(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_mon_reg_read(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t mon = ctable_get(p->pid, args[0]);
 	if (!mon)
 		return ERR_INVALID_INDEX;
 
-	if (args[1] >= N_PROC)
+	if (args[1] >= S3K_PROC_CNT)
 		return ERR_INVALID_PID;
 
 	if (!kernel_lock())
@@ -288,13 +288,13 @@ err_t sys_mon_reg_read(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_mon_reg_write(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_mon_reg_write(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t mon = ctable_get(p->pid, args[0]);
 	if (!mon)
 		return ERR_INVALID_INDEX;
 
-	if (args[1] >= N_PROC)
+	if (args[1] >= S3K_PROC_CNT)
 		return ERR_INVALID_PID;
 
 	if (!kernel_lock())
@@ -304,13 +304,13 @@ err_t sys_mon_reg_write(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_mon_cap_read(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_mon_cap_read(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t mon = ctable_get(p->pid, args[0]);
 	cte_t src = ctable_get(args[1], args[2]);
 	if (!mon || !src)
 		return ERR_INVALID_INDEX;
-	if (args[1] >= N_PROC)
+	if (args[1] >= S3K_PROC_CNT)
 		return ERR_INVALID_PID;
 
 	if (!kernel_lock())
@@ -320,7 +320,7 @@ err_t sys_mon_cap_read(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_mon_cap_move(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_mon_cap_move(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t mon = ctable_get(p->pid, args[0]);
 	cte_t src = ctable_get(args[1], args[2]);
@@ -328,9 +328,9 @@ err_t sys_mon_cap_move(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	if (!mon)
 		return ERR_INVALID_INDEX;
 	if (!src)
-		return (args[1] >= N_PROC) ? ERR_INVALID_PID : ERR_INVALID_INDEX;
+		return (args[1] >= S3K_PROC_CNT) ? ERR_INVALID_PID : ERR_INVALID_INDEX;
 	if (!dst)
-		return (args[3] >= N_PROC) ? ERR_INVALID_PID : ERR_INVALID_INDEX;
+		return (args[3] >= S3K_PROC_CNT) ? ERR_INVALID_PID : ERR_INVALID_INDEX;
 
 	if (!kernel_lock())
 		return ERR_PREEMPTED;
@@ -339,15 +339,15 @@ err_t sys_mon_cap_move(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_mon_pmp_load(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_mon_pmp_load(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t mon = ctable_get(p->pid, args[0]);
 	cte_t pmp = ctable_get(args[1], args[2]);
 	if (!mon)
 		return ERR_INVALID_INDEX;
 	if (!pmp)
-		return (args[1] >= N_PROC) ? ERR_INVALID_PID : ERR_INVALID_INDEX;
-	if (args[3] >= N_PMP)
+		return (args[1] >= S3K_PROC_CNT) ? ERR_INVALID_PID : ERR_INVALID_INDEX;
+	if (args[3] >= S3K_PMP_CNT)
 		return ERR_INVALID_SLOT;
 
 	if (!kernel_lock())
@@ -357,14 +357,14 @@ err_t sys_mon_pmp_load(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_mon_pmp_unload(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_mon_pmp_unload(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t mon = ctable_get(p->pid, args[0]);
 	cte_t pmp = ctable_get(args[1], args[2]);
 	if (!mon)
 		return ERR_INVALID_INDEX;
 	if (!pmp)
-		return (args[1] >= N_PROC) ? ERR_INVALID_PID : ERR_INVALID_INDEX;
+		return (args[1] >= S3K_PROC_CNT) ? ERR_INVALID_PID : ERR_INVALID_INDEX;
 
 	if (!kernel_lock())
 		return ERR_PREEMPTED;
@@ -373,7 +373,7 @@ err_t sys_mon_pmp_unload(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_sock_send(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_sock_send(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t clnt = ctable_get(p->pid, args[0]);
 	if (!clnt)
@@ -398,7 +398,7 @@ err_t sys_sock_send(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_sock_call(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_sock_call(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t clnt = ctable_get(p->pid, args[0]);
 	if (!clnt)
@@ -424,7 +424,7 @@ err_t sys_sock_call(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_sock_recv(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_sock_recv(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t clnt = ctable_get(p->pid, args[0]);
 	if (!clnt)
@@ -444,7 +444,7 @@ err_t sys_sock_recv(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_sock_reply(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_sock_reply(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t clnt = ctable_get(p->pid, args[0]);
 	if (!clnt)
@@ -467,7 +467,7 @@ err_t sys_sock_reply(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
 	return err;
 }
 
-err_t sys_sock_replyrecv(proc_t *p, reg_t args[N_ARGS], reg_t *ret)
+err_t sys_sock_replyrecv(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	cte_t clnt = ctable_get(p->pid, args[0]);
 	if (!clnt)

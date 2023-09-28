@@ -9,7 +9,7 @@
 #include "sched.h"
 
 static mcslock_t lock;
-static qnode_t nodes[N_HART];
+static qnode_t nodes[S3K_HART_CNT];
 
 void kernel_init(void)
 {
@@ -23,10 +23,10 @@ void kernel_init(void)
 
 bool kernel_lock(void)
 {
-	return mcslock_try_acquire(&lock, csrr_mhartid() - MIN_HARTID);
+	return mcslock_try_acquire(&lock, csrr_mhartid() - S3K_MIN_HART);
 }
 
 void kernel_unlock(void)
 {
-	mcslock_release(&lock, csrr_mhartid() - MIN_HARTID);
+	mcslock_release(&lock, csrr_mhartid() - S3K_MIN_HART);
 }

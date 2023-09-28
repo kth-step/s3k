@@ -9,10 +9,11 @@ PROGRAM?=s3k
 ROOT=..
 
 # Kernel configuration
-CONFIG_H?=${ROOT}/config.def.h
+S3K_CONF_H?=${ROOT}/s3k_conf.def.h
 
 # Platform
 PLATFORM?=${ROOT}/plat/virt
+PLAT_CONF_H?=${PLATFORM}/plat_conf.h
 
 # Common sources
 COMMON=${ROOT}/common
@@ -52,8 +53,7 @@ CFLAGS+=-ffunction-sections -fdata-sections
 CFLAGS+=-T${PLATFORM}/platform.ld -Tlinker.ld
 CFLAGS+=-Wl,--no-warn-rwx-segments
 
-INC+=-include ${PLATFORM}/config.h
-INC+=-include ${CONFIG_H}
+INC+=-include ${PLAT_CONF_H} -include ${S3K_CONF_H}
 INC+=-Iinc -I${COMMON}/inc
 
 ELF=${BUILD}/${PROGRAM}.elf

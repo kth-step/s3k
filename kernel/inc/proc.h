@@ -47,8 +47,8 @@ typedef struct {
 	 * registers). */
 	trap_frame_t tf;
 	/** PMP registers */
-	uint8_t pmpcfg[N_PMP];
-	uint64_t pmpaddr[N_PMP];
+	uint8_t pmpcfg[S3K_PMP_CNT];
+	uint64_t pmpaddr[S3K_PMP_CNT];
 	/** Instrumentation registers */
 	uint64_t instrument_wcet;
 	/** Process ID. */

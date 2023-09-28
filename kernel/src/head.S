@@ -31,7 +31,7 @@ _start:
 
 	/* If hartid != MIN_HARTID, then jump to wait. */
 	csrr t0, mhartid
-	li t1, MIN_HARTID
+	li t1, S3K_MIN_HART
 	bne t0, t1, wait
 
 zero_bss: /* write zeros to the bss section */
@@ -47,8 +47,8 @@ zero_bss: /* write zeros to the bss section */
 wake:   /* Wake harts MIN_HARTID .. MAX_HARTID. */
 	/* Wake using software interrupt */
 	la t0, _clint
-	addi t1, t0, (MAX_HARTID * 4)
-	addi t0, t0, (MIN_HARTID * 4)
+	addi t1, t0, (S3K_MAX_HART * 4)
+	addi t0, t0, (S3K_MIN_HART * 4)
 	li t2, 1
 1:	sw t2, 0(t0)
 	addi t0, t0, 4
