@@ -43,67 +43,61 @@ typedef enum capty {
 	CAPTY_SOCKET = 6,  ///< IPC Server/Client capability.
 } capty_t;
 
-typedef struct {
-	uint64_t type : 4;
-	uint64_t unused : 4;
-	uint64_t hart : 8;
-	uint64_t bgn : 16;
-	uint64_t mrk : 16;
-	uint64_t end : 16;
-} cap_time_t;
-
-typedef struct {
-	uint64_t type : 4;
-	uint64_t rwx : 3;
-	uint64_t lck : 1;
-	uint64_t offset : 8;
-	uint64_t bgn : 16;
-	uint64_t mrk : 16;
-	uint64_t end : 16;
-} cap_memory_t;
-
-typedef struct {
-	uint64_t type : 4;
-	uint64_t rwx : 3;
-	uint64_t used : 1;
-	uint64_t slot : 8;
-	uint64_t addr : 48;
-} cap_pmp_t;
-
-typedef struct {
-	uint64_t type : 4;
-	uint64_t unused : 12;
-	uint64_t bgn : 16;
-	uint64_t mrk : 16;
-	uint64_t end : 16;
-} cap_monitor_t;
-
-typedef struct {
-	uint64_t type : 4;
-	uint64_t unused : 12;
-	uint64_t bgn : 16;
-	uint64_t mrk : 16;
-	uint64_t end : 16;
-} cap_channel_t;
-
-typedef struct {
-	uint64_t type : 4;
-	uint64_t mode : 4;
-	uint64_t perm : 8;
-	uint64_t chan : 16;
-	uint64_t tag : 32;
-} cap_socket_t;
 
 /// Capability description
 typedef union cap {
 	uint64_t type : 4;
 	uint64_t raw;
-	cap_time_t time;
-	cap_memory_t mem;
-	cap_pmp_t pmp;
-	cap_monitor_t mon;
-	cap_channel_t chan;
-	cap_socket_t sock;
+	struct {
+		uint64_t type : 4;
+		uint64_t unused : 4;
+		uint64_t hart : 8;
+		uint64_t bgn : 16;
+		uint64_t mrk : 16;
+		uint64_t end : 16;
+	} time;
+
+	struct {
+		uint64_t type : 4;
+		uint64_t rwx : 3;
+		uint64_t lck : 1;
+		uint64_t offset : 8;
+		uint64_t bgn : 16;
+		uint64_t mrk : 16;
+		uint64_t end : 16;
+	} mem;
+
+	struct {
+		uint64_t type : 4;
+		uint64_t rwx : 3;
+		uint64_t used : 1;
+		uint64_t slot : 8;
+		uint64_t addr : 48;
+	} pmp;
+
+	struct {
+		uint64_t type : 4;
+		uint64_t unused : 12;
+		uint64_t bgn : 16;
+		uint64_t mrk : 16;
+		uint64_t end : 16;
+	} mon;
+
+	struct {
+		uint64_t type : 4;
+		uint64_t unused : 12;
+		uint64_t bgn : 16;
+		uint64_t mrk : 16;
+		uint64_t end : 16;
+	} chan;
+
+	struct {
+		uint64_t type : 4;
+		uint64_t mode : 4;
+		uint64_t perm : 8;
+		uint64_t chan : 16;
+		uint64_t tag : 32;
+	} sock;
 } cap_t;
 
 cap_t cap_mk_time(uint64_t hart, uint64_t bgn, uint64_t end);

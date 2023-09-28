@@ -11,7 +11,7 @@ include ${PLATFORM}/platform.mk
 vpath %.c src ${COMMON}/src
 vpath %.S src ${COMMON}/src
 
-SRCS=init/start.S altio/altio.c
+SRCS=init/start.S altio/altio.c s3k/s3k.c
 SRCS+=${DRIVERS}
 SRCS+=main.c
 
