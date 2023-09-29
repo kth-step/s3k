@@ -192,7 +192,8 @@ typedef enum {
 	S3K_REG_EPC,
 	S3K_REG_ESP,
 	S3K_REG_ECAUSE,
-	S3K_REG_EVAL
+	S3K_REG_EVAL,
+	S3K_REG_PREEMPT,
 } s3k_reg_t;
 
 s3k_cap_t s3k_mk_time(uint64_t hart, uint64_t bgn, uint64_t end);
@@ -203,8 +204,6 @@ s3k_cap_t s3k_mk_channel(uint64_t bgn, uint64_t end);
 s3k_cap_t s3k_mk_socket(uint64_t chan, uint64_t mode, uint64_t perm,
 			uint64_t tag);
 
-void preempt_set_mask(uint64_t mask);
-uint64_t preempt_get_mask(void);
 void s3k_napot_decode(uint64_t addr, uint64_t *base, uint64_t *size);
 uint64_t s3k_napot_encode(uint64_t base, uint64_t size);
 

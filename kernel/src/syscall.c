@@ -17,6 +17,8 @@
 
 #define ARGS 8
 
+/** True if process p should ignore ERR_PREEMPTED for system call */
+static bool ignore_preempt(proc_t *p, uint64_t call);
 static err_t sys_get_info(proc_t *p, reg_t args[ARGS], reg_t *ret);
 static err_t sys_reg_read(proc_t *p, reg_t args[ARGS], reg_t *ret);
 static err_t sys_reg_write(proc_t *p, reg_t args[ARGS], reg_t *ret);
@@ -83,12 +85,23 @@ proc_t *handle_syscall(proc_t *p)
 	case SYNC:
 		p = sched(p);
 		break;
+	case ERR_PREEMPTED:
+		if (ignore_preempt(p, call)) {
+			p->tf.pc -= 4;
+			break;
+		}
+		/* fallthrough */
 	default:
 		p->tf.a0 = ret;
 		p->tf.t0 = err;
 		break;
 	}
 	return p;
+}
+
+bool ignore_preempt(proc_t *p, uint64_t call)
+{
+	return !(p->tf.preempt & (1ul << call));
 }
 
 err_t sys_get_info(proc_t *p, reg_t args[ARGS], reg_t *ret)

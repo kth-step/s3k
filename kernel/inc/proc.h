@@ -35,6 +35,7 @@ typedef struct {
 	reg_t t3, t4, t5, t6;
 	reg_t tpc, tsp;
 	reg_t epc, esp, ecause, eval;
+	reg_t preempt;
 } trap_frame_t;
 
 /**
