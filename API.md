@@ -1,5 +1,31 @@
 # S3K API
+
 ---
+
+## Registers
+
+Each process in S3K has access to the standard RISC-V general-purpose
+registers, and a few S3K specific registers. The general-purpose registers are
+as described in RISC-V and are fully controlled by the user process.
+
+The S3K specific registers, are *virtual* registers that reside inside the
+kernel. They are used to control how the process behaves and for servicing
+exceptions.
+
+- Trap program-counter (`S3K_REG_TPC`): Pointer to process's trap handling routing.
+- Trap stack pointer (`S3K_REG_TSP`): Stack pointer for trap handling.
+- Exception program-counter (`S3K_REG_EPC`): Program counter at time of exception
+- Exception stack pointer (`S3K_REG_ESP`): Stack pointer at time of exception.
+- Exception cause (`S3K_REG_ECAUSE`): Cause of exception. See RISC-V's `mcause` register.
+- Exception value (`S3K_REG_EVAL`): Auxiliary information for exception handling. See RISC-V's `mtval` register.
+- Preemption mask (`S3K_REG_PREEMPT`): Mask for preemption error.
+  - Hides the preemption of a system call if corresponding bit is clear.
+  - When a system call X (see `s3k_syscall_t`) is preempted, the system call
+    will be aborted and return `S3K_ERR_PREEMPTED` if bit X is set. Otherwise
+    the system call will be retried.
+
+---
+
 ## System calls
 - Get local information
   - [s3k_get_pid](#s3k_get_pid) - Get the process ID.
