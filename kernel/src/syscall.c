@@ -46,11 +46,15 @@ static err_t sys_sock_replyrecv(proc_t *p, reg_t args[ARGS], reg_t *ret);
 typedef err_t (*sys_handler_t)(proc_t *, reg_t *, reg_t *);
 
 sys_handler_t handlers[] = {
-    sys_get_info,      sys_reg_read,	 sys_reg_write,	   sys_sync,	     sys_sync_mem,
-    sys_cap_read,      sys_cap_move,	 sys_cap_delete,   sys_cap_revoke,   sys_cap_derive,
-    sys_pmp_load,      sys_pmp_unload,	 sys_mon_suspend,  sys_mon_resume,   sys_mon_reg_read,
-    sys_mon_reg_write, sys_mon_cap_read, sys_mon_cap_move, sys_mon_pmp_load, sys_mon_pmp_unload,
-    sys_sock_send,     sys_sock_call,	 sys_sock_reply,   sys_sock_recv,    sys_sock_replyrecv,
+	sys_get_info,	    sys_reg_read,	sys_reg_write,
+	sys_sync,	    sys_sync_mem,	sys_cap_read,
+	sys_cap_move,	    sys_cap_delete,	sys_cap_revoke,
+	sys_cap_derive,	    sys_pmp_load,	sys_pmp_unload,
+	sys_mon_suspend,    sys_mon_resume,	sys_mon_reg_read,
+	sys_mon_reg_write,  sys_mon_cap_read,	sys_mon_cap_move,
+	sys_mon_pmp_load,   sys_mon_pmp_unload, sys_sock_send,
+	sys_sock_call,	    sys_sock_reply,	sys_sock_recv,
+	sys_sock_replyrecv,
 };
 
 proc_t *handle_syscall(proc_t *p)
@@ -203,7 +207,7 @@ err_t sys_cap_derive(proc_t *p, reg_t args[ARGS], reg_t *ret)
 	if (!src || !dst)
 		return ERR_INVALID_INDEX;
 
-	cap_t new_cap = (cap_t){.raw = args[2]};
+	cap_t new_cap = (cap_t){ .raw = args[2] };
 	if (!kernel_lock())
 		return ERR_PREEMPTED;
 	err_t err = cap_derive(src, dst, new_cap);
@@ -328,9 +332,11 @@ err_t sys_mon_cap_move(proc_t *p, reg_t args[ARGS], reg_t *ret)
 	if (!mon)
 		return ERR_INVALID_INDEX;
 	if (!src)
-		return (args[1] >= S3K_PROC_CNT) ? ERR_INVALID_PID : ERR_INVALID_INDEX;
+		return (args[1] >= S3K_PROC_CNT) ? ERR_INVALID_PID :
+						   ERR_INVALID_INDEX;
 	if (!dst)
-		return (args[3] >= S3K_PROC_CNT) ? ERR_INVALID_PID : ERR_INVALID_INDEX;
+		return (args[3] >= S3K_PROC_CNT) ? ERR_INVALID_PID :
+						   ERR_INVALID_INDEX;
 
 	if (!kernel_lock())
 		return ERR_PREEMPTED;
@@ -346,7 +352,8 @@ err_t sys_mon_pmp_load(proc_t *p, reg_t args[ARGS], reg_t *ret)
 	if (!mon)
 		return ERR_INVALID_INDEX;
 	if (!pmp)
-		return (args[1] >= S3K_PROC_CNT) ? ERR_INVALID_PID : ERR_INVALID_INDEX;
+		return (args[1] >= S3K_PROC_CNT) ? ERR_INVALID_PID :
+						   ERR_INVALID_INDEX;
 	if (args[3] >= S3K_PMP_CNT)
 		return ERR_INVALID_SLOT;
 
@@ -364,7 +371,8 @@ err_t sys_mon_pmp_unload(proc_t *p, reg_t args[ARGS], reg_t *ret)
 	if (!mon)
 		return ERR_INVALID_INDEX;
 	if (!pmp)
-		return (args[1] >= S3K_PROC_CNT) ? ERR_INVALID_PID : ERR_INVALID_INDEX;
+		return (args[1] >= S3K_PROC_CNT) ? ERR_INVALID_PID :
+						   ERR_INVALID_INDEX;
 
 	if (!kernel_lock())
 		return ERR_PREEMPTED;

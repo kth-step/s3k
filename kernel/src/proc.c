@@ -3,8 +3,8 @@
 
 #include "cap_pmp.h"
 #include "csr.h"
-#include "kassert.h"
 #include "drivers/timer.h"
+#include "kassert.h"
 
 static proc_t _processes[S3K_PROC_CNT];
 extern unsigned char _payload[];
@@ -37,13 +37,16 @@ bool proc_acquire(proc_t *proc)
 	// If state == 0, then process is ready.
 	bool is_ready = (expected == 0);
 	// If state is blocked, then process logically ready on timeout.
-	bool is_timeout = ((expected & PSF_BLOCKED) && time_get() >= proc->timeout);
+	bool is_timeout
+	    = ((expected & PSF_BLOCKED) && time_get() >= proc->timeout);
 
 	if (!is_ready && !is_timeout)
 		return false;
 
-	return __atomic_compare_exchange(&proc->state, &expected, &desired, false /* not weak */,
-					 __ATOMIC_ACQUIRE /* succ */, __ATOMIC_RELAXED /* fail */);
+	return __atomic_compare_exchange(&proc->state, &expected, &desired,
+					 false /* not weak */,
+					 __ATOMIC_ACQUIRE /* succ */,
+					 __ATOMIC_RELAXED /* fail */);
 }
 
 void proc_release(proc_t *proc)
@@ -55,7 +58,8 @@ void proc_release(proc_t *proc)
 void proc_suspend(proc_t *proc)
 {
 	// Set the suspend flag
-	uint64_t prev_state = __atomic_fetch_or(&proc->state, PSF_SUSPENDED, __ATOMIC_ACQUIRE);
+	uint64_t prev_state
+	    = __atomic_fetch_or(&proc->state, PSF_SUSPENDED, __ATOMIC_ACQUIRE);
 
 	// If the process was waiting, we also unset the waiting flag.
 	if ((prev_state & 0xFF) == PSF_BLOCKED) {
@@ -68,7 +72,8 @@ void proc_suspend(proc_t *proc)
 void proc_resume(proc_t *proc)
 {
 	// Unset the suspend flag
-	__atomic_fetch_and(&proc->state, (uint64_t)~PSF_SUSPENDED, __ATOMIC_RELEASE);
+	__atomic_fetch_and(&proc->state, (uint64_t)~PSF_SUSPENDED,
+			   __ATOMIC_RELEASE);
 }
 
 void proc_ipc_wait(proc_t *proc, uint64_t channel)
@@ -83,7 +88,9 @@ bool proc_ipc_acquire(proc_t *proc, uint64_t channel)
 		return false;
 	uint64_t expected = PSF_BLOCKED | (channel << 16);
 	uint64_t desired = PSF_BUSY;
-	return __atomic_compare_exchange(&proc->state, &expected, &desired, false, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED);
+	return __atomic_compare_exchange(&proc->state, &expected, &desired,
+					 false, __ATOMIC_ACQUIRE,
+					 __ATOMIC_RELAXED);
 }
 
 bool proc_is_suspended(proc_t *proc)

@@ -7,7 +7,8 @@
 static err_t check_monitor(cte_t mon, uint64_t pid, bool check_suspended)
 {
 	cap_t mon_cap = cte_cap(mon);
-	if (mon_cap.type != CAPTY_MONITOR || mon_cap.mon.mrk > pid || pid >= mon_cap.mon.end)
+	if (mon_cap.type != CAPTY_MONITOR || mon_cap.mon.mrk > pid
+	    || pid >= mon_cap.mon.end)
 		return ERR_INVALID_MONITOR;
 	if (check_suspended && !proc_is_suspended(proc_get(pid)))
 		return ERR_INVALID_STATE;

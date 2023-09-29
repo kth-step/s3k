@@ -76,7 +76,7 @@ void cte_move(cte_t src, cte_t dst, cap_t *cap)
 	*cap = src->cap;
 	if (src == dst)
 		return;
-	cte_set_cap(src, (cap_t){0});
+	cte_set_cap(src, (cap_t){ 0 });
 	cte_set_prev(dst, cte_prev(src));
 	cte_set_next(dst, cte_next(src));
 	cte_prev(dst)->next = offset(dst);
@@ -87,7 +87,7 @@ void cte_move(cte_t src, cte_t dst, cap_t *cap)
 cap_t cte_delete(cte_t c)
 {
 	cap_t cap = cte_cap(c);
-	cte_set_cap(c, (cap_t){0});
+	cte_set_cap(c, (cap_t){ 0 });
 	cte_set_next(cte_prev(c), cte_next(c));
 	cte_set_prev(cte_next(c), cte_prev(c));
 	return cap;

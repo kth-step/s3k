@@ -32,8 +32,8 @@ int alt_puts(const char *str)
 
 int alt_printf(const char *fmt, ...)
 {
-	static const char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
-				     '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+	static const char hex[16] = { '0', '1', '2', '3', '4', '5', '6', '7',
+				      '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 	unsigned long long x;
 	int len;
 	va_list args;

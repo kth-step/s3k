@@ -117,7 +117,6 @@ void proc_suspend(proc_t *proc);
  */
 void proc_resume(proc_t *proc);
 
-
 void proc_ipc_wait(proc_t *proc, uint64_t channel);
 bool proc_ipc_acquire(proc_t *proc, uint64_t channel);
 

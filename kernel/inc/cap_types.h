@@ -43,11 +43,11 @@ typedef enum capty {
 	CAPTY_SOCKET = 6,  ///< IPC Server/Client capability.
 } capty_t;
 
-
 /// Capability description
 typedef union cap {
 	uint64_t type : 4;
 	uint64_t raw;
+
 	struct {
 		uint64_t type : 4;
 		uint64_t unused : 4;

@@ -33,7 +33,8 @@ void sched_init(void)
 		sched_update(pid, end, hartid, from, to);
 }
 
-void sched_update(uint64_t pid, uint64_t end, uint64_t hartid, uint64_t from, uint64_t to)
+void sched_update(uint64_t pid, uint64_t end, uint64_t hartid, uint64_t from,
+		  uint64_t to)
 {
 	// Acquire all resources, blocking everyone else.
 	semaphore_acquire_n(&sched_semaphore, S3K_HART_CNT);
@@ -61,7 +62,8 @@ slot_info_t slot_info_get(uint64_t hartid, uint64_t slot)
 	return slots[hartid - S3K_MIN_HART][slot % S3K_SLOT_CNT];
 }
 
-static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time, uint64_t *end_time)
+static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
+			   uint64_t *end_time)
 {
 	proc_t *p = NULL;
 	semaphore_acquire(&sched_semaphore);

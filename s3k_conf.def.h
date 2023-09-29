@@ -18,7 +18,7 @@
 #define S3K_SLOT_LEN (S3K_RTC_HZ / S3K_SLOT_CNT / 100ull)
 
 // Scheduler time
-#define S3K_SCHED_TIME (S3K_SLOT_LEN/10)
+#define S3K_SCHED_TIME (S3K_SLOT_LEN / 10)
 
 //! You should probably not change these variables
 // Min logarithmic size of a memory slice

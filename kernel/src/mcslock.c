@@ -13,7 +13,8 @@ static void _release(qnode_t *me)
 
 	do {
 		next = me->next;
-	} while (__atomic_compare_exchange(&next->prev, &me, &prev, false, __ATOMIC_RELEASE, __ATOMIC_RELAXED));
+	} while (__atomic_compare_exchange(&next->prev, &me, &prev, false,
+					   __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 	if (prev != NULL)
 		prev->next = next;
 }

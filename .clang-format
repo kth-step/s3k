@@ -4,7 +4,7 @@ UseTab: Always
 TabWidth: 8
 IndentWidth: 8
 ContinuationIndentWidth: 4
-ColumnLimit: 120
+ColumnLimit: 80
 SortIncludes: true
 MaxEmptyLinesToKeep: 1
 
@@ -21,7 +21,6 @@ AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
-ArrayInitializerAlignmentStyle: Left
 BinPackArguments: true
 BinPackParameters: true
 BreakBeforeBinaryOperators: true
@@ -30,7 +29,6 @@ BreakBeforeTernaryOperators: false
 BreakStringLiterals: false
 IncludeBlocks: Regroup
 IndentCaseLabels: false
-InitializerList::Pack: Never
 KeepEmptyLinesAtTheStartOfBlocks: false
 PenaltyBreakAssignment: 10
 PenaltyBreakBeforeFirstCallParameter: 30

@@ -1,8 +1,8 @@
 #ifndef S3K_H
 #define S3K_H
 
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef enum {
 	S3K_MEM_NONE = 0,
@@ -44,6 +44,7 @@ typedef enum s3k_capty {
 typedef union s3k_cap {
 	uint64_t type : 4;
 	uint64_t raw;
+
 	struct {
 		uint64_t type : 4;
 		uint64_t unused : 4;
@@ -194,13 +195,13 @@ typedef enum {
 	S3K_REG_EVAL
 } s3k_reg_t;
 
-
 s3k_cap_t s3k_mk_time(uint64_t hart, uint64_t bgn, uint64_t end);
 s3k_cap_t s3k_mk_memory(uint64_t bgn, uint64_t end, uint64_t rwx);
 s3k_cap_t s3k_mk_pmp(uint64_t addr, uint64_t rwx);
 s3k_cap_t s3k_mk_monitor(uint64_t bgn, uint64_t end);
 s3k_cap_t s3k_mk_channel(uint64_t bgn, uint64_t end);
-s3k_cap_t s3k_mk_socket(uint64_t chan, uint64_t mode, uint64_t perm, uint64_t tag);
+s3k_cap_t s3k_mk_socket(uint64_t chan, uint64_t mode, uint64_t perm,
+			uint64_t tag);
 
 void preempt_set_mask(uint64_t mask);
 uint64_t preempt_get_mask(void);
@@ -227,12 +228,16 @@ s3k_err_t s3k_pmp_load(uint64_t pmp_idx, uint64_t pmp_slot);
 s3k_err_t s3k_pmp_unload(uint64_t pmp_idx);
 s3k_err_t s3k_mon_suspend(uint64_t mon_idx, uint64_t pid);
 s3k_err_t s3k_mon_resume(uint64_t mon_idx, uint64_t pid);
-s3k_err_t s3k_mon_reg_read(uint64_t mon_idx, uint64_t pid, uint64_t reg, uint64_t *val);
-s3k_err_t s3k_mon_reg_write(uint64_t mon_idx, uint64_t pid, uint64_t reg, uint64_t val);
-s3k_err_t s3k_mon_cap_read(uint64_t mon_idx, uint64_t pid, uint64_t read_idx, s3k_cap_t *cap);
-s3k_err_t s3k_mon_cap_move(uint64_t mon_idx, uint64_t src_pid, uint64_t src_idx, uint64_t dst_pid,
-		uint64_t dst_idx);
-s3k_err_t s3k_mon_pmp_load(uint64_t mon_idx, uint64_t pid, uint64_t pmp_idx, uint64_t pmp_slot);
+s3k_err_t s3k_mon_reg_read(uint64_t mon_idx, uint64_t pid, uint64_t reg,
+			   uint64_t *val);
+s3k_err_t s3k_mon_reg_write(uint64_t mon_idx, uint64_t pid, uint64_t reg,
+			    uint64_t val);
+s3k_err_t s3k_mon_cap_read(uint64_t mon_idx, uint64_t pid, uint64_t read_idx,
+			   s3k_cap_t *cap);
+s3k_err_t s3k_mon_cap_move(uint64_t mon_idx, uint64_t src_pid, uint64_t src_idx,
+			   uint64_t dst_pid, uint64_t dst_idx);
+s3k_err_t s3k_mon_pmp_load(uint64_t mon_idx, uint64_t pid, uint64_t pmp_idx,
+			   uint64_t pmp_slot);
 s3k_err_t s3k_mon_pmp_unload(uint64_t mon_idx, uint64_t pid, uint64_t pmp_idx);
 
 #endif /* S3K_H */

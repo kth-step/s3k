@@ -16,7 +16,8 @@ static proc_t *handle_default(proc_t *p, reg_t mcause, reg_t mepc, reg_t mtval);
 proc_t *handle_exception(proc_t *p, reg_t mcause, reg_t mepc, reg_t mtval)
 {
 	/* Check if it is a return from exception */
-	if (mcause == ILLEGAL_INSTRUCTION && (mtval == MRET || mtval == SRET || mtval == URET))
+	if (mcause == ILLEGAL_INSTRUCTION
+	    && (mtval == MRET || mtval == SRET || mtval == URET))
 		// Handle return from exception
 		return handle_ret(p);
 	// Handle default exception
@@ -46,7 +47,8 @@ proc_t *handle_ret(proc_t *p)
  * pointer in the process's registers, and switches to the trap handler program
  * counter and stack pointer.
  */
-proc_t *handle_default(proc_t *p, uint64_t mcause, uint64_t mepc, uint64_t mtval)
+proc_t *handle_default(proc_t *p, uint64_t mcause, uint64_t mepc,
+		       uint64_t mtval)
 {
 	p->tf.ecause = mcause;
 	p->tf.eval = mtval;

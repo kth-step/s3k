@@ -1,7 +1,6 @@
 #ifndef __PLATFORM_H__
 #define __PLATFORM_H__
 
-
 // Min and max usable hart ID.
 #define MIN_HARTID 1
 #define MAX_HARTID 4

@@ -7,9 +7,9 @@
 #include <stdint.h>
 
 typedef struct ipc_msg {
-     uint64_t buf[4];
-     cte_t cbuf;
-     bool send_cap;
+	uint64_t buf[4];
+	cte_t cbuf;
+	bool send_cap;
 } ipc_msg_t;
 
 err_t cap_sock_send(proc_t *p, cte_t c, ipc_msg_t *msg, reg_t *yield_to);

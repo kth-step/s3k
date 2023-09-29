@@ -58,7 +58,8 @@ static void send_msg(uint64_t *args, cte_t dst, ipc_msg_t *msg, uint64_t tag)
 	args[3] = msg->buf[2];
 	args[4] = msg->buf[3];
 	args[5] = 0;
-	args[6] = (msg->send_cap) ? cap_move(msg->cbuf, dst, (cap_t *)&args[5]) : 0;
+	args[6]
+	    = (msg->send_cap) ? cap_move(msg->cbuf, dst, (cap_t *)&args[5]) : 0;
 }
 
 err_t cap_sock_send(proc_t *p, cte_t c, ipc_msg_t *msg, reg_t *yield_to)

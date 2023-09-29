@@ -18,7 +18,8 @@
 #ifndef NDEBUG
 
 #define _X_(x) #x
-#define KASSERT_FAILURE(FILE, LINE) uart_puts("Kernel assertion failed at " FILE ":" _X_(LINE) ".");
+#define KASSERT_FAILURE(FILE, LINE) \
+	uart_puts("Kernel assertion failed at " FILE ":" _X_(LINE) ".");
 
 #define KASSERT(EXPR)                                        \
 	do {                                                 \

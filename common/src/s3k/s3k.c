@@ -86,7 +86,8 @@ s3k_cap_t s3k_mk_channel(uint64_t bgn, uint64_t end)
 	};
 }
 
-s3k_cap_t s3k_mk_socket(uint64_t chan, uint64_t mode, uint64_t perm, uint64_t tag)
+s3k_cap_t s3k_mk_socket(uint64_t chan, uint64_t mode, uint64_t perm,
+			uint64_t tag)
 {
 	return (s3k_cap_t) {
 		.sock = {
@@ -266,7 +267,8 @@ retry:
 	return t0;
 }
 
-s3k_err_t s3k_mon_reg_read(uint64_t mon_idx, uint64_t pid, uint64_t reg, uint64_t *val)
+s3k_err_t s3k_mon_reg_read(uint64_t mon_idx, uint64_t pid, uint64_t reg,
+			   uint64_t *val)
 {
 retry:
 	register uint64_t t0 __asm__("t0") = S3K_SYSCALL_MON_REG_READ;
@@ -280,7 +282,8 @@ retry:
 	return t0;
 }
 
-s3k_err_t s3k_mon_reg_write(uint64_t mon_idx, uint64_t pid, uint64_t reg, uint64_t val)
+s3k_err_t s3k_mon_reg_write(uint64_t mon_idx, uint64_t pid, uint64_t reg,
+			    uint64_t val)
 {
 retry:
 	register uint64_t t0 __asm__("t0") = S3K_SYSCALL_MON_REG_WRITE;
@@ -288,13 +291,16 @@ retry:
 	register uint64_t a1 __asm__("a1") = pid;
 	register uint64_t a2 __asm__("a2") = reg;
 	register uint64_t a3 __asm__("a3") = val;
-	__asm__ volatile("ecall" : "+r"(t0) : "r"(a0), "r"(a1), "r"(a2), "r"(a3));
+	__asm__ volatile("ecall"
+			 : "+r"(t0)
+			 : "r"(a0), "r"(a1), "r"(a2), "r"(a3));
 	if (preempt_retry(t0, S3K_SYSCALL_MON_REG_WRITE))
 		goto retry;
 	return t0;
 }
 
-s3k_err_t s3k_mon_cap_read(uint64_t mon_idx, uint64_t pid, uint64_t read_idx, s3k_cap_t *cap)
+s3k_err_t s3k_mon_cap_read(uint64_t mon_idx, uint64_t pid, uint64_t read_idx,
+			   s3k_cap_t *cap)
 {
 retry:
 	register uint64_t t0 __asm__("t0") = S3K_SYSCALL_MON_CAP_READ;
@@ -309,8 +315,8 @@ retry:
 	return t0;
 }
 
-s3k_err_t s3k_mon_cap_move(uint64_t mon_idx, uint64_t src_pid, uint64_t src_idx, uint64_t dst_pid,
-		uint64_t dst_idx)
+s3k_err_t s3k_mon_cap_move(uint64_t mon_idx, uint64_t src_pid, uint64_t src_idx,
+			   uint64_t dst_pid, uint64_t dst_idx)
 {
 retry:
 	register uint64_t t0 __asm__("t0") = S3K_SYSCALL_MON_CAP_MOVE;
@@ -319,13 +325,16 @@ retry:
 	register uint64_t a2 __asm__("a2") = src_idx;
 	register uint64_t a3 __asm__("a3") = dst_pid;
 	register uint64_t a4 __asm__("a4") = dst_idx;
-	__asm__ volatile("ecall" : "+r"(t0) : "r"(a0), "r"(a1), "r"(a2), "r"(a3), "r"(a4));
+	__asm__ volatile("ecall"
+			 : "+r"(t0)
+			 : "r"(a0), "r"(a1), "r"(a2), "r"(a3), "r"(a4));
 	if (preempt_retry(t0, S3K_SYSCALL_MON_CAP_MOVE))
 		goto retry;
 	return t0;
 }
 
-s3k_err_t s3k_mon_pmp_load(uint64_t mon_idx, uint64_t pid, uint64_t pmp_idx, uint64_t pmp_slot)
+s3k_err_t s3k_mon_pmp_load(uint64_t mon_idx, uint64_t pid, uint64_t pmp_idx,
+			   uint64_t pmp_slot)
 {
 retry:
 	register uint64_t t0 __asm__("t0") = S3K_SYSCALL_MON_PMP_LOAD;
@@ -333,7 +342,9 @@ retry:
 	register uint64_t a1 __asm__("a1") = pid;
 	register uint64_t a2 __asm__("a2") = pmp_idx;
 	register uint64_t a3 __asm__("a3") = pmp_slot;
-	__asm__ volatile("ecall" : "+r"(t0) : "r"(a0), "r"(a1), "r"(a2), "r"(a3));
+	__asm__ volatile("ecall"
+			 : "+r"(t0)
+			 : "r"(a0), "r"(a1), "r"(a2), "r"(a3));
 	if (preempt_retry(t0, S3K_SYSCALL_MON_PMP_LOAD))
 		goto retry;
 	return t0;
