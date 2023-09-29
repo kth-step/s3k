@@ -32,17 +32,21 @@ s3k_cap_t s3k_mk_time(uint64_t hart, uint64_t bgn, uint64_t end)
 
 s3k_cap_t s3k_mk_memory(uint64_t bgn, uint64_t end, uint64_t rwx)
 {
-	uint64_t offset = bgn >> 15;
+	uint64_t tag = bgn >> S3K_MAX_BLOCK_SIZE;
+	bgn = (bgn - (tag << S3K_MAX_BLOCK_SIZE)) >> S3K_MIN_BLOCK_SIZE;
+	end = (end - (tag << S3K_MAX_BLOCK_SIZE)) >> S3K_MIN_BLOCK_SIZE;
 
-	s3k_cap_t cap;
-	cap.type = S3K_CAPTY_MEMORY;
-	cap.mem.offset = offset;
-	cap.mem.bgn = (bgn - (offset << 15));
-	cap.mem.end = (end - (offset << 15));
-	cap.mem.mrk = cap.mem.bgn;
-	cap.mem.rwx = (rwx & 0x7);
-	cap.mem.lck = 0;
-	return cap;
+	return (s3k_cap_t) {
+		.mem = {
+			.type = S3K_CAPTY_MEMORY,
+			.tag = tag,
+			.bgn = bgn,
+			.end = end,
+			.mrk = bgn,
+			.rwx = rwx,
+			.lck = 0,
+		}
+	};
 }
 
 s3k_cap_t s3k_mk_pmp(uint64_t addr, uint64_t rwx)

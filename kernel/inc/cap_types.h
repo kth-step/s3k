@@ -61,7 +61,7 @@ typedef union cap {
 		uint64_t type : 4;
 		uint64_t rwx : 3;
 		uint64_t lck : 1;
-		uint64_t offset : 8;
+		uint64_t tag : 8;
 		uint64_t bgn : 16;
 		uint64_t mrk : 16;
 		uint64_t end : 16;

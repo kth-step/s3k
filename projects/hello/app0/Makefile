@@ -24,7 +24,7 @@ CFLAGS+=-DSTACK_SIZE=1024
 CFLAGS+=-T${PLATFORM}/platform.ld -Tlinker.ld
 CFLAGS+=-Wl,--no-warn-rwx-segments
 
-INC=-Iinc -I${COMMON}/inc
+INC=-Iinc -I${COMMON}/inc -include ${S3K_CONF_H}
 
 ELF=${BUILD}/${PROGRAM}.elf
 BIN=${ELF:.elf=.bin}
