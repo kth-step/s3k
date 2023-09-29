@@ -68,8 +68,12 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 	proc_t *p = NULL;
 	semaphore_acquire(&sched_semaphore);
 
+	// Get time slot (in global sense)
 	uint64_t slot = time_get() / S3K_SLOT_LEN;
+	// Get time slot information
 	slot_info_t si = slot_info_get(hartid, slot);
+	// Check if time slot is first in time slice.
+	bool first = (slot_info_get(hartid, slot - 1).length == 0);
 
 	// If length = 0, then slice is deleted.
 	if (si.length == 0)
@@ -99,9 +103,10 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 		p = NULL;
 		goto fail;
 	}
-	*start_time = slot * S3K_SLOT_LEN;
-	*end_time = (slot + si.length) * S3K_SLOT_LEN - S3K_SCHED_TIME;
+	*start_time = slot * S3K_SLOT_LEN + (first ? S3K_SCHED_TIME : 0);
+	*end_time = (slot + si.length) * S3K_SLOT_LEN;
 	p->timeout = *end_time;
+
 fail:
 	semaphore_release(&sched_semaphore);
 	return p;
