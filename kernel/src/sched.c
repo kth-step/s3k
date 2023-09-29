@@ -78,7 +78,7 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 	// Have priority over harts with lower ID when scheduling length is
 	// longer.
 	for (uint64_t i = S3K_MIN_HART; i < hartid; i++) {
-		slot_info_t other_si = slot_info_get(hartid, slot);
+		slot_info_t other_si = slot_info_get(i, slot);
 		if (si.pid == other_si.pid && si.length <= other_si.length)
 			goto fail;
 	}
@@ -86,7 +86,7 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 	// Have priority over harts with higher ID when scheduling length is
 	// equal or longer.
 	for (uint64_t i = hartid + 1; i < S3K_MAX_HART; i++) {
-		slot_info_t other_si = slot_info_get(hartid, slot);
+		slot_info_t other_si = slot_info_get(i, slot);
 		if (si.pid == other_si.pid && si.length < other_si.length)
 			goto fail;
 	}
