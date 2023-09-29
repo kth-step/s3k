@@ -20,12 +20,6 @@
 // Scheduler time
 #define S3K_SCHED_TIME (S3K_SLOT_LEN / 10)
 
-//! You should probably not change these variables
-// Min logarithmic size of a memory slice
-#define S3K_MIN_BLOCK_SIZE 12
-// Max logarithmic size of a memory slice
-#define S3K_MAX_BLOCK_SIZE (S3K_MIN_BLOCK_SIZE + 15)
-
 // If debugging, comment
 // #define NDEBUG
 

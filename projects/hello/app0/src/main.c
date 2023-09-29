@@ -15,7 +15,7 @@ int main(void)
 	s3k_cap_derive(1, 17, s3k_mk_pmp(app1_addr, S3K_MEM_RWX));
 	s3k_mon_cap_move(8, 0, 17, 1, 0);
 	s3k_mon_cap_move(8, 0, 18, 1, 1);
-	s3k_cap_derive(4, 19, s3k_mk_time(0, 0, 15));
+	s3k_cap_derive(4, 19, s3k_mk_time(S3K_MIN_HART, 0, S3K_SLOT_CNT / 2));
 	s3k_mon_cap_move(8, 0, 19, 1, 2);
 	s3k_mon_pmp_load(8, 1, 0, 0);
 	s3k_mon_pmp_load(8, 1, 1, 1);

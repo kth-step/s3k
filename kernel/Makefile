@@ -9,20 +9,17 @@ PROGRAM?=s3k
 ROOT=..
 
 # Kernel configuration
-S3K_CONF_H?=${ROOT}/s3k_conf.def.h
+S3K_CONF_H?=s3k_conf.h
 
-# Platform
+# Platform specific config
 PLATFORM?=${ROOT}/plat/virt
-PLAT_CONF_H?=${PLATFORM}/plat_conf.h
+include ${PLATFORM}/platform.mk
 
 # Common sources
 COMMON=${ROOT}/common
 
 # Get toolchain
 include ${ROOT}/tools.mk
-
-# Platform specific config
-include ${PLATFORM}/platform.mk
 
 # Search path
 vpath %.c src ${COMMON}/src

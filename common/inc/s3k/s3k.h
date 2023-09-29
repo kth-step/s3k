@@ -4,6 +4,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// Min logarithmic size of a memory slice
+#define S3K_MIN_BLOCK_SIZE 12
+// Max logarithmic size of a memory slice
+#define S3K_MAX_BLOCK_SIZE (S3K_MIN_BLOCK_SIZE + 15)
+
+
 typedef enum {
 	S3K_MEM_NONE = 0,
 	S3K_MEM_R = 1,
