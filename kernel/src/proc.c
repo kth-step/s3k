@@ -14,7 +14,6 @@ void proc_init(void)
 	for (uint64_t i = 0; i < S3K_PROC_CNT; i++) {
 		_processes[i].pid = i;
 		_processes[i].state = PSF_SUSPENDED;
-		_processes[i].instrument_wcet = 0;
 	}
 	_processes[0].state = 0;
 	_processes[0].tf.pc = (uint64_t)_payload;

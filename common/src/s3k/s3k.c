@@ -98,7 +98,7 @@ uint64_t s3k_get_pid(void)
 {
 	register uint64_t t0 __asm__("t0") = S3K_SYSCALL_GET_INFO;
 	register uint64_t a0 __asm__("a0") = 0;
-	__asm__ volatile("ecall" : "+r"(a0) : "r"(t0));
+	__asm__ volatile("ecall" : "+r"(t0), "+r"(a0));
 	return a0;
 }
 
@@ -106,7 +106,7 @@ uint64_t s3k_get_time(void)
 {
 	register uint64_t t0 __asm__("t0") = S3K_SYSCALL_GET_INFO;
 	register uint64_t a0 __asm__("a0") = 1;
-	__asm__ volatile("ecall" : "+r"(a0) : "r"(t0));
+	__asm__ volatile("ecall" : "+r"(t0), "+r"(a0));
 	return a0;
 }
 
@@ -114,7 +114,7 @@ uint64_t s3k_get_timeout(void)
 {
 	register uint64_t t0 __asm__("t0") = S3K_SYSCALL_GET_INFO;
 	register uint64_t a0 __asm__("a0") = 2;
-	__asm__ volatile("ecall" : "+r"(a0) : "r"(t0));
+	__asm__ volatile("ecall" : "+r"(t0), "+r"(a0));
 	return a0;
 }
 
@@ -122,7 +122,7 @@ uint64_t s3k_read_reg(uint64_t reg)
 {
 	register uint64_t t0 __asm__("t0") = S3K_SYSCALL_REG_READ;
 	register uint64_t a0 __asm__("a0") = reg;
-	__asm__ volatile("ecall" : "+r"(a0) : "r"(t0));
+	__asm__ volatile("ecall" : "+r"(t0), "+r"(a0));
 	return a0;
 }
 
@@ -131,19 +131,21 @@ void s3k_write_reg(uint64_t reg, uint64_t val)
 	register uint64_t t0 __asm__("t0") = S3K_SYSCALL_REG_WRITE;
 	register uint64_t a0 __asm__("a0") = reg;
 	register uint64_t a1 __asm__("a1") = val;
-	__asm__ volatile("ecall" ::"r"(a0), "r"(a1), "r"(t0));
+	__asm__ volatile("ecall" : "+r"(t0), "+r"(a0) : "r"(a1));
 }
 
 void s3k_sync(void)
 {
 	register uint64_t t0 __asm__("t0") = S3K_SYSCALL_SYNC;
-	__asm__ volatile("ecall" ::"r"(t0));
+	register uint64_t a0 __asm__("a0");
+	__asm__ volatile("ecall" : "+r"(t0), "=r"(a0));
 }
 
 void s3k_sync_mem(void)
 {
 	register uint64_t t0 __asm__("t0") = S3K_SYSCALL_SYNC_MEM;
-	__asm__ volatile("ecall" ::"r"(t0));
+	register uint64_t a0 __asm__("a0");
+	__asm__ volatile("ecall" : "+r"(t0), "=r"(a0));
 }
 
 s3k_err_t s3k_cap_read(uint64_t read_idx, s3k_cap_t *cap)

@@ -37,6 +37,7 @@ typedef struct {
 	reg_t t3, t4, t5, t6;
 	reg_t tpc, tsp;
 	reg_t epc, esp, ecause, eval;
+	reg_t wcet;
 } trap_frame_t;
 
 /**
@@ -52,7 +53,6 @@ typedef struct {
 	uint8_t pmpcfg[S3K_PMP_CNT];
 	uint64_t pmpaddr[S3K_PMP_CNT];
 	/** Instrumentation registers */
-	uint64_t instrument_wcet;
 	/** Process ID. */
 	uint64_t pid;
 	/** Process state. */

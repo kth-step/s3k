@@ -195,6 +195,7 @@ typedef enum {
 	S3K_REG_ESP,
 	S3K_REG_ECAUSE,
 	S3K_REG_EVAL,
+	S3K_REG_WCET,
 } s3k_reg_t;
 
 s3k_cap_t s3k_mk_time(uint64_t hart, uint64_t bgn, uint64_t end);

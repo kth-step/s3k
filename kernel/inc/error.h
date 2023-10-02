@@ -1,6 +1,7 @@
 #pragma once
 
 typedef enum {
+	YIELD = -1,
 	SUCCESS = 0,
 	ERR_EMPTY,
 	ERR_SRC_EMPTY,
@@ -18,7 +19,4 @@ typedef enum {
 	ERR_PREEMPTED,
 	ERR_TIMEOUT,
 	ERR_SUSPENDED,
-	// Special values.
-	JUSTRET,
-	YIELD,
 } err_t;

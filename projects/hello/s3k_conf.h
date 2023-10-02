@@ -21,6 +21,7 @@
 #define S3K_SCHED_TIME (S3K_SLOT_LEN / 10)
 
 // If debugging, comment
-// #define NDEBUG
+#define NDEBUG
+#define INSTRUMENT
 
 #endif /* __S3K_CONF_H__ */

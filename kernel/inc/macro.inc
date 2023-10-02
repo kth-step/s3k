@@ -20,8 +20,8 @@
 
 .macro	instr_init
 #ifdef INSTRUMENT
-	csrw	mcounteren,0x3
-	csrw	scounteren,0x3
+	csrw	mcounteren,0xF
+	csrw	scounteren,0xF
 	csrw	mcountinhibit,0x8
 	csrw	mhpmcounter3,0
 #endif

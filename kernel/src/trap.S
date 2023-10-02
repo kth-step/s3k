@@ -119,6 +119,9 @@ trap_exit:
 	ld	t0,PROC_PC(a0)
 	csrw	mepc,t0
 
+	ld	t0,PROC_WCET(a0)
+	csrw	mhpmcounter3,t0
+
 	ld	ra,PROC_RA(a0)
 	ld	sp,PROC_SP(a0)
 	ld	gp,PROC_GP(a0)

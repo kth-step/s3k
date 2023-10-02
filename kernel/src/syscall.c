@@ -85,8 +85,6 @@ proc_t *handle_syscall(proc_t *p)
 		p->tf.t0 = err;
 		proc_release(p);
 		return NULL;
-	case JUSTRET: // No return value or error code.
-		return p;
 	default:
 		p->tf.a0 = ret;
 		p->tf.t0 = err;
@@ -125,9 +123,11 @@ err_t sys_reg_write(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	reg_t reg = args[0], val = args[1];
 	reg_t *regs = (reg_t *)&p->tf;
-	if (args[0] < N_REG)
+	if (args[0] < N_REG) {
+		*ret = regs[reg];
 		regs[reg] = val;
-	return JUSTRET;
+	}
+	return SUCCESS;
 }
 
 err_t sys_sync(proc_t *p, reg_t args[ARGS], reg_t *ret)
@@ -139,7 +139,7 @@ err_t sys_sync(proc_t *p, reg_t args[ARGS], reg_t *ret)
 err_t sys_sync_mem(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
 	kernel_pmp_refresh();
-	return JUSTRET;
+	return SUCCESS;
 }
 
 err_t sys_cap_read(proc_t *p, reg_t args[ARGS], reg_t *ret)
@@ -306,7 +306,7 @@ err_t sys_mon_reg_write(proc_t *p, reg_t args[ARGS], reg_t *ret)
 
 	if (!kernel_lock(p))
 		return ERR_PREEMPTED;
-	err_t err = cap_monitor_reg_write(mon, args[1], args[2], args[3]);
+	err_t err = cap_monitor_reg_write(mon, args[1], args[2], args[3], ret);
 	kernel_unlock(p);
 	return err;
 }
