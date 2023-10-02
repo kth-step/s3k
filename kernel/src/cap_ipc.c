@@ -6,222 +6,157 @@
 #include "kassert.h"
 #include "proc.h"
 
-typedef struct {
-	proc_t *serv;
-	proc_t *clnt;
-	cte_t serv_dst, clnt_dst;
-} chan_info_t;
+#include <stdint.h>
 
-static chan_info_t chan_infos[S3K_CHAN_CNT];
+#define SERVER 0
+#define CLIENT 1
 
-static err_t validate_client_cap(cap_t cap, ipc_msg_t *msg, bool recv)
+static proc_t *receivers[S3K_CHAN_CNT][2];
+
+static proc_t *_get_client(uint64_t chan);
+static void _set_client(uint64_t chan, proc_t *client, ipc_mode_t mode);
+static proc_t *_get_server(uint64_t chan);
+static void _set_server(uint64_t chan, proc_t *server, ipc_mode_t mode);
+static err_t _validate_socket(cap_t cap, bool send_cap);
+
+proc_t *_get_client(uint64_t chan)
+{
+	proc_t *p = receivers[chan][CLIENT];
+	if (p && proc_ipc_acquire(p, chan))
+		return p;
+	return NULL;
+}
+
+void _set_client(uint64_t chan, proc_t *proc, ipc_mode_t mode)
+{
+	proc_ipc_wait(proc, chan);
+	// If no yielding mode, we have no timeout.
+	if (mode == IPC_NOYIELD)
+		proc->timeout = UINT64_MAX;
+	proc->service_time = 0;
+	receivers[chan][CLIENT] = proc;
+}
+
+proc_t *_get_server(uint64_t chan)
+{
+	proc_t *p = receivers[chan][SERVER];
+	if (p && proc_ipc_acquire(p, chan))
+		return p;
+	return NULL;
+}
+
+void _set_server(uint64_t chan, proc_t *proc, ipc_mode_t mode)
+{
+	proc_ipc_wait(proc, chan);
+	if (mode == IPC_NOYIELD)
+		proc->service_time = 0;
+	proc->timeout = UINT64_MAX;
+	receivers[chan][SERVER] = proc;
+}
+
+err_t _validate_socket(cap_t cap, bool send_cap)
 {
 	if (!cap.type)
 		return ERR_EMPTY;
-	if ((cap.type != CAPTY_SOCKET) || (cap.sock.tag == 0))
-		return ERR_INVALID_CLIENT;
-	// If we try to send capability but not allowed.
-	if (!(cap.sock.perm & IPC_CCAP) && msg->send_cap)
-		return ERR_INVALID_CLIENT;
-	// If we do send capability
-	if ((cap.sock.perm & IPC_CCAP) && msg->send_cap)
+	if (cap.type != CAPTY_SOCKET)
+		return ERR_INVALID_SOCKET;
+	if (!send_cap)
 		return SUCCESS;
-	// If we must receive capability but has no space
-	if (recv && (cap.sock.perm & IPC_SCAP) && !cte_is_empty(msg->cbuf))
-		return ERR_DST_OCCUPIED;
-	return SUCCESS;
-}
-
-static err_t validate_server_cap(cap_t cap, ipc_msg_t *msg, bool recv)
-{
-	if (!cap.type)
-		return ERR_EMPTY;
-	if ((cap.type != CAPTY_SOCKET) || (cap.sock.tag != 0))
-		return ERR_INVALID_SERVER;
-	// If we try to send capability but not allowed.
-	if (!(cap.sock.perm & IPC_SCAP) && msg->send_cap)
-		return ERR_INVALID_SERVER;
-	// If we do send capability
-	if ((cap.sock.perm & IPC_SCAP) && msg->send_cap)
+	if (cap.sock.perm & (cap.sock.tag ? IPC_CCAP : IPC_SCAP))
 		return SUCCESS;
-	// If we must receive capability but has no space
-	if (recv && (cap.sock.perm & IPC_CCAP) && !cte_is_empty(msg->cbuf))
-		return ERR_DST_OCCUPIED;
-	return SUCCESS;
+	return ERR_INVALID_SOCKET;
 }
 
-static void send_msg(uint64_t *args, cte_t dst, ipc_msg_t *msg, uint64_t tag)
+err_t _cap_sock_send(proc_t *sender, cap_t cap, bool send_cap, reg_t *yield_to)
 {
-	args[0] = tag;
-	args[1] = msg->buf[0];
-	args[2] = msg->buf[1];
-	args[3] = msg->buf[2];
-	args[4] = msg->buf[3];
-	args[5] = 0;
-	args[6]
-	    = (msg->send_cap) ? cap_move(msg->cbuf, dst, (cap_t *)&args[5]) : 0;
-}
+	uint64_t chan = cap.sock.chan;
+	uint64_t tag = cap.sock.tag;
+	uint64_t mode = cap.sock.mode;
 
-err_t cap_sock_send(proc_t *p, cte_t c, ipc_msg_t *msg, reg_t *yield_to)
-{
-	cap_t cap = cte_cap(c);
+	proc_t *recv = tag ? _get_server(chan) : _get_client(chan);
 
-	// check capability type
-	err_t err = validate_client_cap(cap, msg, false);
-	if (err)
-		return err;
-
-	if (proc_is_suspended(p))
-		return ERR_SUSPENDED;
-
-	chan_info_t *ci = &chan_infos[cap.sock.chan];
-
-	proc_t *recv = ci->serv;
-	cte_t dst = ci->serv_dst;
-	if (!recv || proc_ipc_acquire(recv, cap.sock.chan))
+	if (!recv)
 		return ERR_NO_RECEIVER;
 
-	// check capability sending
 	recv->tf.t0 = SUCCESS;
-	send_msg(&recv->tf.a0, dst, msg, cap.sock.tag);
+	recv->tf.a0 = tag;
+	recv->tf.a1 = 0;
+	recv->tf.a2 = sender->tf.a2;
+	recv->tf.a3 = sender->tf.a3;
+	recv->tf.a4 = sender->tf.a4;
+	recv->tf.a5 = sender->tf.a5;
+	if (send_cap)
+		cap_move(sender->cap_buf, recv->cap_buf, (cap_t *)&recv->tf.a1);
 
-	switch (cap.sock.mode) {
-	case IPC_YIELD:
-		proc_release(p);
-		*yield_to = recv->pid;
+	if (mode == IPC_YIELD) {
+		// Yield to receiver
+		*yield_to = (uint64_t)recv;
 		return YIELD;
-	case IPC_NOYIELD:
+	} else {
+		// No yield, just success
 		proc_release(recv);
 		return SUCCESS;
-	default:
-		KASSERT(0);
 	}
 }
 
-err_t cap_sock_call(proc_t *p, cte_t c, ipc_msg_t *msg, reg_t *yield_to)
+err_t _cap_sock_recv(proc_t *recv, cap_t sock_cap)
 {
-	cap_t cap = cte_cap(c);
+	uint64_t chan = sock_cap.sock.chan;
+	uint64_t tag = sock_cap.sock.tag;
+	ipc_mode_t mode = sock_cap.sock.mode;
+	bool recv_cap = sock_cap.sock.perm & (tag ? IPC_SCAP : IPC_CCAP);
 
-	// check capability type
-	err_t err = validate_client_cap(cap, msg, true);
-	if (err)
-		return err;
+	// if we can receive a capability, free the slot.
+	if (recv_cap)
+		cap_delete(recv->cap_buf);
 
-	if (proc_is_suspended(p))
-		return ERR_SUSPENDED;
-
-	chan_info_t *ci = &chan_infos[cap.sock.chan];
-
-	proc_t *recv = ci->serv;
-	cte_t dst = ci->serv_dst;
-	if (!recv || proc_ipc_acquire(recv, cap.sock.chan))
-		return ERR_NO_RECEIVER;
-
-	// check capability sending
-	send_msg(&recv->tf.a0, dst, msg, cap.sock.tag);
-
-	proc_ipc_wait(p, cap.sock.chan);
-	ci->clnt = p;
-	ci->clnt_dst = (cap.sock.perm & IPC_SCAP) ? msg->cbuf : NULL;
-
-	switch (cap.sock.mode) {
-	case IPC_YIELD:
-		*yield_to = recv->pid;
-		return YIELD;
-	case IPC_NOYIELD:
-		proc_release(recv);
-		return SYNC;
-	default:
-		KASSERT(0);
+	if (tag) {
+		// tag != 0 means client capability
+		_set_client(chan, recv, mode);
+	} else {
+		// tag == 0 means client capability
+		_set_server(chan, recv, mode);
 	}
+	return YIELD;
 }
 
-err_t cap_sock_reply(proc_t *p, cte_t c, ipc_msg_t *msg, reg_t *yield_to)
+err_t cap_sock_send(proc_t *proc, cte_t sock, bool send_cap, reg_t *yield_to)
 {
-	cap_t cap = cte_cap(c);
+	cap_t cap = cte_cap(sock);
 
-	// check capability type
-	err_t err = validate_server_cap(cap, msg, false);
+	err_t err = _validate_socket(cap, send_cap);
 	if (err)
 		return err;
-
-	if (proc_is_suspended(p))
+	if (proc->state & PSF_SUSPENDED)
 		return ERR_SUSPENDED;
-
-	chan_info_t *ci = &chan_infos[cap.sock.chan];
-
-	proc_t *recv = ci->clnt;
-	if (!recv || proc_ipc_acquire(recv, cap.sock.chan))
-		return ERR_NO_RECEIVER;
-
-	// check capability sending
-	send_msg(&recv->tf.a0, ci->clnt_dst, msg, 0);
-
-	switch (cap.sock.mode) {
-	case IPC_YIELD:
-		proc_release(p);
-		*yield_to = recv->pid;
-		return YIELD;
-	case IPC_NOYIELD:
-		proc_release(recv);
-		return SUCCESS;
-	default:
-		KASSERT(0);
-	}
+	return _cap_sock_send(proc, cap, send_cap, yield_to);
 }
 
-err_t cap_sock_recv(proc_t *p, cte_t c, ipc_msg_t *msg)
+err_t cap_sock_sendrecv(proc_t *proc, cte_t sock, bool send_cap,
+			reg_t *yield_to)
 {
-	cap_t cap = cte_cap(c);
-
-	// check capability
-	err_t err = validate_server_cap(cap, msg, true);
+	cap_t cap = cte_cap(sock);
+	err_t err = _validate_socket(cap, send_cap);
 	if (err)
 		return err;
-
-	chan_info_t *ci = &chan_infos[cap.sock.chan];
-
-	if (proc_is_suspended(p))
+	if (proc->state & PSF_SUSPENDED)
 		return ERR_SUSPENDED;
+	err = _cap_sock_send(proc, cap, send_cap, yield_to);
 
-	proc_ipc_wait(p, cap.sock.chan);
+	if (cap.sock.tag && (err == ERR_NO_RECEIVER))
+		return err;
+	// Delete capability if it should have been sent
+	if (send_cap)
+		cap_delete(proc->cap_buf);
 
-	ci->serv = p;
-	ci->serv_dst = msg->cbuf;
-	return SYNC;
+	return _cap_sock_recv(proc, cap);
 }
 
-err_t cap_sock_replyrecv(proc_t *p, cte_t c, ipc_msg_t *msg, reg_t *yield_to)
+void cap_sock_clear(cap_t cap, proc_t *p)
 {
-	cap_t cap = cte_cap(c);
-
-	// check capability type
-	err_t err = validate_server_cap(cap, msg, false);
-	if (err)
-		return err;
-
-	if (proc_is_suspended(p))
-		return ERR_SUSPENDED;
-
-	chan_info_t *ci = &chan_infos[cap.sock.chan];
-
-	proc_t *recv = ci->clnt;
-	if (!recv || proc_ipc_acquire(recv, cap.sock.chan))
-		return ERR_NO_RECEIVER;
-
-	// check capability sending
-	send_msg(&recv->tf.a0, ci->clnt_dst, msg, 0);
-
-	proc_ipc_wait(p, cap.sock.chan);
-
-	switch (cap.sock.mode) {
-	case IPC_YIELD:
-		*yield_to = recv->pid;
-		return YIELD;
-	case IPC_NOYIELD:
-		proc_release(recv);
-		return SYNC;
-	default:
-		KASSERT(0);
+	if (!cap.sock.tag) {
+		receivers[cap.sock.chan][SERVER] = NULL;
+	} else if (receivers[cap.sock.chan][CLIENT] == p) {
+		receivers[cap.sock.chan][CLIENT] = NULL;
 	}
 }

@@ -57,10 +57,7 @@ exceptions.
   - [s3k_monitor_cap_move](#s3k_monitor_cap_move) - Move a capability.
 - IPC capability invocations
   - [s3k_sock_send](#s3k_sock_send) - Send a packet to the server.
-  - [s3k_sock_call](#s3k_sock_call) - Make an RPC.
-  - [s3k_sock_reply](#s3k_sock_reply) - Send a packet to the client.
-  - [s3k_sock_recv](#s3k_sock_recv) - Receive a packet from client.
-  - [s3k_sock_replyrecv](#s3k_sock_replyrecv) - Send then receive a packet from client.
+  - [s3k_sock_sendrecv](#s3k_sock_sendrecv) - Send the receive a packet.
 
 ### s3k_get_pid
 ```c
@@ -386,25 +383,23 @@ error_t s3k_monitor_cap_move();
 
 ### s3k_sock_send
 ```c
-error_t s3k_client_send();
+error_t s3k_sock_send(uint64_t sock_idx, uint64_t cap_idx, uint64_t data[4], bool send_cap);
+```
+**Parameters:**
+- `sock_idx` - index of socket capability
+- `cap_idx` - index of capability slot used for sending capabilities
+- `data` - data to send
+- `send_cap` - whether to send a capability or not
+
+### s3k_sock_sendrecv
+```c
+error_t s3k_sock_sendrecv(uint64_t sock_idx, uint64_t cap_idx, uint64_t data[4], uint64_t send_cap, uint64_t service_time);
 ```
 
-### s3k_sock_call
-```c
-error_t s3k_client_call();
-```
+**Parameters:**
+- `sock_idx` - index of socket capability
+- `cap_idx` - index of capability slot used for sending/receiving capabilities
+- `data` - buffer for data to send/recv
+- `send_cap` - whether to send a capability or not
+- `service_time` - only for yielding server sockets, how much remaining time a client should have when sending
 
-### s3k_sock_recv
-```c
-error_t s3k_sock_recv();
-```
-
-### s3k_sock_reply
-```c
-error_t s3k_server_reply();
-```
-
-### s3k_sock_replyrecv
-```c
-error_t s3k_server_replyrecv();
-```

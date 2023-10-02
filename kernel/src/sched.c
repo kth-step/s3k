@@ -5,6 +5,7 @@
 #include "csr.h"
 #include "drivers/timer.h"
 #include "kassert.h"
+#include "kernel.h"
 #include "proc.h"
 #include "semaphore.h"
 #include "trap.h"
@@ -65,7 +66,6 @@ slot_info_t slot_info_get(uint64_t hartid, uint64_t slot)
 static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 			   uint64_t *end_time)
 {
-	proc_t *p = NULL;
 	semaphore_acquire(&sched_semaphore);
 
 	// Get time slot (in global sense)
@@ -96,20 +96,20 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 	}
 
 	// Get the process.
-	p = proc_get(si.pid);
+	proc_t *p = proc_get(si.pid);
 
 	// Try to acquire the process.
-	if (!proc_acquire(p)) {
-		p = NULL;
+	if (!proc_acquire(p))
 		goto fail;
-	}
+	semaphore_release(&sched_semaphore);
 	*start_time = slot * S3K_SLOT_LEN + (first ? S3K_SCHED_TIME : 0);
 	*end_time = (slot + si.length) * S3K_SLOT_LEN;
 	p->timeout = *end_time;
+	return p;
 
 fail:
 	semaphore_release(&sched_semaphore);
-	return p;
+	return NULL;
 }
 
 proc_t *sched(proc_t *p)
@@ -123,7 +123,7 @@ proc_t *sched(proc_t *p)
 		p = sched_fetch(hartid, &start_time, &end_time);
 	} while (!p);
 
-	proc_pmp_sync(p);
+	kernel_pmp_refresh();
 	timer_set(hartid, start_time);
 	while (!(csrr_mip() & MIP_MTIP))
 		wfi();

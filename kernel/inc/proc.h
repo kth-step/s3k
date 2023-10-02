@@ -10,6 +10,8 @@
  * @copyright MIT License
  */
 
+#include "cap_table.h"
+#include "mcslock.h"
 #include "types.h"
 
 #include <stdbool.h>
@@ -35,7 +37,6 @@ typedef struct {
 	reg_t t3, t4, t5, t6;
 	reg_t tpc, tsp;
 	reg_t epc, esp, ecause, eval;
-	reg_t preempt;
 } trap_frame_t;
 
 /**
@@ -56,10 +57,26 @@ typedef struct {
 	uint64_t pid;
 	/** Process state. */
 	uint64_t state;
-	/** Sleep until. */
-	uint64_t sleep;
-	/** timeout */
+	qnode_t qnode;
+
+	/** Scheduling information */
+
+	/***** IPC related things *****/
+	/**
+	 * Timeout of IPC yielding send.
+	 * Time before sender gives up.
+	 */
 	uint64_t timeout;
+	/**
+	 * Minimum remaining time required for receiving messages.
+	 * If a client does not have sufficient execution time,
+	 * it is not allowed to send the message.
+	 */
+	uint64_t service_time;
+	/**
+	 * Source and destination pointer for transmitting capabilities.
+	 */
+	cte_t cap_buf;
 } proc_t;
 
 /**

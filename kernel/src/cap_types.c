@@ -19,59 +19,67 @@ cap_t cap_mk_memory(uint64_t bgn, uint64_t end, uint64_t rwx)
 	bgn = (bgn - (tag << S3K_MAX_BLOCK_SIZE)) >> S3K_MIN_BLOCK_SIZE;
 	end = (end - (tag << S3K_MAX_BLOCK_SIZE)) >> S3K_MIN_BLOCK_SIZE;
 
-	return (cap_t) {
-		.mem = {
-			.type = CAPTY_MEMORY,
-			.tag = tag,
-			.bgn = bgn,
-			.end = end,
-			.mrk = bgn,
-			.rwx = rwx,
-			.lck = 0,
-		}
-	};
+	return (cap_t){
+	    .mem = {
+		    .type = CAPTY_MEMORY,
+		    .tag = tag,
+		    .bgn = bgn,
+		    .end = end,
+		    .mrk = bgn,
+		    .rwx = rwx,
+		    .lck = 0,
+		    }
+	     };
 }
 
 cap_t cap_mk_pmp(uint64_t addr, uint64_t rwx)
 {
-	cap_t cap;
-	cap.type = CAPTY_PMP;
-	cap.pmp.addr = addr & 0xFFFFFFFFFF;
-	cap.pmp.rwx = rwx & 0x7;
-	cap.pmp.used = 0;
-	cap.pmp.slot = 0;
-	return cap;
+	return (cap_t){
+	    .pmp = {
+		    .type = CAPTY_PMP,
+		    .addr = addr,
+		    .rwx = rwx,
+		    .used = 0,
+		    .slot = 0,
+		    }
+	     };
 }
 
 cap_t cap_mk_monitor(uint64_t bgn, uint64_t end)
 {
-	cap_t cap;
-	cap.type = CAPTY_MONITOR;
-	cap.mon.bgn = bgn & 0xFFFF;
-	cap.mon.end = end & 0xFFFF;
-	cap.mon.mrk = cap.mon.bgn;
-	return cap;
+	return (cap_t){
+	    .mon = {
+		    .type = CAPTY_MONITOR,
+		    .bgn = bgn & 0xFFFF,
+		    .end = end & 0xFFFF,
+		    .mrk = bgn,
+		    }
+	     };
 }
 
 cap_t cap_mk_channel(uint64_t bgn, uint64_t end)
 {
-	cap_t cap;
-	cap.type = CAPTY_CHANNEL;
-	cap.chan.bgn = bgn & 0xFFFF;
-	cap.chan.end = end & 0xFFFF;
-	cap.chan.mrk = cap.chan.bgn;
-	return cap;
+	return (cap_t){
+	    .chan = {
+		     .type = CAPTY_CHANNEL,
+		     .bgn = bgn,
+		     .end = end,
+		     .mrk = bgn,
+		     }
+	     };
 }
 
 cap_t cap_mk_socket(uint64_t chan, uint64_t mode, uint64_t perm, uint64_t tag)
 {
-	cap_t cap;
-	cap.type = CAPTY_SOCKET;
-	cap.sock.chan = chan & 0xFFFF;
-	cap.sock.mode = mode & 0xF;
-	cap.sock.perm = perm & 0xFF;
-	cap.sock.tag = tag & 0xFFFFFFFF;
-	return cap;
+	return (cap_t){
+	    .sock = {
+		     .type = CAPTY_SOCKET,
+		     .chan = chan,
+		     .mode = mode,
+		     .perm = perm,
+		     .tag = tag,
+		     }
+	     };
 }
 
 static inline bool is_range_subset(uint64_t a_bgn, uint64_t a_end,
@@ -220,7 +228,7 @@ static bool cap_chan_derivable(cap_t p, cap_t c)
 {
 	KASSERT(p.type == CAPTY_CHANNEL);
 	if (c.type == CAPTY_SOCKET) {
-		return (p.sock.tag == 0)
+		return (c.sock.tag == 0)
 		       && is_range_subset(p.chan.mrk, p.chan.end, c.sock.chan,
 					  c.sock.chan + 1);
 	}

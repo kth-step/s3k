@@ -9,7 +9,6 @@
 // Max logarithmic size of a memory slice
 #define S3K_MAX_BLOCK_SIZE (S3K_MIN_BLOCK_SIZE + 15)
 
-
 typedef enum {
 	S3K_MEM_NONE = 0,
 	S3K_MEM_R = 1,
@@ -24,7 +23,7 @@ typedef enum {
 typedef enum {
 	S3K_IPC_NOYIELD = 0, // Non-Yielding Synchronous
 	S3K_IPC_YIELD = 1,   // Yielding Synchronous
-			     //	S3K_IPC_ASYNC = 2,   // Asynchronous
+			   //	S3K_IPC_ASYNC = 2,   // Asynchronous
 } s3k_ipc_mode_t;
 
 // IPC Permissions
@@ -104,22 +103,22 @@ typedef union s3k_cap {
 } s3k_cap_t;
 
 typedef enum {
-	S3K_SUCCESS,
+	S3K_SUCCESS = 0,
 	S3K_ERR_EMPTY,
 	S3K_ERR_SRC_EMPTY,
 	S3K_ERR_DST_OCCUPIED,
-	S3K_ERR_INVALID_CLIENT,
-	S3K_ERR_INVALID_DERIVATION,
 	S3K_ERR_INVALID_INDEX,
+	S3K_ERR_INVALID_DERIVATION,
 	S3K_ERR_INVALID_MONITOR,
 	S3K_ERR_INVALID_PID,
-	S3K_ERR_INVALID_PMP,
-	S3K_ERR_INVALID_SERVER,
-	S3K_ERR_INVALID_SLOT,
 	S3K_ERR_INVALID_STATE,
+	S3K_ERR_INVALID_PMP,
+	S3K_ERR_INVALID_SLOT,
+	S3K_ERR_INVALID_SOCKET,
 	S3K_ERR_INVALID_SYSCALL,
 	S3K_ERR_NO_RECEIVER,
 	S3K_ERR_PREEMPTED,
+	S3K_ERR_TIMEOUT,
 	S3K_ERR_SUSPENDED,
 } s3k_err_t;
 
@@ -154,10 +153,7 @@ typedef enum {
 
 	// Socket calls
 	S3K_SYSCALL_SOCK_SEND,
-	S3K_SYSCALL_SOCK_CALL,
-	S3K_SYSCALL_SOCK_REPLY,
-	S3K_SYSCALL_SOCK_RECV,
-	S3K_SYSCALL_SOCK_REPLYRECV,
+	S3K_SYSCALL_SOCK_SENDRECV,
 } s3k_syscall_t;
 
 typedef enum {
@@ -199,7 +195,6 @@ typedef enum {
 	S3K_REG_ESP,
 	S3K_REG_ECAUSE,
 	S3K_REG_EVAL,
-	S3K_REG_PREEMPT,
 } s3k_reg_t;
 
 s3k_cap_t s3k_mk_time(uint64_t hart, uint64_t bgn, uint64_t end);
@@ -244,5 +239,38 @@ s3k_err_t s3k_mon_cap_move(uint64_t mon_idx, uint64_t src_pid, uint64_t src_idx,
 s3k_err_t s3k_mon_pmp_load(uint64_t mon_idx, uint64_t pid, uint64_t pmp_idx,
 			   uint64_t pmp_slot);
 s3k_err_t s3k_mon_pmp_unload(uint64_t mon_idx, uint64_t pid, uint64_t pmp_idx);
+s3k_err_t s3k_sock_send(uint64_t sock_idx, uint64_t buf_idx, uint64_t data[4],
+			uint64_t send_cap);
+s3k_err_t s3k_sock_sendrecv(uint64_t sock_idx, uint64_t buf_idx,
+			    uint64_t data[4], uint64_t send_cap,
+			    uint64_t service_time);
+
+s3k_err_t s3k_try_cap_move(uint64_t src_idx, uint64_t dst_idx);
+s3k_err_t s3k_try_cap_delete(uint64_t del_idx);
+s3k_err_t s3k_try_cap_revoke(uint64_t rev_idx);
+s3k_err_t s3k_try_cap_derive(uint64_t src_idx, uint64_t dst_idx,
+			     s3k_cap_t new_cap);
+s3k_err_t s3k_try_pmp_load(uint64_t pmp_idx, uint64_t pmp_slot);
+s3k_err_t s3k_try_pmp_unload(uint64_t pmp_idx);
+s3k_err_t s3k_try_mon_suspend(uint64_t mon_idx, uint64_t pid);
+s3k_err_t s3k_try_mon_resume(uint64_t mon_idx, uint64_t pid);
+s3k_err_t s3k_try_mon_reg_read(uint64_t mon_idx, uint64_t pid, uint64_t reg,
+			       uint64_t *val);
+s3k_err_t s3k_try_mon_reg_write(uint64_t mon_idx, uint64_t pid, uint64_t reg,
+				uint64_t val);
+s3k_err_t s3k_try_mon_cap_read(uint64_t mon_idx, uint64_t pid,
+			       uint64_t read_idx, s3k_cap_t *cap);
+s3k_err_t s3k_try_mon_cap_move(uint64_t mon_idx, uint64_t src_pid,
+			       uint64_t src_idx, uint64_t dst_pid,
+			       uint64_t dst_idx);
+s3k_err_t s3k_try_mon_pmp_load(uint64_t mon_idx, uint64_t pid, uint64_t pmp_idx,
+			       uint64_t pmp_slot);
+s3k_err_t s3k_try_mon_pmp_unload(uint64_t mon_idx, uint64_t pid,
+				 uint64_t pmp_idx);
+s3k_err_t s3k_try_sock_send(uint64_t sock_idx, uint64_t buf_idx,
+			    uint64_t data[4], uint64_t send_cap);
+s3k_err_t s3k_try_sock_sendrecv(uint64_t sock_idx, uint64_t buf_idx,
+				uint64_t data[4], uint64_t send_cap,
+				uint64_t service_time);
 
 #endif /* S3K_H */

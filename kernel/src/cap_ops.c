@@ -1,5 +1,6 @@
 #include "cap_ops.h"
 
+#include "cap_ipc.h"
 #include "pmp.h"
 #include "sched.h"
 
@@ -28,6 +29,9 @@ static void ipc_move_hook(cte_t src, cte_t dst)
 			cap.pmp.slot = 0;
 			cte_set_cap(src, cap);
 		}
+		break;
+	case CAPTY_SOCKET:
+		cap_sock_clear(cap, proc_get(cte_pid(src)));
 		break;
 	}
 }
@@ -59,6 +63,9 @@ static void delete_hook(cte_t c, cap_t cap)
 	case CAPTY_PMP:
 		if (cap.pmp.used)
 			proc_pmp_unload(proc_get(cte_pid(c)), cap.pmp.slot);
+		break;
+	case CAPTY_SOCKET:
+		cap_sock_clear(cap, proc_get(cte_pid(c)));
 		break;
 	}
 }
@@ -104,6 +111,7 @@ void cap_reclaim(cte_t p, cap_t pcap, cte_t c, cap_t ccap)
 		pcap.chan.mrk = ccap.chan.mrk;
 		break;
 	case CAPTY_SOCKET:
+		cap_sock_clear(ccap, proc_get(cte_pid(c)));
 		return;
 	default:
 		KASSERT(0);

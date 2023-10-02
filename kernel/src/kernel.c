@@ -9,11 +9,10 @@
 #include "sched.h"
 
 static mcslock_t lock;
-static qnode_t nodes[S3K_HART_CNT];
 
 void kernel_init(void)
 {
-	mcslock_init(&lock, nodes);
+	mcslock_init(&lock);
 	uart_init();
 	ctable_init();
 	sched_init();
@@ -21,12 +20,29 @@ void kernel_init(void)
 	uart_puts("Kernel initialization complete");
 }
 
-bool kernel_lock(void)
+bool kernel_lock(proc_t *p)
 {
-	return mcslock_try_acquire(&lock, csrr_mhartid() - S3K_MIN_HART);
+	return mcslock_try_acquire(&lock, &p->qnode);
 }
 
-void kernel_unlock(void)
+void kernel_unlock(proc_t *p)
 {
-	mcslock_release(&lock, csrr_mhartid() - S3K_MIN_HART);
+	mcslock_release(&lock, &p->qnode);
+}
+
+void kernel_pmp_refresh(void)
+{
+	csrw_pmpcfg0(0);
+}
+
+void kernel_hook_sys_entry(proc_t *p)
+{
+}
+
+void kernel_hook_sys_exit(proc_t *p)
+{
+}
+
+void kernel_hook_sys_preempt(proc_t *p)
+{
 }

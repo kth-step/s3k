@@ -33,12 +33,13 @@ bool proc_acquire(proc_t *proc)
 	// Set the busy flag if expected state
 	uint64_t expected = proc->state;
 	uint64_t desired = PSF_BUSY;
+	uint64_t curr_time = time_get();
 
 	// If state == 0, then process is ready.
 	bool is_ready = (expected == 0);
 	// If state is blocked, then process logically ready on timeout.
 	bool is_timeout
-	    = ((expected & PSF_BLOCKED) && time_get() >= proc->timeout);
+	    = ((expected & PSF_BLOCKED) && curr_time >= proc->timeout);
 
 	if (!is_ready && !is_timeout)
 		return false;
@@ -79,13 +80,23 @@ void proc_resume(proc_t *proc)
 void proc_ipc_wait(proc_t *proc, uint64_t channel)
 {
 	KASSERT(proc->state == PSF_BUSY);
-	proc->state = PSF_BLOCKED | (channel << 16);
+	proc->state = PSF_BLOCKED | PSF_BUSY | (channel << 16);
 }
 
 bool proc_ipc_acquire(proc_t *proc, uint64_t channel)
 {
-	if (proc->timeout <= time_get())
+	uint64_t curr_time = time_get();
+	uint64_t timeout = timer_get(csrr_mhartid());
+
+	// Check if the process has timed out
+	if (proc->timeout <= curr_time)
 		return false;
+
+	// Check if we have enough execution time to service the process
+	if (proc->service_time && (proc->service_time + curr_time >= timeout))
+		return false;
+
+	// Try to acquire the process
 	uint64_t expected = PSF_BLOCKED | (channel << 16);
 	uint64_t desired = PSF_BUSY;
 	return __atomic_compare_exchange(&proc->state, &expected, &desired,
@@ -112,17 +123,4 @@ void proc_pmp_load(proc_t *proc, uint64_t slot, uint64_t rwx, uint64_t addr)
 void proc_pmp_unload(proc_t *proc, uint64_t slot)
 {
 	proc->pmpcfg[slot] = 0;
-}
-
-void proc_pmp_sync(proc_t *proc)
-{
-	csrw_pmpcfg0(*((uint64_t *)proc->pmpcfg));
-	csrw_pmpaddr0(proc->pmpaddr[0]);
-	csrw_pmpaddr1(proc->pmpaddr[1]);
-	csrw_pmpaddr2(proc->pmpaddr[2]);
-	csrw_pmpaddr3(proc->pmpaddr[3]);
-	csrw_pmpaddr4(proc->pmpaddr[4]);
-	csrw_pmpaddr5(proc->pmpaddr[5]);
-	csrw_pmpaddr6(proc->pmpaddr[6]);
-	csrw_pmpaddr7(proc->pmpaddr[7]);
 }

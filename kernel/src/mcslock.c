@@ -1,60 +1,61 @@
 // TODO: Replace with proper MCS Lock
 #include "mcslock.h"
 
+#include "kassert.h"
 #include "preempt.h"
 
 #include <stddef.h>
 
-static void _release(qnode_t *me)
+static void _release(qnode_t *const node)
 {
-	qnode_t *next, *prev;
-
-	prev = __atomic_exchange_n(&me->prev, NULL, __ATOMIC_RELAXED);
-
+	qnode_t *expected, *next, *prev;
+	prev = __atomic_exchange_n(&node->prev, NULL, __ATOMIC_RELAXED);
 	do {
-		next = me->next;
-	} while (__atomic_compare_exchange(&next->prev, &me, &prev, false,
-					   __ATOMIC_RELEASE, __ATOMIC_RELAXED));
-	if (prev != NULL)
+		expected = node;
+		next = node->next;
+	} while (!__atomic_compare_exchange_n(&next->prev, &expected, prev,
+					      false, __ATOMIC_RELEASE,
+					      __ATOMIC_RELAXED));
+	if (prev)
 		prev->next = next;
 }
 
-static bool _acquire(qnode_t *tail, qnode_t *me, bool preemptive)
+static bool _acquire(mcslock_t *lock, qnode_t *const node, bool preemptive)
 {
-	me->next = tail;
-	me->prev = __atomic_exchange_n(&tail->prev, me, __ATOMIC_ACQUIRE);
-
-	// If there is a predecessor, set its next ptr to me.
-	if (me->prev)
-		me->prev->next = me;
-
-	// Wait while me->prev != NULL
-	while (__atomic_load_n(&me->prev, __ATOMIC_ACQUIRE)) {
+	if (preemptive && preempt())
+		return false;
+	node->next = &lock->tail;
+	node->prev
+	    = __atomic_exchange_n(&lock->tail.prev, node, __ATOMIC_ACQUIRE);
+	if (node->prev == NULL)
+		return true;
+	node->prev->next = node;
+	while (__atomic_load_n(&node->prev, __ATOMIC_ACQUIRE)) {
 		if (preemptive && preempt()) {
-			_release(me);
+			_release(node);
 			return false;
 		}
 	}
 	return true;
 }
 
-void mcslock_init(mcslock_t *lock, qnode_t *nodes)
+void mcslock_init(mcslock_t *lock)
 {
+	// lock->tail.prev = lock->tail.next = NULL;
 	lock->tail.prev = lock->tail.next = NULL;
-	lock->nodes = nodes;
 }
 
-void mcslock_acquire(mcslock_t *lock, uint64_t me)
+void mcslock_acquire(mcslock_t *lock, qnode_t *node)
 {
-	_acquire(&lock->tail, &lock->nodes[me], false);
+	_acquire(lock, node, false);
 }
 
-bool mcslock_try_acquire(mcslock_t *lock, uint64_t me)
+bool mcslock_try_acquire(mcslock_t *lock, qnode_t *node)
 {
-	return _acquire(&lock->tail, &lock->nodes[me], true);
+	return _acquire(lock, node, true);
 }
 
-void mcslock_release(mcslock_t *lock, uint64_t me)
+void mcslock_release(mcslock_t *lock, qnode_t *node)
 {
-	_release(&lock->nodes[me]);
+	_release(node);
 }

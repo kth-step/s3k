@@ -51,6 +51,13 @@ void setup_app1(uint64_t tmp)
 	s3k_mon_reg_write(MONITOR, APP1_PID, S3K_REG_PC, 0x80020000);
 }
 
+void setup_socket(uint64_t socket, uint64_t tmp)
+{
+	s3k_cap_derive(CHANNEL, socket, s3k_mk_socket(0, S3K_IPC_YIELD, 0, 0));
+	s3k_cap_derive(socket, tmp, s3k_mk_socket(0, S3K_IPC_YIELD, 0, 1));
+	s3k_mon_cap_move(MONITOR, APP0_PID, tmp, APP1_PID, 3);
+}
+
 int main(void)
 {
 	// Setup UART access
@@ -59,12 +66,22 @@ int main(void)
 	// Setup app1 capabilities and PC
 	setup_app1(11);
 
+	// Setup socket capabilities.
+	setup_socket(11, 12);
+
 	// Resume app1
 	s3k_mon_resume(MONITOR, APP1_PID);
 
-	// Write hello world.
-	alt_puts("hello, world from app0");
-
-	// BYE!
-	alt_puts("bye from app0");
+	uint64_t data[4];
+	char *str = (char *)data;
+	while (1) {
+		str[0] = 'p';
+		str[1] = 'o';
+		str[2] = 'n';
+		str[3] = 'g';
+		str[4] = '\0';
+		while (s3k_sock_sendrecv(11, 0, data, 0, 1000))
+			alt_puts("server err");
+		alt_puts(str);
+	}
 }
