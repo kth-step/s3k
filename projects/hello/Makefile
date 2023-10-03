@@ -8,7 +8,10 @@ all: ${DIRS}
 ${DIRS}:
 	@${MAKE} -C $@
 
+tmux qemu:
+	./scripts/$@.sh
+
 clean:
 	rm -rf ${BUILD}
 
-.PHONY: all clean ${DIRS}
+.PHONY: all clean ${DIRS} tmux qemu
