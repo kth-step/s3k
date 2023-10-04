@@ -5,9 +5,11 @@
 
 .globl trap_entry
 .globl trap_exit
+.globl trap_resume
 
 .type trap_entry, @function
 .type trap_exit, @function
+.type trap_resume, @function
 
 .section .text.trap
 .balign 16
@@ -71,29 +73,23 @@ _exception:
 	csrr	a2,mepc
 	csrr	a3,mtval
 	csrc	mstatus,MSTATUS_MIE
-	call	handle_exception
-	j	trap_exit
+	tail	handle_exception
 
 _syscall:
 	csrc	mstatus,MSTATUS_MIE
-	call	handle_syscall
-	beqz	a0,_yield
-	j	trap_exit
+	tail	handle_syscall
 
 _myield:
 	csrrw	a0,mscratch,a0
-	ld_gp
 	ld_sp	t0
 
 _yield:
 	/* Call scheduler */
-	call	sched
+	tail	sched
 
 trap_exit:
 	csrs	mstatus,MSTATUS_MIE
 	
-	csrr	t0,pmpcfg0
-	bnez	t0,1f
 	/* Load PMP registers */
 	ld	s0,PROC_PMPADDR0(a0)
 	ld	s1,PROC_PMPADDR1(a0)
@@ -114,7 +110,9 @@ trap_exit:
 	csrw	pmpaddr7,s7
 	csrw	pmpcfg0,s8
 
-1:
+trap_resume:
+	csrs	mstatus,MSTATUS_MIE
+
 	/* Load call-used registers, ra, sp, gp, tp, pc */
 	ld	t0,PROC_PC(a0)
 	csrw	mepc,t0

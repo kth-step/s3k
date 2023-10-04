@@ -19,8 +19,10 @@
  * handle_ret() function. Otherwise, it calls the handle_default() function
  * to handle the exception.
  *
+ * @param p  Process having the exception
  * @param mcause  The value of the mcause register
  * @param mepc  The value of the mepc register
  * @param mtval  The value of the mtval register
  */
-proc_t *handle_exception(proc_t *p, reg_t mcause, reg_t mepc, reg_t mtval);
+void handle_exception(proc_t *p, reg_t mcause, reg_t mepc, reg_t mtval)
+    __attribute__((noreturn));

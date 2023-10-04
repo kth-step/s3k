@@ -53,7 +53,7 @@ sys_handler_t handlers[] = {
     sys_sock_send,    sys_sock_sendrecv,
 };
 
-proc_t *handle_syscall(proc_t *p)
+void handle_syscall(proc_t *p)
 {
 	// Error code.
 	err_t err = ERR_INVALID_SYSCALL;
@@ -75,20 +75,18 @@ proc_t *handle_syscall(proc_t *p)
 	switch (err) {
 	case YIELD: // Yield to another process.
 		p->tf.t0 = SUCCESS;
-		proc_release(p);
 		if (!ret)
-			return NULL;
-		kernel_pmp_refresh();
-		return (proc_t *)ret;
+			sched(p);
+		proc_release(p);
+		trap_exit((proc_t*)ret);
 	case ERR_SUSPENDED:
 	case ERR_PREEMPTED:
 		p->tf.t0 = err;
-		proc_release(p);
-		return NULL;
+		sched(p);
 	default:
 		p->tf.a0 = ret;
 		p->tf.t0 = err;
-		return p;
+		trap_resume(p);
 	}
 }
 
@@ -138,8 +136,8 @@ err_t sys_sync(proc_t *p, reg_t args[ARGS], reg_t *ret)
 
 err_t sys_sync_mem(proc_t *p, reg_t args[ARGS], reg_t *ret)
 {
-	kernel_pmp_refresh();
-	return SUCCESS;
+	*ret = (uint64_t)p;
+	return YIELD;
 }
 
 err_t sys_cap_read(proc_t *p, reg_t args[ARGS], reg_t *ret)

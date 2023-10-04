@@ -112,7 +112,7 @@ fail:
 	return NULL;
 }
 
-proc_t *sched(proc_t *p)
+void sched(proc_t *p)
 {
 	uint64_t hartid = csrr_mhartid();
 	uint64_t start_time, end_time;
@@ -128,5 +128,5 @@ proc_t *sched(proc_t *p)
 	while (!(csrr_mip() & MIP_MTIP))
 		wfi();
 	timer_set(hartid, end_time);
-	return p;
+	trap_exit(p);
 }

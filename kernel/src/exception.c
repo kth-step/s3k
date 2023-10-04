@@ -3,6 +3,7 @@
 
 #include "kernel.h"
 #include "proc.h"
+#include "trap.h"
 
 #define ILLEGAL_INSTRUCTION 0x2
 
@@ -10,18 +11,19 @@
 #define SRET 0x10200073
 #define URET 0x00200073
 
-static proc_t *handle_ret(proc_t *p);
-static proc_t *handle_default(proc_t *p, reg_t mcause, reg_t mepc, reg_t mtval);
+static void handle_ret(proc_t *p) __attribute__((noreturn));
+static void handle_default(proc_t *p, reg_t mcause, reg_t mepc, reg_t mtval)
+    __attribute__((noreturn));
 
-proc_t *handle_exception(proc_t *p, reg_t mcause, reg_t mepc, reg_t mtval)
+void handle_exception(proc_t *p, reg_t mcause, reg_t mepc, reg_t mtval)
 {
 	/* Check if it is a return from exception */
 	if (mcause == ILLEGAL_INSTRUCTION
 	    && (mtval == MRET || mtval == SRET || mtval == URET))
 		// Handle return from exception
-		return handle_ret(p);
+		handle_ret(p);
 	// Handle default exception
-	return handle_default(p, mcause, mepc, mtval);
+	handle_default(p, mcause, mepc, mtval);
 }
 
 /**
@@ -29,7 +31,7 @@ proc_t *handle_exception(proc_t *p, reg_t mcause, reg_t mepc, reg_t mtval)
  * prior to the exception, and clears the exception cause and exception value
  * registers.
  */
-proc_t *handle_ret(proc_t *p)
+void handle_ret(proc_t *p)
 {
 	p->tf.pc = p->tf.epc;
 	p->tf.sp = p->tf.esp;
@@ -37,7 +39,7 @@ proc_t *handle_ret(proc_t *p)
 	p->tf.eval = 0;
 	p->tf.epc = 0;
 	p->tf.esp = 0;
-	return p;
+	trap_resume(p);
 }
 
 /*
@@ -47,8 +49,7 @@ proc_t *handle_ret(proc_t *p)
  * pointer in the process's registers, and switches to the trap handler program
  * counter and stack pointer.
  */
-proc_t *handle_default(proc_t *p, uint64_t mcause, uint64_t mepc,
-		       uint64_t mtval)
+void handle_default(proc_t *p, uint64_t mcause, uint64_t mepc, uint64_t mtval)
 {
 	p->tf.ecause = mcause;
 	p->tf.eval = mtval;
@@ -56,5 +57,5 @@ proc_t *handle_default(proc_t *p, uint64_t mcause, uint64_t mepc,
 	p->tf.esp = p->tf.sp;
 	p->tf.pc = p->tf.tpc;
 	p->tf.sp = p->tf.tsp;
-	return p;
+	trap_resume(p);
 }

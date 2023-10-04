@@ -42,4 +42,4 @@ typedef enum {
 	SYSCALL_SOCK_REPLYRECV,
 } syscall_t;
 
-proc_t *handle_syscall(proc_t *p);
+void handle_syscall(proc_t *p) __attribute__((noreturn));
