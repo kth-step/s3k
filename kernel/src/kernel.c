@@ -22,8 +22,10 @@ void kernel_init(void)
 
 bool kernel_lock(proc_t *p)
 {
-	kernel_hook_sys_preempt(p);
-	return mcslock_try_acquire(&lock, &p->qnode);
+	kernel_hook_sys_exit(p);
+	bool result = mcslock_try_acquire(&lock, &p->qnode);
+	kernel_hook_sys_entry(p);
+	return result;
 }
 
 void kernel_unlock(proc_t *p)
@@ -47,16 +49,6 @@ void kernel_hook_sys_exit(proc_t *p)
 {
 #ifdef INSTRUMENT
 	uint64_t cycles = csrr_mcycle();
-	if (p->tf.wcet < cycles)
-		p->tf.wcet = cycles;
-#endif
-}
-
-void kernel_hook_sys_preempt(proc_t *p)
-{
-#ifdef INSTRUMENT
-	uint64_t cycles = csrr_mcycle();
-	csrw_mcycle(0);
 	if (p->tf.wcet < cycles)
 		p->tf.wcet = cycles;
 #endif
