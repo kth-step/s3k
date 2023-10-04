@@ -52,6 +52,9 @@ HEX:=${ELF:.elf=.hex}
 
 all: ${ELF} ${BIN} ${HEX}
 
+format:
+	clang-format -i $(shell find -name '*.[hc]' -not -path '*/.*')
+
 clean:
 	rm -f ${ELF} ${OBJS} ${DEPS}
 
