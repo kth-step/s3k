@@ -54,7 +54,8 @@ err_t cap_monitor_reg_read(cte_t mon, uint64_t pid, uint64_t reg, uint64_t *val)
 	return err;
 }
 
-err_t cap_monitor_reg_write(cte_t mon, uint64_t pid, uint64_t reg, uint64_t val, uint64_t *ret)
+err_t cap_monitor_reg_write(cte_t mon, uint64_t pid, uint64_t reg, uint64_t val,
+			    uint64_t *ret)
 {
 	err_t err = check_monitor(mon, pid, true);
 	if (!err && reg < N_REG) {
