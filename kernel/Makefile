@@ -87,6 +87,9 @@ ${DA}: ${ELF}
 	@echo "OBJDUMP $@"
 	@${OBJDUMP} -D $< > $@
 
+format:
+	clang-format -i $(shell find -name '*.[hc]' -not -path '*/.*')
+
 clean:
 	rm -f ${ELF} ${BIN} ${DA} ${OBJS} ${DEPS}
 
