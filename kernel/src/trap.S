@@ -162,6 +162,3 @@ trap_resume:
 	ld	a0,PROC_A0(a0)
 
 	mret
-
-__hang:
-	j	__hang
