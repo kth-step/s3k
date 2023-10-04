@@ -27,7 +27,7 @@ vpath %.S src
 
 # Source files
 SRCS =head.S trap.S stack.S
-SRCS+=cap_table.c cap_types.c cap_ops.c cap_pmp.c cap_monitor.c cap_ipc.c \
+SRCS+=cap_table.c cap_util.c cap_ops.c cap_pmp.c cap_monitor.c cap_ipc.c \
       csr.c exception.c kernel.c proc.c sched.c mcslock.c syscall.c
 SRCS+=${DRIVERS}
 OBJS=${patsubst %, ${BUILD}/${PROGRAM}/%.o, ${SRCS}}

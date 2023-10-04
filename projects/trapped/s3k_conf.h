@@ -22,5 +22,6 @@
 
 // If debugging, comment
 #define NDEBUG
+#define INSTRUMENT
 
 #endif /* __S3K_CONF_H__ */

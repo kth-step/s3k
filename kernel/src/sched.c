@@ -123,7 +123,6 @@ void sched(proc_t *p)
 		p = sched_fetch(hartid, &start_time, &end_time);
 	} while (!p);
 
-	kernel_pmp_refresh();
 	timer_set(hartid, start_time);
 	while (!(csrr_mip() & MIP_MTIP))
 		wfi();

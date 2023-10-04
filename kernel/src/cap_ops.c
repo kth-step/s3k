@@ -1,6 +1,7 @@
 #include "cap_ops.h"
 
 #include "cap_ipc.h"
+#include "cap_util.h"
 #include "pmp.h"
 #include "sched.h"
 
@@ -32,6 +33,8 @@ static void ipc_move_hook(cte_t src, cte_t dst)
 		break;
 	case CAPTY_SOCKET:
 		cap_sock_clear(cap, proc_get(cte_pid(src)));
+		break;
+	default:
 		break;
 	}
 }
@@ -66,6 +69,8 @@ static void delete_hook(cte_t c, cap_t cap)
 		break;
 	case CAPTY_SOCKET:
 		cap_sock_clear(cap, proc_get(cte_pid(c)));
+		break;
+	default:
 		break;
 	}
 }
@@ -129,9 +134,15 @@ err_t cap_reset(cte_t c)
 
 	cap_t cap = cte_cap(c);
 	switch (cap.type) {
-	case CAPTY_TIME:
+	case CAPTY_TIME: {
+		uint64_t pid = cte_pid(c);
+		uint64_t end = cap.time.end;
+		uint64_t hartid = cap.time.hart;
+		uint64_t from = cap.time.bgn;
+		uint64_t to = cap.time.mrk;
+		sched_update(pid, end, hartid, from, to);
 		cap.time.mrk = cap.time.bgn;
-		break;
+	} break;
 	case CAPTY_MEMORY:
 		cap.mem.mrk = cap.mem.bgn;
 		cap.mem.lck = false;
@@ -142,6 +153,8 @@ err_t cap_reset(cte_t c)
 	case CAPTY_CHANNEL:
 		cap.chan.mrk = cap.chan.bgn;
 		break;
+	default:
+		return SUCCESS;
 	}
 
 	cte_set_cap(c, cap);
@@ -160,24 +173,26 @@ static void derive(cte_t src, cap_t scap, cte_t dst, cap_t ncap)
 		uint64_t from = ncap.time.mrk;
 		uint64_t to = ncap.time.end;
 		sched_update(pid, end, hartid, from, to);
-		scap.time.mrk = ncap.time.bgn;
+		scap.time.mrk = ncap.time.end;
 	} break;
 	case CAPTY_MEMORY:
-		scap.mem.mrk = ncap.mem.bgn;
+		scap.mem.mrk = ncap.mem.end;
 		break;
 	case CAPTY_PMP:
 		scap.mem.lck = true;
 		break;
 	case CAPTY_MONITOR:
-		scap.mon.mrk = ncap.mon.bgn;
+		scap.mon.mrk = ncap.mon.end;
 		break;
 	case CAPTY_CHANNEL:
-		scap.chan.mrk = ncap.chan.bgn;
+		scap.chan.mrk = ncap.chan.end;
 		break;
 	case CAPTY_SOCKET:
 		if (ncap.sock.tag == 0)
 			scap.chan.mrk = ncap.sock.chan + 1;
 		break;
+	case CAPTY_NONE:
+		KASSERT(0);
 	}
 	cte_insert(dst, ncap, src);
 	cte_set_cap(src, scap);
@@ -192,7 +207,7 @@ err_t cap_derive(cte_t src, cte_t dst, cap_t ncap)
 		return ERR_DST_OCCUPIED;
 
 	cap_t scap = cte_cap(src);
-	if (!cap_derivable(scap, ncap))
+	if (!cap_is_derivable(scap, ncap))
 		return ERR_INVALID_DERIVATION;
 	derive(src, scap, dst, ncap);
 	return SUCCESS;

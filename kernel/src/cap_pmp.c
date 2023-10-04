@@ -1,5 +1,6 @@
 #include "cap_table.h"
 #include "cap_types.h"
+#include "error.h"
 #include "kernel.h"
 #include "pmp.h"
 

@@ -24,5 +24,5 @@
  * @param mepc  The value of the mepc register
  * @param mtval  The value of the mtval register
  */
-void handle_exception(proc_t *p, reg_t mcause, reg_t mepc, reg_t mtval)
+void handle_exception(proc_t *p, uint64_t mcause, uint64_t mepc, uint64_t mtval)
     __attribute__((noreturn));

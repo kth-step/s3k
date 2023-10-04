@@ -1,7 +1,7 @@
 export BUILD=${abspath build}
 export S3K_CONF_H=${abspath s3k_conf.h}
 
-DIRS=../../kernel app0 app1
+DIRS=../../kernel app0
 
 all: ${DIRS}
 

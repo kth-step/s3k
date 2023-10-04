@@ -67,7 +67,8 @@ err_t _validate_socket(cap_t cap, bool send_cap)
 	return ERR_INVALID_SOCKET;
 }
 
-err_t _cap_sock_send(proc_t *sender, cap_t cap, bool send_cap, reg_t *yield_to)
+err_t _cap_sock_send(proc_t *sender, cap_t cap, bool send_cap,
+		     uint64_t *yield_to)
 {
 	uint64_t chan = cap.sock.chan;
 	uint64_t tag = cap.sock.tag;
@@ -81,10 +82,10 @@ err_t _cap_sock_send(proc_t *sender, cap_t cap, bool send_cap, reg_t *yield_to)
 	recv->tf.t0 = SUCCESS;
 	recv->tf.a0 = tag;
 	recv->tf.a1 = 0;
-	recv->tf.a2 = sender->tf.a2;
-	recv->tf.a3 = sender->tf.a3;
-	recv->tf.a4 = sender->tf.a4;
-	recv->tf.a5 = sender->tf.a5;
+	recv->tf.a2 = sender->tf.a1;
+	recv->tf.a3 = sender->tf.a2;
+	recv->tf.a4 = sender->tf.a3;
+	recv->tf.a5 = sender->tf.a4;
 	if (send_cap)
 		cap_move(sender->cap_buf, recv->cap_buf, (cap_t *)&recv->tf.a1);
 
@@ -120,7 +121,7 @@ err_t _cap_sock_recv(proc_t *recv, cap_t sock_cap)
 	return YIELD;
 }
 
-err_t cap_sock_send(proc_t *proc, cte_t sock, bool send_cap, reg_t *yield_to)
+err_t cap_sock_send(proc_t *proc, cte_t sock, bool send_cap, uint64_t *yield_to)
 {
 	cap_t cap = cte_cap(sock);
 
@@ -133,7 +134,7 @@ err_t cap_sock_send(proc_t *proc, cte_t sock, bool send_cap, reg_t *yield_to)
 }
 
 err_t cap_sock_sendrecv(proc_t *proc, cte_t sock, bool send_cap,
-			reg_t *yield_to)
+			uint64_t *yield_to)
 {
 	cap_t cap = cte_cap(sock);
 	err_t err = _validate_socket(cap, send_cap);
@@ -148,8 +149,8 @@ err_t cap_sock_sendrecv(proc_t *proc, cte_t sock, bool send_cap,
 	// Delete capability if it should have been sent
 	if (send_cap)
 		cap_delete(proc->cap_buf);
-
-	return _cap_sock_recv(proc, cap);
+	_cap_sock_recv(proc, cap);
+	return YIELD;
 }
 
 void cap_sock_clear(cap_t cap, proc_t *p)

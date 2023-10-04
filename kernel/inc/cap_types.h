@@ -1,22 +1,33 @@
 #pragma once
 
-#include "error.h"
-#include "kassert.h"
-
 #include <stdbool.h>
-#include <stddef.h>
 #include <stdint.h>
 
 // Min logarithmic size of a memory slice
-#define S3K_MIN_BLOCK_SIZE 12
+#define MIN_BLOCK_SIZE 12
+
 // Max logarithmic size of a memory slice
-#define S3K_MAX_BLOCK_SIZE (S3K_MIN_BLOCK_SIZE + 15)
+#define MAX_BLOCK_SIZE 27
+
+typedef uint64_t napot_t;
+typedef uint64_t addr_t;
+typedef uint16_t block_t;
+typedef uint16_t chan_t;
+typedef uint16_t time_slot_t;
+typedef uint16_t pid_t;
+typedef uint16_t cidx_t;
+typedef uint8_t hart_t;
+typedef uint8_t tag_t;
+typedef uint8_t rwx_t;
+typedef uint8_t pmp_slot_t;
+/* register number */
+typedef int regnr_t;
 
 typedef enum {
 	MEM_NONE = 0,
-	MEM_R = 1,
-	MEM_W = 2,
-	MEM_X = 4,
+	MEM_R = 0x1,
+	MEM_W = 0x2,
+	MEM_X = 0x4,
 	MEM_RW = MEM_R | MEM_W,
 	MEM_RX = MEM_R | MEM_X,
 	MEM_RWX = MEM_R | MEM_W | MEM_X,
@@ -24,17 +35,16 @@ typedef enum {
 
 // IPC Modes
 typedef enum {
-	IPC_NOYIELD = 0, // Non-Yielding Synchronous
-	IPC_YIELD = 1,	 // Yielding Synchronous
-			 //	IPC_ASYNC = 2,	 // Asynchronous
+	IPC_NOYIELD = 0x0, // Non-Yielding Synchronous
+	IPC_YIELD = 0x1,   // Yielding Synchronous
 } ipc_mode_t;
 
 // IPC Permissions
 typedef enum {
-	IPC_SDATA = 1, // Server can send data
-	IPC_SCAP = 2,  // Server can send capabilities
-	IPC_CDATA = 4, // Client can send data
-	IPC_CCAP = 8,  // Client can send capabilities
+	IPC_SDATA = 0x1, // Server can send data
+	IPC_SCAP = 0x2,	 // Server can send capabilities
+	IPC_CDATA = 0x4, // Client can send data
+	IPC_CCAP = 0x8,	 // Client can send capabilities
 } ipc_perm_t;
 
 // Capability types
@@ -45,72 +55,65 @@ typedef enum capty {
 	CAPTY_PMP = 3,	   ///< PMP Frame capability.
 	CAPTY_MONITOR = 4, ///< Monitor capability.
 	CAPTY_CHANNEL = 5, ///< IPC Channel capability.
-	CAPTY_SOCKET = 6,  ///< IPC Server/Client capability.
+	CAPTY_SOCKET = 6,  ///< IPC Socket capability.
 } capty_t;
 
 /// Capability description
 typedef union cap {
-	uint64_t type : 4;
+	capty_t type : 4;
+
 	uint64_t raw;
 
 	struct {
-		uint64_t type : 4;
-		uint64_t unused : 4;
-		uint64_t hart : 8;
-		uint64_t bgn : 16;
-		uint64_t mrk : 16;
-		uint64_t end : 16;
+		capty_t type : 4;
+		uint16_t _padding : 4;
+		hart_t hart;
+		time_slot_t bgn;
+		time_slot_t mrk;
+		time_slot_t end;
 	} time;
 
 	struct {
-		uint64_t type : 4;
-		uint64_t rwx : 3;
-		uint64_t lck : 1;
-		uint64_t tag : 8;
-		uint64_t bgn : 16;
-		uint64_t mrk : 16;
-		uint64_t end : 16;
+		capty_t type : 4;
+		rwx_t rwx : 3;
+		bool lck : 1;
+		tag_t tag;
+		block_t bgn;
+		block_t mrk;
+		block_t end;
 	} mem;
 
 	struct {
-		uint64_t type : 4;
-		uint64_t rwx : 3;
-		uint64_t used : 1;
-		uint64_t slot : 8;
-		uint64_t addr : 48;
+		capty_t type : 4;
+		rwx_t rwx : 3;
+		bool used : 1;
+		pmp_slot_t slot;
+		napot_t addr : 48;
 	} pmp;
 
 	struct {
-		uint64_t type : 4;
-		uint64_t unused : 12;
-		uint64_t bgn : 16;
-		uint64_t mrk : 16;
-		uint64_t end : 16;
+		capty_t type : 4;
+		uint16_t _padding : 12;
+		pid_t bgn;
+		pid_t mrk;
+		pid_t end;
 	} mon;
 
 	struct {
-		uint64_t type : 4;
-		uint64_t unused : 12;
-		uint64_t bgn : 16;
-		uint64_t mrk : 16;
-		uint64_t end : 16;
+		capty_t type : 4;
+		uint16_t _padding : 12;
+		chan_t bgn;
+		chan_t mrk;
+		chan_t end;
 	} chan;
 
 	struct {
-		uint64_t type : 4;
-		uint64_t mode : 4;
-		uint64_t perm : 8;
-		uint64_t chan : 16;
-		uint64_t tag : 32;
+		capty_t type : 4;
+		ipc_mode_t mode : 4;
+		ipc_perm_t perm : 8;
+		chan_t chan;
+		uint32_t tag;
 	} sock;
 } cap_t;
 
-cap_t cap_mk_time(uint64_t hart, uint64_t bgn, uint64_t end);
-cap_t cap_mk_memory(uint64_t bgn, uint64_t end, uint64_t rwx);
-cap_t cap_mk_pmp(uint64_t addr, uint64_t rwx);
-cap_t cap_mk_monitor(uint64_t bgn, uint64_t end);
-cap_t cap_mk_channel(uint64_t bgn, uint64_t end);
-cap_t cap_mk_socket(uint64_t chan, uint64_t mode, uint64_t perm, uint64_t tag);
-
-bool cap_revokable(cap_t p, cap_t c);
-bool cap_derivable(cap_t p, cap_t c);
+_Static_assert(sizeof(cap_t) == 8, "cap_t has the wrong size");

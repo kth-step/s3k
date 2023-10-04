@@ -8,7 +8,7 @@ all: ${DIRS}
 ${DIRS}:
 	@${MAKE} -C $@
 
-gdb qemu:
+gdb qemu: all
 	./scripts/$@.sh
 
 clean:

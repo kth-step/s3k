@@ -43,15 +43,19 @@ bool proc_acquire(proc_t *proc)
 	if (!is_ready && !is_timeout)
 		return false;
 
-	return __atomic_compare_exchange(&proc->state, &expected, &desired,
-					 false /* not weak */,
-					 __ATOMIC_ACQUIRE /* succ */,
-					 __ATOMIC_RELAXED /* fail */);
+	bool succ = __atomic_compare_exchange(&proc->state, &expected, &desired,
+					      false /* not weak */,
+					      __ATOMIC_ACQUIRE /* succ */,
+					      __ATOMIC_RELAXED /* fail */);
+	if (is_timeout)
+		proc->tf.t0 = ERR_TIMEOUT;
+	return succ;
 }
 
 void proc_release(proc_t *proc)
 {
-	// Unset all flags except suspend flag.
+	// Unset the busy flag.
+	KASSERT(proc->state & PSF_BUSY);
 	__atomic_fetch_and(&proc->state, (uint64_t)~PSF_BUSY, __ATOMIC_RELEASE);
 }
 
@@ -86,13 +90,17 @@ bool proc_ipc_acquire(proc_t *proc, uint64_t channel)
 {
 	uint64_t curr_time = time_get();
 	uint64_t timeout = timer_get(csrr_mhartid());
+	uint64_t remaining_time = timeout - curr_time;
+
+	if (timeout < curr_time)
+		return false;
 
 	// Check if the process has timed out
-	if (proc->timeout <= curr_time)
+	if (curr_time >= proc->timeout)
 		return false;
 
 	// Check if we have enough execution time to service the process
-	if (proc->service_time && (proc->service_time + curr_time >= timeout))
+	if (proc->service_time > remaining_time)
 		return false;
 
 	// Try to acquire the process

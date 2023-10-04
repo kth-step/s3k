@@ -83,6 +83,9 @@ _myield:
 	csrrw	a0,mscratch,a0
 	ld_sp	t0
 
+	csrr	t0,mscratch
+	bltz	t0,__hang
+
 _yield:
 	/* Call scheduler */
 	tail	sched
@@ -162,3 +165,7 @@ trap_resume:
 	ld	a0,PROC_A0(a0)
 
 	mret
+
+__hang:
+	ebreak
+	j __hang

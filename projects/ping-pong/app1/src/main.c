@@ -3,18 +3,25 @@
 
 #include <stdint.h>
 
+void *memcpy(void *dest, const void *src, size_t n)
+{
+	for (int i = 0; i < n; ++i) {
+		((char *)dest)[i] = ((char *)src)[i];
+	}
+	return dest;
+}
+
 int main(void)
 {
-	uint64_t data[4];
-	char *str = (char *)data;
+	s3k_msg_t msg;
+	s3k_reply_t reply;
+	memcpy(msg.data, "ping", 5);
 	while (1) {
-		str[0] = 'p';
-		str[1] = 'i';
-		str[2] = 'n';
-		str[3] = 'g';
-		str[4] = '\0';
-		while (s3k_sock_sendrecv(3, 0, data, 0, 0))
-			;
-		alt_puts(str);
+		do {
+			reply = s3k_sock_sendrecv(3, &msg);
+			if (reply.err == S3K_ERR_TIMEOUT)
+				alt_puts("timeout");
+		} while (reply.err);
+		alt_puts((char *)reply.data);
 	}
 }

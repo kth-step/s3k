@@ -11,8 +11,8 @@
  */
 
 #include "cap_table.h"
+#include "cap_types.h"
 #include "mcslock.h"
-#include "types.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -29,15 +29,15 @@
 #define N_REG (sizeof(trap_frame_t) / sizeof(uint64_t))
 
 typedef struct {
-	reg_t pc, ra, sp, gp, tp;
-	reg_t t0, t1, t2;
-	reg_t s0, s1;
-	reg_t a0, a1, a2, a3, a4, a5, a6, a7;
-	reg_t s2, s3, s4, s5, s6, s7, s8, s9, s10, s11;
-	reg_t t3, t4, t5, t6;
-	reg_t tpc, tsp;
-	reg_t epc, esp, ecause, eval;
-	reg_t wcet;
+	uint64_t pc, ra, sp, gp, tp;
+	uint64_t t0, t1, t2;
+	uint64_t s0, s1;
+	uint64_t a0, a1, a2, a3, a4, a5, a6, a7;
+	uint64_t s2, s3, s4, s5, s6, s7, s8, s9, s10, s11;
+	uint64_t t3, t4, t5, t6;
+	uint64_t tpc, tsp;
+	uint64_t epc, esp, ecause, eval;
+	uint64_t wcet;
 } trap_frame_t;
 
 /**

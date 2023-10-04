@@ -1,5 +1,6 @@
 #include "cap_table.h"
 
+#include "cap_util.h"
 #include "kassert.h"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
@@ -26,8 +27,8 @@ void ctable_init(void)
 
 cte_t ctable_get(uint64_t pid, uint64_t index)
 {
-	if (pid >= S3K_PROC_CNT || index >= S3K_CAP_CNT)
-		return NULL;
+	KASSERT(pid < S3K_PROC_CNT);
+	KASSERT(index < S3K_CAP_CNT);
 	return &ctable[pid * S3K_CAP_CNT + index];
 }
 

@@ -80,5 +80,4 @@ head_exit:
 
 	/* Start user processes. */
 	li	a0,0
-	call	sched
-	j	trap_exit
+	tail	sched

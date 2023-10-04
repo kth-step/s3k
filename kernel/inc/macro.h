@@ -16,6 +16,8 @@
 /* The function is side-effect free and does not depend on mutable environment.
  */
 #define CONST __attribute__((const))
+#define UNREACHABLE __builtin_unreachable
+#define NORETURN __attribute__((noreturn))
 
 /* Returns the size of an array */
 #define ARRAY_SIZE(x) (sizeof(x) / (sizeof((x)[0])))

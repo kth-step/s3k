@@ -16,6 +16,14 @@
 #define MONITOR 8
 #define CHANNEL 9
 
+void *memcpy(void *dest, const void *src, size_t n)
+{
+	for (int i = 0; i < n; ++i) {
+		((char *)dest)[i] = ((char *)src)[i];
+	}
+	return dest;
+}
+
 void setup_uart(uint64_t uart_idx)
 {
 	uint64_t uart_addr = s3k_napot_encode(0x10000000, 0x8);
@@ -69,19 +77,21 @@ int main(void)
 	// Setup socket capabilities.
 	setup_socket(11, 12);
 
+	s3k_cap_t cap;
+	while (s3k_cap_read(1, &cap))
+		;
+
 	// Resume app1
 	s3k_mon_resume(MONITOR, APP1_PID);
 
-	uint64_t data[4];
-	char *str = (char *)data;
+	s3k_msg_t msg;
+	s3k_reply_t reply;
+	memcpy(msg.data, "pong", 5);
+	msg.serv_time = 3000;
 	while (1) {
-		str[0] = 'p';
-		str[1] = 'o';
-		str[2] = 'n';
-		str[3] = 'g';
-		str[4] = '\0';
-		while (s3k_sock_sendrecv(11, 0, data, 0, 1000))
-			alt_puts("server err");
-		alt_puts(str);
+		do {
+			reply = s3k_sock_sendrecv(11, &msg);
+		} while (reply.err);
+		alt_puts((char *)reply.data);
 	}
 }

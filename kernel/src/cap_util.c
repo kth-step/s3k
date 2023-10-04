@@ -1,85 +1,72 @@
-#include "cap_types.h"
+#include "cap_util.h"
 
 #include "pmp.h"
 
-cap_t cap_mk_time(uint64_t hart, uint64_t bgn, uint64_t end)
+cap_t cap_mk_time(hart_t hart, time_slot_t bgn, time_slot_t end)
 {
 	cap_t cap;
 	cap.type = CAPTY_TIME;
 	cap.time.hart = hart;
 	cap.time.bgn = bgn;
-	cap.time.mrk = cap.time.bgn;
+	cap.time.mrk = bgn;
 	cap.time.end = end;
 	return cap;
 }
 
-cap_t cap_mk_memory(uint64_t bgn, uint64_t end, uint64_t rwx)
+cap_t cap_mk_memory(addr_t bgn, addr_t end, rwx_t rwx)
 {
-	uint64_t tag = bgn >> S3K_MAX_BLOCK_SIZE;
-	bgn = (bgn - (tag << S3K_MAX_BLOCK_SIZE)) >> S3K_MIN_BLOCK_SIZE;
-	end = (end - (tag << S3K_MAX_BLOCK_SIZE)) >> S3K_MIN_BLOCK_SIZE;
-
-	return (cap_t){
-	    .mem = {
-		    .type = CAPTY_MEMORY,
-		    .tag = tag,
-		    .bgn = bgn,
-		    .end = end,
-		    .mrk = bgn,
-		    .rwx = rwx,
-		    .lck = 0,
-		    }
-	     };
+	uint64_t tag = bgn >> MAX_BLOCK_SIZE;
+	cap_t cap;
+	cap.mem.type = CAPTY_MEMORY;
+	cap.mem.tag = tag;
+	cap.mem.bgn = (bgn - (tag << MAX_BLOCK_SIZE)) >> MIN_BLOCK_SIZE;
+	cap.mem.end = (end - (tag << MAX_BLOCK_SIZE)) >> MIN_BLOCK_SIZE;
+	cap.mem.mrk = bgn;
+	cap.mem.rwx = rwx;
+	cap.mem.lck = false;
+	return cap;
 }
 
-cap_t cap_mk_pmp(uint64_t addr, uint64_t rwx)
+cap_t cap_mk_pmp(napot_t addr, rwx_t rwx)
 {
-	return (cap_t){
-	    .pmp = {
-		    .type = CAPTY_PMP,
-		    .addr = addr,
-		    .rwx = rwx,
-		    .used = 0,
-		    .slot = 0,
-		    }
-	     };
+	cap_t cap;
+	cap.pmp.type = CAPTY_PMP;
+	cap.pmp.addr = addr;
+	cap.pmp.rwx = rwx;
+	cap.pmp.used = 0;
+	cap.pmp.slot = 0;
+	return cap;
 }
 
-cap_t cap_mk_monitor(uint64_t bgn, uint64_t end)
+cap_t cap_mk_monitor(pid_t bgn, pid_t end)
 {
-	return (cap_t){
-	    .mon = {
-		    .type = CAPTY_MONITOR,
-		    .bgn = bgn & 0xFFFF,
-		    .end = end & 0xFFFF,
-		    .mrk = bgn,
-		    }
-	     };
+	cap_t cap;
+	cap.mon.type = CAPTY_MONITOR;
+	cap.mon.bgn = bgn;
+	cap.mon.end = end;
+	cap.mon.mrk = bgn;
+	return cap;
 }
 
-cap_t cap_mk_channel(uint64_t bgn, uint64_t end)
+cap_t cap_mk_channel(chan_t bgn, chan_t end)
 {
-	return (cap_t){
-	    .chan = {
-		     .type = CAPTY_CHANNEL,
-		     .bgn = bgn,
-		     .end = end,
-		     .mrk = bgn,
-		     }
-	     };
+	cap_t cap;
+	cap.chan.type = CAPTY_CHANNEL;
+	cap.chan.bgn = bgn;
+	cap.chan.end = end;
+	cap.chan.mrk = bgn;
+	return cap;
 }
 
-cap_t cap_mk_socket(uint64_t chan, uint64_t mode, uint64_t perm, uint64_t tag)
+cap_t cap_mk_socket(chan_t chan, ipc_mode_t mode, ipc_perm_t perm, uint32_t tag)
 {
-	return (cap_t){
-	    .sock = {
-		     .type = CAPTY_SOCKET,
-		     .chan = chan,
-		     .mode = mode,
-		     .perm = perm,
-		     .tag = tag,
-		     }
-	     };
+	cap_t cap;
+	cap.sock.type = CAPTY_SOCKET;
+	cap.sock.chan = chan;
+	cap.sock.mode = mode;
+	cap.sock.perm = perm;
+	cap.sock.tag = tag;
+	return cap;
 }
 
 static inline bool is_range_subset(uint64_t a_bgn, uint64_t a_end,
@@ -99,9 +86,14 @@ static inline bool is_bit_subset(uint64_t a, uint64_t b)
 	return (a & b) == a;
 }
 
+static inline addr_t tag_block_to_addr(tag_t tag, block_t block)
+{
+	return ((uint64_t)tag << MAX_BLOCK_SIZE)
+	       + ((uint64_t)block << MIN_BLOCK_SIZE);
+}
+
 static bool cap_time_revokable(cap_t p, cap_t c)
 {
-	KASSERT(p.type == CAPTY_TIME);
 	return (c.type == CAPTY_TIME) && (p.time.hart == c.time.hart)
 	       && is_range_subset(p.time.bgn, p.time.end, c.time.bgn,
 				  c.time.end);
@@ -109,16 +101,12 @@ static bool cap_time_revokable(cap_t p, cap_t c)
 
 static bool cap_mem_revokable(cap_t p, cap_t c)
 {
-	KASSERT(p.type == CAPTY_MEMORY);
 	if (c.type == CAPTY_PMP) {
-		uint64_t p_tag = (uint64_t)p.mem.tag << S3K_MAX_BLOCK_SIZE;
-		uint64_t p_bgn
-		    = p_tag + ((uint64_t)p.mem.mrk << S3K_MIN_BLOCK_SIZE);
-		uint64_t p_end
-		    = p_tag + ((uint64_t)p.mem.end << S3K_MIN_BLOCK_SIZE);
-		uint64_t c_bgn, c_end;
-		pmp_napot_decode(c.pmp.addr, &c_bgn, &c_end);
-		return is_range_subset(p_bgn, p_end, c_bgn, c_end);
+		uint64_t p_bgn, p_end, c_base, c_size;
+		p_bgn = tag_block_to_addr(p.mem.tag, p.mem.bgn);
+		p_end = tag_block_to_addr(p.mem.tag, p.mem.end);
+		pmp_napot_decode(c.pmp.addr, &c_base, &c_size);
+		return is_range_subset(p_bgn, p_end, c_base, c_base + c_size);
 	}
 	return (c.type == CAPTY_MEMORY) && (p.mem.tag == c.mem.tag)
 	       && is_range_subset(p.mem.bgn, p.mem.end, c.mem.bgn, c.mem.end);
@@ -126,14 +114,12 @@ static bool cap_mem_revokable(cap_t p, cap_t c)
 
 static bool cap_mon_revokable(cap_t p, cap_t c)
 {
-	KASSERT(p.type == CAPTY_MONITOR);
 	return (c.type == CAPTY_MONITOR)
 	       && is_range_subset(p.mon.bgn, p.mon.end, c.mon.bgn, c.mon.end);
 }
 
 static bool cap_chan_revokable(cap_t p, cap_t c)
 {
-	KASSERT(p.type == CAPTY_CHANNEL);
 	if (c.type == CAPTY_SOCKET) {
 		return is_range_subset(p.chan.bgn, p.chan.end, c.sock.chan,
 				       c.sock.chan + 1);
@@ -145,12 +131,11 @@ static bool cap_chan_revokable(cap_t p, cap_t c)
 
 static bool cap_sock_revokable(cap_t p, cap_t c)
 {
-	KASSERT(p.type == CAPTY_SOCKET);
 	return (p.sock.tag == 0) && (c.sock.tag != 0)
 	       && (p.sock.chan == c.sock.chan);
 }
 
-bool cap_revokable(cap_t p, cap_t c)
+bool cap_is_revokable(cap_t p, cap_t c)
 {
 	switch (p.type) {
 	case CAPTY_TIME:
@@ -168,7 +153,7 @@ bool cap_revokable(cap_t p, cap_t c)
 	}
 }
 
-static bool cap_valid(cap_t c)
+bool cap_is_valid(cap_t c)
 {
 	switch (c.type) {
 	case CAPTY_TIME:
@@ -192,7 +177,6 @@ static bool cap_valid(cap_t c)
 
 static bool cap_time_derivable(cap_t p, cap_t c)
 {
-	KASSERT(p.type == CAPTY_TIME);
 	return (c.type == CAPTY_TIME) && (p.time.hart == c.time.hart)
 	       && is_range_prefix(p.time.bgn, p.time.end, c.time.bgn,
 				  c.time.end);
@@ -200,16 +184,12 @@ static bool cap_time_derivable(cap_t p, cap_t c)
 
 static bool cap_mem_derivable(cap_t p, cap_t c)
 {
-	KASSERT(p.type == CAPTY_MEMORY);
 	if (c.type == CAPTY_PMP) {
-		uint64_t p_tag = (uint64_t)p.mem.tag << S3K_MAX_BLOCK_SIZE;
-		uint64_t p_mark
-		    = p_tag + ((uint64_t)p.mem.mrk << S3K_MIN_BLOCK_SIZE);
-		uint64_t p_end
-		    = p_tag + ((uint64_t)p.mem.end << S3K_MIN_BLOCK_SIZE);
-		uint64_t c_bgn, c_end;
-		pmp_napot_decode(c.pmp.addr, &c_bgn, &c_end);
-		return is_range_subset(p_mark, p_end, c_bgn, c_end)
+		uint64_t p_mrk, p_end, c_base, c_size;
+		p_mrk = tag_block_to_addr(p.mem.tag, p.mem.mrk);
+		p_end = tag_block_to_addr(p.mem.tag, p.mem.end);
+		pmp_napot_decode(c.pmp.addr, &c_base, &c_size);
+		return is_range_subset(p_mrk, p_end, c_base, c_base + c_size)
 		       && is_bit_subset(c.pmp.rwx, p.mem.rwx);
 	}
 	return (c.type == CAPTY_MEMORY) && (p.mem.tag == c.mem.tag)
@@ -219,14 +199,12 @@ static bool cap_mem_derivable(cap_t p, cap_t c)
 
 static bool cap_mon_derivable(cap_t p, cap_t c)
 {
-	KASSERT(p.type == CAPTY_MONITOR);
 	return (c.type == CAPTY_MONITOR)
 	       && is_range_subset(p.mon.mrk, p.mon.end, c.mon.bgn, c.mon.end);
 }
 
 static bool cap_chan_derivable(cap_t p, cap_t c)
 {
-	KASSERT(p.type == CAPTY_CHANNEL);
 	if (c.type == CAPTY_SOCKET) {
 		return (c.sock.tag == 0)
 		       && is_range_subset(p.chan.mrk, p.chan.end, c.sock.chan,
@@ -239,16 +217,13 @@ static bool cap_chan_derivable(cap_t p, cap_t c)
 
 static bool cap_sock_derivable(cap_t p, cap_t c)
 {
-	KASSERT(p.type == CAPTY_SOCKET);
 	return (c.type == CAPTY_SOCKET) && (p.sock.chan == c.sock.chan)
 	       && (p.sock.tag == 0) && (c.sock.tag != 0)
 	       && (p.sock.mode == c.sock.mode) && (p.sock.perm == c.sock.perm);
 }
 
-bool cap_derivable(cap_t p, cap_t c)
+bool cap_is_derivable(cap_t p, cap_t c)
 {
-	if (!cap_valid(c))
-		return false;
 	switch (p.type) {
 	case CAPTY_TIME:
 		return cap_time_derivable(p, c);

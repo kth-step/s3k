@@ -17,25 +17,20 @@ void kernel_init(void)
 	ctable_init();
 	sched_init();
 	proc_init();
-	uart_puts("Kernel initialization complete");
+	uart_puts("kernel initialized");
 }
 
 bool kernel_lock(proc_t *p)
 {
 	kernel_hook_sys_exit(p);
-	bool result = mcslock_try_acquire(&lock, &p->qnode);
+	bool res = mcslock_try_acquire(&lock, &p->qnode);
 	kernel_hook_sys_entry(p);
-	return result;
+	return res;
 }
 
 void kernel_unlock(proc_t *p)
 {
 	mcslock_release(&lock, &p->qnode);
-}
-
-void kernel_pmp_refresh(void)
-{
-	csrw_pmpcfg0(0);
 }
 
 void kernel_hook_sys_entry(proc_t *p)

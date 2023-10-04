@@ -24,6 +24,7 @@ void setup_uart(uint64_t uart_idx)
 	// Load the derive PMP capability to PMP configuration
 	s3k_pmp_load(uart_idx, 1);
 	// Synchronize PMP unit (hardware) with PMP configuration
+	// false => not full synchronization.
 	s3k_sync_mem();
 }
 
@@ -43,12 +44,13 @@ void setup_app1(uint64_t tmp)
 	s3k_mon_pmp_load(MONITOR, APP1_PID, 1, 1);
 
 	// derive a time slice capability
-	// s3k_cap_derive(HART0_TIME, tmp, s3k_mk_time(S3K_MIN_HART, 0,
-	// S3K_SLOT_CNT / 2));
 	s3k_mon_cap_move(MONITOR, APP0_PID, HART1_TIME, APP1_PID, 2);
 
 	// Write start PC of app1 to PC
 	s3k_mon_reg_write(MONITOR, APP1_PID, S3K_REG_PC, 0x80020000);
+
+	// Start app1
+	s3k_mon_resume(MONITOR, APP1_PID);
 }
 
 int main(void)
@@ -58,9 +60,6 @@ int main(void)
 
 	// Setup app1 capabilities and PC
 	setup_app1(11);
-
-	// Resume app1
-	s3k_mon_resume(MONITOR, APP1_PID);
 
 	// Write hello world.
 	alt_puts("hello, world from app0");

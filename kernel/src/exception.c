@@ -12,10 +12,10 @@
 #define URET 0x00200073
 
 static void handle_ret(proc_t *p) __attribute__((noreturn));
-static void handle_default(proc_t *p, reg_t mcause, reg_t mepc, reg_t mtval)
-    __attribute__((noreturn));
+static void handle_default(proc_t *p, uint64_t mcause, uint64_t mepc,
+			   uint64_t mtval) __attribute__((noreturn));
 
-void handle_exception(proc_t *p, reg_t mcause, reg_t mepc, reg_t mtval)
+void handle_exception(proc_t *p, uint64_t mcause, uint64_t mepc, uint64_t mtval)
 {
 	/* Check if it is a return from exception */
 	if (mcause == ILLEGAL_INSTRUCTION
