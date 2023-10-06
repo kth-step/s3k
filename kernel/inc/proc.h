@@ -26,19 +26,49 @@
 #define PSF_BLOCKED 2
 #define PSF_SUSPENDED 4
 
-#define N_REG (sizeof(trap_frame_t) / sizeof(uint64_t))
-
-typedef struct {
-	uint64_t pc, ra, sp, gp, tp;
-	uint64_t t0, t1, t2;
-	uint64_t s0, s1;
-	uint64_t a0, a1, a2, a3, a4, a5, a6, a7;
-	uint64_t s2, s3, s4, s5, s6, s7, s8, s9, s10, s11;
-	uint64_t t3, t4, t5, t6;
-	uint64_t tpc, tsp;
-	uint64_t epc, esp, ecause, eval;
-	uint64_t wcet;
-} trap_frame_t;
+typedef enum {
+	REG_PC,
+	REG_RA,
+	REG_SP,
+	REG_GP,
+	REG_TP,
+	REG_T0,
+	REG_T1,
+	REG_T2,
+	REG_S0,
+	REG_S1,
+	REG_A0,
+	REG_A1,
+	REG_A2,
+	REG_A3,
+	REG_A4,
+	REG_A5,
+	REG_A6,
+	REG_A7,
+	REG_S2,
+	REG_S3,
+	REG_S4,
+	REG_S5,
+	REG_S6,
+	REG_S7,
+	REG_S8,
+	REG_S9,
+	REG_S10,
+	REG_S11,
+	REG_T3,
+	REG_T4,
+	REG_T5,
+	REG_T6,
+	REG_TPC,
+	REG_TSP,
+	REG_EPC,
+	REG_ESP,
+	REG_ECAUSE,
+	REG_EVAL,
+	REG_WCET,
+	/* Special value for number of registers */
+	REG_CNT,
+} reg_t;
 
 /**
  * @brief Process control block.
@@ -48,7 +78,7 @@ typedef struct {
 typedef struct {
 	/** The registers of the process (RISC-V registers and virtual
 	 * registers). */
-	trap_frame_t tf;
+	uint64_t regs[REG_CNT];
 	/** PMP registers */
 	uint8_t pmpcfg[S3K_PMP_CNT];
 	uint64_t pmpaddr[S3K_PMP_CNT];

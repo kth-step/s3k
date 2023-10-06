@@ -33,12 +33,12 @@ void handle_exception(proc_t *p, uint64_t mcause, uint64_t mepc, uint64_t mtval)
  */
 void handle_ret(proc_t *p)
 {
-	p->tf.pc = p->tf.epc;
-	p->tf.sp = p->tf.esp;
-	p->tf.ecause = 0;
-	p->tf.eval = 0;
-	p->tf.epc = 0;
-	p->tf.esp = 0;
+	p->regs[REG_PC] = p->regs[REG_EPC];
+	p->regs[REG_SP] = p->regs[REG_ESP];
+	p->regs[REG_ECAUSE] = 0;
+	p->regs[REG_EVAL] = 0;
+	p->regs[REG_EPC] = 0;
+	p->regs[REG_ESP] = 0;
 	trap_resume(p);
 }
 
@@ -51,11 +51,11 @@ void handle_ret(proc_t *p)
  */
 void handle_default(proc_t *p, uint64_t mcause, uint64_t mepc, uint64_t mtval)
 {
-	p->tf.ecause = mcause;
-	p->tf.eval = mtval;
-	p->tf.epc = p->tf.pc;
-	p->tf.esp = p->tf.sp;
-	p->tf.pc = p->tf.tpc;
-	p->tf.sp = p->tf.tsp;
+	p->regs[REG_ECAUSE] = mcause;
+	p->regs[REG_EVAL] = mtval;
+	p->regs[REG_EPC] = p->regs[REG_PC];
+	p->regs[REG_ESP] = p->regs[REG_SP];
+	p->regs[REG_PC] = p->regs[REG_TPC];
+	p->regs[REG_SP] = p->regs[REG_TSP];
 	trap_resume(p);
 }

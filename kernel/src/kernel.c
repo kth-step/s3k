@@ -44,7 +44,7 @@ void kernel_hook_sys_exit(proc_t *p)
 {
 #ifdef INSTRUMENT
 	uint64_t cycles = csrr_mcycle();
-	if (p->tf.wcet < cycles)
-		p->tf.wcet = cycles;
+	if (p->regs[REG_WCET] < cycles)
+		p->regs[REG_WCET] = cycles;
 #endif
 }

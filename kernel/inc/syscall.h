@@ -48,7 +48,7 @@ typedef union {
 	} get_info;
 
 	struct {
-		regnr_t regnr;
+		regnr_t reg;
 		uint64_t val;
 	} reg;
 
@@ -75,7 +75,7 @@ typedef union {
 	struct {
 		cidx_t mon_idx;
 		pid_t pid;
-		regnr_t regnr;
+		regnr_t reg;
 		uint64_t val;
 	} mon_reg;
 

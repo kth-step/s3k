@@ -79,15 +79,15 @@ err_t _cap_sock_send(proc_t *sender, cap_t cap, bool send_cap,
 	if (!recv)
 		return ERR_NO_RECEIVER;
 
-	recv->tf.t0 = SUCCESS;
-	recv->tf.a0 = tag;
-	recv->tf.a1 = 0;
-	recv->tf.a2 = sender->tf.a1;
-	recv->tf.a3 = sender->tf.a2;
-	recv->tf.a4 = sender->tf.a3;
-	recv->tf.a5 = sender->tf.a4;
+	recv->regs[REG_T0] = SUCCESS;
+	recv->regs[REG_A0] = tag;
+	recv->regs[REG_A1] = 0;
+	recv->regs[REG_A2] = sender->regs[REG_A1];
+	recv->regs[REG_A3] = sender->regs[REG_A2];
+	recv->regs[REG_A4] = sender->regs[REG_A3];
+	recv->regs[REG_A5] = sender->regs[REG_A4];
 	if (send_cap)
-		cap_move(sender->cap_buf, recv->cap_buf, (cap_t *)&recv->tf.a1);
+		cap_move(sender->cap_buf, recv->cap_buf, (cap_t *)&recv->regs[REG_A1]);
 
 	if (mode == IPC_YIELD) {
 		// Yield to receiver

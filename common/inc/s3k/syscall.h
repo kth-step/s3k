@@ -75,6 +75,8 @@ typedef enum {
 	S3K_REG_ECAUSE,
 	S3K_REG_EVAL,
 	S3K_REG_WCET,
+	/* Special value for number of registers */
+	S3K_REG_CNT,
 } s3k_reg_t;
 
 typedef struct {

@@ -16,7 +16,7 @@ void proc_init(void)
 		_processes[i].state = PSF_SUSPENDED;
 	}
 	_processes[0].state = 0;
-	_processes[0].tf.pc = (uint64_t)_payload;
+	_processes[0].regs[REG_PC] = (uint64_t)_payload;
 	KASSERT(cap_pmp_load(ctable_get(0, 0), 0) == SUCCESS);
 }
 
@@ -48,7 +48,7 @@ bool proc_acquire(proc_t *proc)
 					      __ATOMIC_ACQUIRE /* succ */,
 					      __ATOMIC_RELAXED /* fail */);
 	if (is_timeout)
-		proc->tf.t0 = ERR_TIMEOUT;
+		proc->regs[REG_T0] = ERR_TIMEOUT;
 	return succ;
 }
 
@@ -67,7 +67,7 @@ void proc_suspend(proc_t *proc)
 
 	// If the process was waiting, we also unset the waiting flag.
 	if ((prev_state & 0xFF) == PSF_BLOCKED) {
-		proc->tf.t0 = ERR_SUSPENDED;
+		proc->regs[REG_T0] = ERR_SUSPENDED;
 		proc->state = PSF_SUSPENDED;
 		__atomic_thread_fence(__ATOMIC_ACQUIRE);
 	}
