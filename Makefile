@@ -9,7 +9,10 @@ clean:
 		make -C $$i clean; \
 	done
 
+docs:
+	doxygen
+
 format:
 	clang-format -i $(shell find -name '*.[hc]' -not -path '*/.*')
 
-.PHONY: all clean
+.PHONY: all docs clean

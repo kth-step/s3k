@@ -87,7 +87,8 @@ err_t _cap_sock_send(proc_t *sender, cap_t cap, bool send_cap,
 	recv->regs[REG_A4] = sender->regs[REG_A3];
 	recv->regs[REG_A5] = sender->regs[REG_A4];
 	if (send_cap)
-		cap_move(sender->cap_buf, recv->cap_buf, (cap_t *)&recv->regs[REG_A1]);
+		cap_move(sender->cap_buf, recv->cap_buf,
+			 (cap_t *)&recv->regs[REG_A1]);
 
 	if (mode == IPC_YIELD) {
 		// Yield to receiver

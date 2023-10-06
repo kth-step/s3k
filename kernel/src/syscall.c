@@ -400,8 +400,8 @@ err_t sys_mon_reg_read(proc_t *p, const sys_args_t *args, uint64_t *ret)
 err_t sys_mon_reg_write(proc_t *p, const sys_args_t *args, uint64_t *ret)
 {
 	cte_t mon = ctable_get(p->pid, args->mon_reg.mon_idx);
-	return cap_monitor_reg_write(mon, args->mon_reg.pid,
-				     args->mon_reg.reg, args->mon_reg.val);
+	return cap_monitor_reg_write(mon, args->mon_reg.pid, args->mon_reg.reg,
+				     args->mon_reg.val);
 }
 
 err_t sys_mon_cap_read(proc_t *p, const sys_args_t *args, uint64_t *ret)
