@@ -436,14 +436,25 @@ err_t sys_mon_pmp_unload(proc_t *p, const sys_args_t *args, uint64_t *ret)
 err_t sys_sock_send(proc_t *p, const sys_args_t *args, uint64_t *ret)
 {
 	cte_t sock = ctable_get(p->pid, args->sock.sock_idx);
-	p->cap_buf = ctable_get(p->pid, args->sock.cbuf_idx);
-	return cap_sock_send(p, sock, args->sock.send_cap, ret);
+	const ipc_msg_t msg = {
+	    .cap_buf = ctable_get(p->pid, args->sock.cbuf_idx),
+	    .send_cap = args->sock.send_cap,
+	    .data = {args->sock.data[0], args->sock.data[1], args->sock.data[1],
+		     args->sock.data[3]},
+	    .serv_time = args->sock.serv_time,
+	};
+	return cap_sock_send(p, sock, &msg, ret);
 }
 
 err_t sys_sock_sendrecv(proc_t *p, const sys_args_t *args, uint64_t *ret)
 {
 	cte_t sock = ctable_get(p->pid, args->sock.sock_idx);
-	p->cap_buf = ctable_get(p->pid, args->sock.cbuf_idx);
-	p->service_time = args->sock.serv_time;
-	return cap_sock_sendrecv(p, sock, args->sock.send_cap, ret);
+	const ipc_msg_t msg = {
+	    .cap_buf = ctable_get(p->pid, args->sock.cbuf_idx),
+	    .send_cap = args->sock.send_cap,
+	    .data = {args->sock.data[0], args->sock.data[1], args->sock.data[1],
+		     args->sock.data[3]},
+	    .serv_time = args->sock.serv_time,
+	};
+	return cap_sock_sendrecv(p, sock, &msg, ret);
 }

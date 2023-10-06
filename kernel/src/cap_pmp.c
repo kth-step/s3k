@@ -4,7 +4,7 @@
 #include "kernel.h"
 #include "pmp.h"
 
-err_t cap_pmp_load(cte_t pmp, uint64_t slot)
+err_t cap_pmp_load(cte_t pmp, pmp_slot_t slot)
 {
 	proc_t *proc = proc_get(cte_pid(pmp));
 	cap_t pmp_cap = cte_cap(pmp);

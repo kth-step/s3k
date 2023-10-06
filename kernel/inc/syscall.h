@@ -98,7 +98,7 @@ typedef union {
 		cidx_t sock_idx;
 		cidx_t cbuf_idx;
 		bool send_cap;
-		uint64_t data0, data1, data2, data3;
+		uint64_t data[4];
 		uint64_t serv_time;
 	} sock;
 } sys_args_t;

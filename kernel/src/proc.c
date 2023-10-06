@@ -47,7 +47,7 @@ bool proc_acquire(proc_t *proc)
 					      false /* not weak */,
 					      __ATOMIC_ACQUIRE /* succ */,
 					      __ATOMIC_RELAXED /* fail */);
-	if (is_timeout)
+	if (is_timeout && succ)
 		proc->regs[REG_T0] = ERR_TIMEOUT;
 	return succ;
 }
@@ -90,17 +90,16 @@ bool proc_ipc_acquire(proc_t *proc, uint64_t channel)
 {
 	uint64_t curr_time = time_get();
 	uint64_t timeout = timer_get(csrr_mhartid());
-	uint64_t remaining_time = timeout - curr_time;
 
-	if (timeout < curr_time)
-		return false;
+	if (proc->serv_time > 0) {
+		// proc is a server for a YIELDING channel with minimum server
+		// time.
+		if (proc->serv_time + curr_time >= timeout)
+			return false; // not enough time
+	}
 
 	// Check if the process has timed out
 	if (curr_time >= proc->timeout)
-		return false;
-
-	// Check if we have enough execution time to service the process
-	if (proc->service_time > remaining_time)
 		return false;
 
 	// Try to acquire the process

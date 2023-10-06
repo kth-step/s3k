@@ -22,9 +22,13 @@
  * PSF_BLOCKED: Waiting for IPC.
  * PSF_SUSPENDED: Waiting for monitor
  */
-#define PSF_BUSY 1
-#define PSF_BLOCKED 2
-#define PSF_SUSPENDED 4
+typedef uint64_t proc_state_t;
+
+typedef enum {
+	PSF_BUSY = 1,
+	PSF_BLOCKED = 2,
+	PSF_SUSPENDED = 4,
+} proc_state_flag_t;
 
 typedef enum {
 	REG_PC,
@@ -84,9 +88,9 @@ typedef struct {
 	uint64_t pmpaddr[S3K_PMP_CNT];
 	/** Instrumentation registers */
 	/** Process ID. */
-	uint64_t pid;
+	pid_t pid;
 	/** Process state. */
-	uint64_t state;
+	proc_state_t state;
 	qnode_t qnode;
 
 	/** Scheduling information */
@@ -102,7 +106,7 @@ typedef struct {
 	 * If a client does not have sufficient execution time,
 	 * it is not allowed to send the message.
 	 */
-	uint64_t service_time;
+	uint64_t serv_time;
 	/**
 	 * Source and destination pointer for transmitting capabilities.
 	 */

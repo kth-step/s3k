@@ -61,8 +61,12 @@ void setup_app1(uint64_t tmp)
 
 void setup_socket(uint64_t socket, uint64_t tmp)
 {
-	s3k_cap_derive(CHANNEL, socket, s3k_mk_socket(0, S3K_IPC_YIELD, 0, 0));
-	s3k_cap_derive(socket, tmp, s3k_mk_socket(0, S3K_IPC_YIELD, 0, 1));
+	s3k_cap_derive(CHANNEL, socket,
+		       s3k_mk_socket(0, S3K_IPC_YIELD,
+				     S3K_IPC_SDATA | S3K_IPC_CDATA, 0));
+	s3k_cap_derive(socket, tmp,
+		       s3k_mk_socket(0, S3K_IPC_YIELD,
+				     S3K_IPC_SDATA | S3K_IPC_CDATA, 1));
 	s3k_mon_cap_move(MONITOR, APP0_PID, tmp, APP1_PID, 3);
 }
 
@@ -87,7 +91,7 @@ int main(void)
 	s3k_msg_t msg;
 	s3k_reply_t reply;
 	memcpy(msg.data, "pong", 5);
-	msg.serv_time = 3000;
+	msg.serv_time = 1500;
 	while (1) {
 		do {
 			reply = s3k_sock_sendrecv(11, &msg);

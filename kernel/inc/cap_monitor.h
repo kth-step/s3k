@@ -127,8 +127,10 @@ err_t cap_monitor_cap_move(cte_t mon, cte_t src, cte_t dst);
  * @param pmp_slot The slot to load the PMP configuration into.
  * @return SUCCESS if the configuration is loaded.
  *         ERR_EMPTY if the CTE is empty.
- *         ERR_INVALID_MONITOR if unauthorized or wrong capability type.
+ *         ERR_INVALID_MONITOR if mon unauthorized or wrong capability type.
  *         ERR_INVALID_STATE if the process is not suspended.
+ *         ERR_INVALID_PMP if the pmp is already in use or has the wrong
+ * capabilty type ERR_DST_OCCUPIED if the pmp slot is occupied
  */
 err_t cap_monitor_pmp_load(cte_t mon, cte_t pmp, pmp_slot_t pmp_slot);
 
@@ -141,5 +143,7 @@ err_t cap_monitor_pmp_load(cte_t mon, cte_t pmp, pmp_slot_t pmp_slot);
  *         ERR_EMPTY if the CTE is empty.
  *         ERR_INVALID_MONITOR if unauthorized or wrong capability type.
  *         ERR_INVALID_STATE if the process is not suspended.
+ *         ERR_INVALID_PMP if the pmp is not in use or has the wrong capabilty
+ * type
  */
 err_t cap_monitor_pmp_unload(cte_t mon, cte_t pmp);
