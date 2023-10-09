@@ -20,7 +20,7 @@ void proc_init(void)
 	KASSERT(cap_pmp_load(ctable_get(0, 0), 0) == SUCCESS);
 }
 
-proc_t *proc_get(uint64_t pid)
+proc_t *proc_get(pid_t pid)
 {
 	KASSERT(pid < S3K_PROC_CNT);
 	KASSERT(_processes[pid].pid == pid);
@@ -80,13 +80,13 @@ void proc_resume(proc_t *proc)
 			   __ATOMIC_RELEASE);
 }
 
-void proc_ipc_wait(proc_t *proc, uint64_t channel)
+void proc_ipc_wait(proc_t *proc, chan_t channel)
 {
 	KASSERT(proc->state == PSF_BUSY);
-	proc->state = PSF_BLOCKED | PSF_BUSY | (channel << 16);
+	proc->state = PSF_BLOCKED | PSF_BUSY | ((uint64_t)channel << 32);
 }
 
-bool proc_ipc_acquire(proc_t *proc, uint64_t channel)
+bool proc_ipc_acquire(proc_t *proc, chan_t channel)
 {
 	uint64_t curr_time = time_get();
 	uint64_t timeout = timer_get(csrr_mhartid());
@@ -103,7 +103,7 @@ bool proc_ipc_acquire(proc_t *proc, uint64_t channel)
 		return false;
 
 	// Try to acquire the process
-	uint64_t expected = PSF_BLOCKED | (channel << 16);
+	uint64_t expected = PSF_BLOCKED | ((uint64_t)channel << 32);
 	uint64_t desired = PSF_BUSY;
 	return __atomic_compare_exchange(&proc->state, &expected, &desired,
 					 false, __ATOMIC_ACQUIRE,
@@ -115,18 +115,18 @@ bool proc_is_suspended(proc_t *proc)
 	return proc->state == PSF_SUSPENDED;
 }
 
-bool proc_pmp_avail(proc_t *proc, uint64_t slot)
+bool proc_pmp_avail(proc_t *proc, pmp_slot_t slot)
 {
 	return proc->pmpcfg[slot] == 0;
 }
 
-void proc_pmp_load(proc_t *proc, uint64_t slot, uint64_t rwx, uint64_t addr)
+void proc_pmp_load(proc_t *proc, pmp_slot_t slot, pmp_slot_t rwx, napot_t addr)
 {
 	proc->pmpcfg[slot] = (uint8_t)(rwx | 0x18);
 	proc->pmpaddr[slot] = addr;
 }
 
-void proc_pmp_unload(proc_t *proc, uint64_t slot)
+void proc_pmp_unload(proc_t *proc, pmp_slot_t slot)
 {
 	proc->pmpcfg[slot] = 0;
 }

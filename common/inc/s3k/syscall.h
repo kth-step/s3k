@@ -1,5 +1,4 @@
 #pragma once
-#include "s3k/error.h"
 #include "s3k/types.h"
 
 typedef enum {
@@ -23,6 +22,7 @@ typedef enum {
 	// Monitor calls
 	S3K_SYS_MON_SUSPEND,
 	S3K_SYS_MON_RESUME,
+	S3K_SYS_MON_STATE_GET,
 	S3K_SYS_MON_YIELD,
 	S3K_SYS_MON_REG_READ,
 	S3K_SYS_MON_REG_WRITE,
@@ -35,64 +35,6 @@ typedef enum {
 	S3K_SYS_SOCK_SEND,
 	S3K_SYS_SOCK_SENDRECV,
 } s3k_syscall_t;
-
-typedef enum {
-	S3K_REG_PC,
-	S3K_REG_RA,
-	S3K_REG_SP,
-	S3K_REG_GP,
-	S3K_REG_TP,
-	S3K_REG_T0,
-	S3K_REG_T1,
-	S3K_REG_T2,
-	S3K_REG_S0,
-	S3K_REG_S1,
-	S3K_REG_A0,
-	S3K_REG_A1,
-	S3K_REG_A2,
-	S3K_REG_A3,
-	S3K_REG_A4,
-	S3K_REG_A5,
-	S3K_REG_A6,
-	S3K_REG_A7,
-	S3K_REG_S2,
-	S3K_REG_S3,
-	S3K_REG_S4,
-	S3K_REG_S5,
-	S3K_REG_S6,
-	S3K_REG_S7,
-	S3K_REG_S8,
-	S3K_REG_S9,
-	S3K_REG_S10,
-	S3K_REG_S11,
-	S3K_REG_T3,
-	S3K_REG_T4,
-	S3K_REG_T5,
-	S3K_REG_T6,
-	S3K_REG_TPC,
-	S3K_REG_TSP,
-	S3K_REG_EPC,
-	S3K_REG_ESP,
-	S3K_REG_ECAUSE,
-	S3K_REG_EVAL,
-	S3K_REG_WCET,
-	/* Special value for number of registers */
-	S3K_REG_CNT,
-} s3k_reg_t;
-
-typedef struct {
-	s3k_cidx_t cap_buf;
-	bool send_cap;
-	uint64_t data[4];
-	uint64_t serv_time;
-} s3k_msg_t;
-
-typedef struct {
-	s3k_err_t err;
-	uint32_t tag;
-	s3k_cap_t cap;
-	uint64_t data[4];
-} s3k_reply_t;
 
 uint64_t s3k_get_pid(void);
 uint64_t s3k_get_time(void);
@@ -110,6 +52,8 @@ s3k_err_t s3k_pmp_load(s3k_cidx_t pmp_idx, s3k_pmp_slot_t pmp_slot);
 s3k_err_t s3k_pmp_unload(s3k_cidx_t pmp_idx);
 s3k_err_t s3k_mon_suspend(s3k_cidx_t mon_idx, s3k_pid_t pid);
 s3k_err_t s3k_mon_resume(s3k_cidx_t mon_idx, s3k_pid_t pid);
+s3k_err_t s3k_mon_state_get(s3k_cidx_t mon_idx, s3k_pid_t pid,
+			    s3k_state_t *state);
 s3k_err_t s3k_mon_yield(s3k_cidx_t mon_idx, s3k_pid_t pid);
 s3k_err_t s3k_mon_reg_read(s3k_cidx_t mon_idx, s3k_pid_t pid, s3k_reg_t reg,
 			   uint64_t *val);
@@ -135,6 +79,8 @@ s3k_err_t s3k_try_pmp_load(s3k_cidx_t pmp_idx, s3k_pmp_slot_t pmp_slot);
 s3k_err_t s3k_try_pmp_unload(s3k_cidx_t pmp_idx);
 s3k_err_t s3k_try_mon_suspend(s3k_cidx_t mon_idx, s3k_pid_t pid);
 s3k_err_t s3k_try_mon_resume(s3k_cidx_t mon_idx, s3k_pid_t pid);
+s3k_err_t s3k_try_mon_state_get(s3k_cidx_t mon_idx, s3k_pid_t pid,
+				s3k_state_t *state);
 s3k_err_t s3k_try_mon_yield(s3k_cidx_t mon_idx, s3k_pid_t pid);
 s3k_err_t s3k_try_mon_reg_read(s3k_cidx_t mon_idx, s3k_pid_t pid, s3k_reg_t reg,
 			       uint64_t *val);

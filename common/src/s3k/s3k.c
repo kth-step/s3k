@@ -68,7 +68,7 @@ typedef union {
 typedef struct {
 	s3k_err_t err;
 	uint64_t val;
-} sys_ret_t;
+} s3k_ret_t;
 
 _Static_assert(sizeof(sys_args_t) == 64, "sys_args_t has the wrong size");
 
@@ -341,7 +341,7 @@ bool s3k_cap_is_derivable(s3k_cap_t p, s3k_cap_t c)
 	}
 }
 
-static inline sys_ret_t do_ecall(s3k_syscall_t call, sys_args_t args)
+static inline s3k_ret_t do_ecall(s3k_syscall_t call, sys_args_t args)
 {
 	register uint64_t t0 __asm__("t0") = call;
 	register uint64_t a0 __asm__("a0") = args.a0;
@@ -356,7 +356,7 @@ static inline sys_ret_t do_ecall(s3k_syscall_t call, sys_args_t args)
 			 : "+r"(t0), "+r"(a0)
 			 : "r"(a1), "r"(a2), "r"(a3), "r"(a4), "r"(a5), "r"(a6),
 			   "r"(a7));
-	return (sys_ret_t){.err = t0, .val = a0};
+	return (s3k_ret_t){.err = t0, .val = a0};
 }
 
 uint64_t s3k_get_pid(void)
@@ -406,7 +406,7 @@ void s3k_sync_mem(void)
 s3k_err_t s3k_cap_read(s3k_cidx_t idx, s3k_cap_t *cap)
 {
 	sys_args_t args = {.cap = {idx}};
-	sys_ret_t ret = do_ecall(S3K_SYS_CAP_READ, args);
+	s3k_ret_t ret = do_ecall(S3K_SYS_CAP_READ, args);
 	if (!ret.err)
 		cap->raw = ret.val;
 	return ret.err;
@@ -480,6 +480,16 @@ s3k_err_t s3k_mon_resume(s3k_cidx_t mon_idx, s3k_pid_t pid)
 	s3k_err_t err;
 	do {
 		err = s3k_try_mon_resume(mon_idx, pid);
+	} while (err == S3K_ERR_PREEMPTED);
+	return err;
+}
+
+s3k_err_t s3k_mon_state_get(s3k_cidx_t mon_idx, s3k_pid_t pid,
+			    s3k_state_t *state)
+{
+	s3k_err_t err;
+	do {
+		err = s3k_try_mon_state_get(mon_idx, pid, state);
 	} while (err == S3K_ERR_PREEMPTED);
 	return err;
 }
@@ -631,6 +641,17 @@ s3k_err_t s3k_try_mon_resume(s3k_cidx_t mon, s3k_pid_t pid)
 	return do_ecall(S3K_SYS_MON_RESUME, args).err;
 }
 
+s3k_err_t s3k_try_mon_state_get(s3k_cidx_t mon, s3k_pid_t pid,
+				s3k_state_t *state)
+{
+	sys_args_t args = {
+	    .mon_state = {mon, pid}
+	   };
+	s3k_ret_t ret = do_ecall(S3K_SYS_MON_STATE_GET, args);
+	*state = ret.val;
+	return ret.err;
+}
+
 s3k_err_t s3k_try_mon_yield(s3k_cidx_t mon, s3k_pid_t pid)
 {
 	sys_args_t args = {
@@ -645,7 +666,7 @@ s3k_err_t s3k_try_mon_reg_read(s3k_cidx_t mon, s3k_pid_t pid, s3k_reg_t reg,
 	sys_args_t args = {
 	    .mon_reg = {mon, pid, reg}
 	      };
-	sys_ret_t ret = do_ecall(S3K_SYS_MON_REG_READ, args);
+	s3k_ret_t ret = do_ecall(S3K_SYS_MON_REG_READ, args);
 	*val = ret.val;
 	return ret.err;
 }
@@ -656,7 +677,7 @@ s3k_err_t s3k_try_mon_reg_write(s3k_cidx_t mon, s3k_pid_t pid, s3k_reg_t reg,
 	sys_args_t args = {
 	    .mon_reg = {mon, pid, reg, val}
 	   };
-	sys_ret_t ret = do_ecall(S3K_SYS_MON_REG_WRITE, args);
+	s3k_ret_t ret = do_ecall(S3K_SYS_MON_REG_WRITE, args);
 	return ret.err;
 }
 
@@ -666,7 +687,7 @@ s3k_err_t s3k_try_mon_cap_read(s3k_cidx_t mon_idx, s3k_pid_t pid,
 	sys_args_t args = {
 	    .mon_cap = {mon_idx, pid, idx}
 	  };
-	sys_ret_t ret = do_ecall(S3K_SYS_MON_CAP_READ, args);
+	s3k_ret_t ret = do_ecall(S3K_SYS_MON_CAP_READ, args);
 	if (!ret.err)
 		cap->raw = ret.val;
 	return ret.err;

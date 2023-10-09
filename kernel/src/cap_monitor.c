@@ -44,6 +44,16 @@ err_t cap_monitor_resume(cte_t mon, pid_t pid)
 	return err;
 }
 
+err_t cap_monitor_state_get(cte_t mon, pid_t pid, proc_state_t *state)
+{
+	err_t err = check_monitor(mon, pid, false);
+	if (!err) {
+		proc_t *proc = proc_get(pid);
+		*state = proc->state;
+	}
+	return err;
+}
+
 err_t cap_monitor_yield(cte_t mon, pid_t pid, proc_t **next)
 {
 	err_t err = check_monitor(mon, pid, false);

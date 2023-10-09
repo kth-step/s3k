@@ -128,7 +128,7 @@ void proc_init(void);
  * @param pid The process ID to look for.
  * @return A pointer to the process corresponding to the given PID.
  */
-proc_t *proc_get(uint64_t pid);
+proc_t *proc_get(pid_t pid);
 
 /**
  * @brief Attempt to acquire the lock for a process.
@@ -169,12 +169,12 @@ void proc_suspend(proc_t *proc);
  */
 void proc_resume(proc_t *proc);
 
-void proc_ipc_wait(proc_t *proc, uint64_t channel);
-bool proc_ipc_acquire(proc_t *proc, uint64_t channel);
+void proc_ipc_wait(proc_t *proc, chan_t channel);
+bool proc_ipc_acquire(proc_t *proc, chan_t channel);
 
 bool proc_is_suspended(proc_t *proc);
 
-bool proc_pmp_avail(proc_t *proc, uint64_t slot);
-void proc_pmp_load(proc_t *proc, uint64_t slot, uint64_t cfg, uint64_t addr);
-void proc_pmp_unload(proc_t *proc, uint64_t slot);
+bool proc_pmp_avail(proc_t *proc, pmp_slot_t slot);
+void proc_pmp_load(proc_t *proc, pmp_slot_t slot, rwx_t cfg, napot_t addr);
+void proc_pmp_unload(proc_t *proc, pmp_slot_t slot);
 void proc_pmp_sync(proc_t *proc);
