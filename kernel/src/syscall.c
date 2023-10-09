@@ -107,6 +107,7 @@ void handle_syscall(proc_t *p)
 	switch (err) {
 	case YIELD: { // Yield to another process.
 		p->regs[REG_PC] += 4;
+		p->regs[REG_T0] = SUCCESS;
 		proc_t *next = (proc_t *)ret;
 		if (next == NULL)
 			sched(p);
@@ -461,7 +462,7 @@ err_t sys_sock_send(proc_t *p, const sys_args_t *args, uint64_t *ret)
 		     args->sock.data[3]},
 	    .serv_time = args->sock.serv_time,
 	};
-	return cap_sock_send(p, sock, &msg, ret);
+	return cap_sock_send(p, sock, &msg, (proc_t **)ret);
 }
 
 err_t sys_sock_sendrecv(proc_t *p, const sys_args_t *args, uint64_t *ret)
@@ -474,5 +475,5 @@ err_t sys_sock_sendrecv(proc_t *p, const sys_args_t *args, uint64_t *ret)
 		     args->sock.data[3]},
 	    .serv_time = args->sock.serv_time,
 	};
-	return cap_sock_sendrecv(p, sock, &msg, ret);
+	return cap_sock_sendrecv(p, sock, &msg, (proc_t **)ret);
 }

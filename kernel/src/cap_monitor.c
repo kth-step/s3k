@@ -59,13 +59,11 @@ err_t cap_monitor_yield(cte_t mon, pid_t pid, proc_t **next)
 	err_t err = check_monitor(mon, pid, false);
 	if (!err) {
 		proc_t *proc = proc_get(pid);
-		proc_t *curr = proc_get(cte_pid(mon));
 		if (proc_acquire(proc)) {
-			curr->regs[REG_T0] = SUCCESS;
 			*next = proc;
 			return YIELD;
 		}
-		curr->regs[REG_T0] = ERR_INVALID_STATE;
+		return ERR_INVALID_STATE;
 	}
 	return err;
 }

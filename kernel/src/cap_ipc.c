@@ -58,7 +58,7 @@ err_t valid_sock(cap_t sock_cap, bool send_cap)
 	return SUCCESS;
 }
 
-err_t do_sock_send(cap_t sock_cap, const ipc_msg_t *msg, uint64_t *yield_to)
+err_t do_sock_send(cap_t sock_cap, const ipc_msg_t *msg, proc_t **next)
 {
 	uint64_t chan = sock_cap.sock.chan;
 	uint64_t tag = sock_cap.sock.tag;
@@ -73,6 +73,11 @@ err_t do_sock_send(cap_t sock_cap, const ipc_msg_t *msg, uint64_t *yield_to)
 	if (!recv || !proc_ipc_acquire(recv, chan))
 		return ERR_NO_RECEIVER;
 
+	if (is_server)
+		clients[chan] = NULL;
+	else
+		servers[chan] = NULL;
+
 	recv->regs[REG_T0] = SUCCESS;
 	recv->regs[REG_A0] = tag;
 	recv->regs[REG_A1] = 0;
@@ -85,12 +90,12 @@ err_t do_sock_send(cap_t sock_cap, const ipc_msg_t *msg, uint64_t *yield_to)
 	if (msg->send_cap) {
 		cap_t cap;
 		cap_move(msg->cap_buf, recv->cap_buf, &cap);
-		recv->regs[REG_A0] = cap.raw;
+		recv->regs[REG_A1] = cap.raw;
 	}
 
 	if (mode == IPC_YIELD) {
 		// Yield to receiver
-		*yield_to = (uint64_t)recv;
+		*next = recv;
 		return YIELD;
 	} else {
 		// No yield, just success
@@ -123,7 +128,7 @@ err_t do_sock_recv(proc_t *recv, cap_t sock_cap, cte_t cap_buf,
 }
 
 err_t cap_sock_send(proc_t *proc, cte_t sock, const ipc_msg_t *msg,
-		    uint64_t *yield_to)
+		    proc_t **next)
 {
 	cap_t sock_cap = cte_cap(sock);
 
@@ -135,11 +140,11 @@ err_t cap_sock_send(proc_t *proc, cte_t sock, const ipc_msg_t *msg,
 	// If suspend flag is set, suspend.
 	if (proc->state & PSF_SUSPENDED)
 		return ERR_SUSPENDED;
-	return do_sock_send(sock_cap, msg, yield_to);
+	return do_sock_send(sock_cap, msg, next);
 }
 
 err_t cap_sock_sendrecv(proc_t *proc, cte_t sock, const ipc_msg_t *msg,
-			uint64_t *yield_to)
+			proc_t **next)
 {
 	cap_t sock_cap = cte_cap(sock);
 	err_t err = valid_sock(sock_cap, msg->send_cap);
@@ -151,7 +156,7 @@ err_t cap_sock_sendrecv(proc_t *proc, cte_t sock, const ipc_msg_t *msg,
 		return ERR_SUSPENDED;
 
 	// Try send capability
-	err = do_sock_send(sock_cap, msg, yield_to);
+	err = do_sock_send(sock_cap, msg, next);
 
 	bool is_server = (sock_cap.sock.tag == 0);
 

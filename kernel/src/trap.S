@@ -51,7 +51,7 @@ trap_entry:
 	sd	t6,PROC_T6(a0)
 	csrr	t1,mepc
 	sd	t1,PROC_PC(a0)
-	csrrw	t2,mscratch, 0
+	csrrw	t2,mscratch,zero
 	sd	t2,PROC_A0(a0)
 
 
@@ -72,26 +72,23 @@ _exception:
 	csrr	a1,mcause
 	csrr	a2,mepc
 	csrr	a3,mtval
-	csrc	mstatus,MSTATUS_MIE
+	csrw	mstatus,x0
 	tail	handle_exception
 
 _syscall:
-	csrc	mstatus,MSTATUS_MIE
+	csrw	mstatus,x0
 	tail	handle_syscall
 
 _myield:
 	csrrw	a0,mscratch,a0
 	ld_sp	t0
 
-	csrr	t0,mscratch
-	bltz	t0,__hang
-
 _yield:
 	/* Call scheduler */
 	tail	sched
 
 trap_exit:
-	csrs	mstatus,MSTATUS_MIE
+	csrw	mstatus,MSTATUS_MIE
 	
 	/* Load PMP registers */
 	ld	s0,PROC_PMPADDR0(a0)
@@ -112,9 +109,9 @@ trap_exit:
 	csrw	pmpaddr6,s6
 	csrw	pmpaddr7,s7
 	csrw	pmpcfg0,s8
-
+	beqz	s8,trap_exit
 trap_resume:
-	csrs	mstatus,MSTATUS_MIE
+	csrw	mstatus,MSTATUS_MIE
 
 	/* Load call-used registers, ra, sp, gp, tp, pc */
 	ld	t0,PROC_PC(a0)
