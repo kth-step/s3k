@@ -178,7 +178,7 @@ bool cap_is_valid(cap_t c)
 static bool cap_time_derivable(cap_t p, cap_t c)
 {
 	return (c.type == CAPTY_TIME) && (p.time.hart == c.time.hart)
-	       && is_range_prefix(p.time.bgn, p.time.end, c.time.bgn,
+	       && is_range_prefix(p.time.mrk, p.time.end, c.time.bgn,
 				  c.time.end);
 }
 
