@@ -66,6 +66,18 @@ err_t cap_monitor_suspend(cte_t mon, pid_t pid);
 err_t cap_monitor_resume(cte_t mon, pid_t pid);
 
 /**
+ * Yield remaining execution time to specified ready process.
+ *
+ * @param mon The CTE of the monitor capability.
+ * @param pid The ID of the process to be run.
+ * @return SUCCESS if the process is resumed.
+ *         ERR_EMPTY if the CTE is empty.
+ *         ERR_INVALID_MONITOR if the CTE has the wrong capability type or is
+ * unauthorized. ERR_INVALID_STATE if the process is not ready.
+ */
+err_t cap_monitor_yield(cte_t mon, pid_t pid, proc_t **next);
+
+/**
  * Reads a register value from a specified suspended process.
  *
  * @param mon The CTE of the monitor capability.

@@ -23,6 +23,7 @@ typedef enum {
 	// Monitor calls
 	S3K_SYS_MON_SUSPEND,
 	S3K_SYS_MON_RESUME,
+	S3K_SYS_MON_YIELD,
 	S3K_SYS_MON_REG_READ,
 	S3K_SYS_MON_REG_WRITE,
 	S3K_SYS_MON_CAP_READ,
@@ -109,6 +110,7 @@ s3k_err_t s3k_pmp_load(s3k_cidx_t pmp_idx, s3k_pmp_slot_t pmp_slot);
 s3k_err_t s3k_pmp_unload(s3k_cidx_t pmp_idx);
 s3k_err_t s3k_mon_suspend(s3k_cidx_t mon_idx, s3k_pid_t pid);
 s3k_err_t s3k_mon_resume(s3k_cidx_t mon_idx, s3k_pid_t pid);
+s3k_err_t s3k_mon_yield(s3k_cidx_t mon_idx, s3k_pid_t pid);
 s3k_err_t s3k_mon_reg_read(s3k_cidx_t mon_idx, s3k_pid_t pid, s3k_reg_t reg,
 			   uint64_t *val);
 s3k_err_t s3k_mon_reg_write(s3k_cidx_t mon_idx, s3k_pid_t pid, s3k_reg_t reg,
@@ -133,6 +135,7 @@ s3k_err_t s3k_try_pmp_load(s3k_cidx_t pmp_idx, s3k_pmp_slot_t pmp_slot);
 s3k_err_t s3k_try_pmp_unload(s3k_cidx_t pmp_idx);
 s3k_err_t s3k_try_mon_suspend(s3k_cidx_t mon_idx, s3k_pid_t pid);
 s3k_err_t s3k_try_mon_resume(s3k_cidx_t mon_idx, s3k_pid_t pid);
+s3k_err_t s3k_try_mon_yield(s3k_cidx_t mon_idx, s3k_pid_t pid);
 s3k_err_t s3k_try_mon_reg_read(s3k_cidx_t mon_idx, s3k_pid_t pid, s3k_reg_t reg,
 			       uint64_t *val);
 s3k_err_t s3k_try_mon_reg_write(s3k_cidx_t mon_idx, s3k_pid_t pid,

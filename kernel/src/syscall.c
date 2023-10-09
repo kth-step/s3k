@@ -35,6 +35,7 @@ static err_t sys_pmp_load(proc_t *p, const sys_args_t *args, uint64_t *ret);
 static err_t sys_pmp_unload(proc_t *p, const sys_args_t *args, uint64_t *ret);
 static err_t sys_mon_suspend(proc_t *p, const sys_args_t *args, uint64_t *ret);
 static err_t sys_mon_resume(proc_t *p, const sys_args_t *args, uint64_t *ret);
+static err_t sys_mon_yield(proc_t *p, const sys_args_t *args, uint64_t *ret);
 static err_t sys_mon_reg_read(proc_t *p, const sys_args_t *args, uint64_t *ret);
 static err_t sys_mon_reg_write(proc_t *p, const sys_args_t *args,
 			       uint64_t *ret);
@@ -50,12 +51,12 @@ static err_t sys_sock_sendrecv(proc_t *p, const sys_args_t *args,
 typedef err_t (*sys_handler_t)(proc_t *, const sys_args_t *, uint64_t *);
 
 sys_handler_t handlers[] = {
-    sys_get_info,      sys_reg_read,	 sys_reg_write,	     sys_sync,
-    sys_cap_read,      sys_cap_move,	 sys_cap_delete,     sys_cap_revoke,
-    sys_cap_derive,    sys_pmp_load,	 sys_pmp_unload,     sys_mon_suspend,
-    sys_mon_resume,    sys_mon_reg_read, sys_mon_reg_write,  sys_mon_cap_read,
-    sys_mon_cap_move,  sys_mon_pmp_load, sys_mon_pmp_unload, sys_sock_send,
-    sys_sock_sendrecv,
+    sys_get_info,     sys_reg_read,	 sys_reg_write,	   sys_sync,
+    sys_cap_read,     sys_cap_move,	 sys_cap_delete,   sys_cap_revoke,
+    sys_cap_derive,   sys_pmp_load,	 sys_pmp_unload,   sys_mon_suspend,
+    sys_mon_resume,   sys_mon_yield,	 sys_mon_reg_read, sys_mon_reg_write,
+    sys_mon_cap_read, sys_mon_cap_move,	 sys_mon_pmp_load, sys_mon_pmp_unload,
+    sys_sock_send,    sys_sock_sendrecv,
 };
 
 void handle_syscall(proc_t *p)
@@ -201,6 +202,7 @@ err_t validate_arguments(uint64_t call, const sys_args_t *args)
 
 	case SYS_MON_SUSPEND:
 	case SYS_MON_RESUME:
+	case SYS_MON_YIELD:
 		if (!valid_idx(args->mon_state.mon_idx))
 			return ERR_INVALID_INDEX;
 		if (!valid_pid(args->mon_state.pid))
@@ -388,6 +390,12 @@ err_t sys_mon_resume(proc_t *p, const sys_args_t *args, uint64_t *ret)
 {
 	cte_t mon = ctable_get(p->pid, args->mon_state.mon_idx);
 	return cap_monitor_resume(mon, args->mon_state.pid);
+}
+
+err_t sys_mon_yield(proc_t *p, const sys_args_t *args, uint64_t *ret)
+{
+	cte_t mon = ctable_get(p->pid, args->mon_state.mon_idx);
+	return cap_monitor_yield(mon, args->mon_state.pid, (proc_t **)ret);
 }
 
 err_t sys_mon_reg_read(proc_t *p, const sys_args_t *args, uint64_t *ret)

@@ -484,6 +484,15 @@ s3k_err_t s3k_mon_resume(s3k_cidx_t mon_idx, s3k_pid_t pid)
 	return err;
 }
 
+s3k_err_t s3k_mon_yield(s3k_cidx_t mon_idx, s3k_pid_t pid)
+{
+	s3k_err_t err;
+	do {
+		err = s3k_try_mon_yield(mon_idx, pid);
+	} while (err == S3K_ERR_PREEMPTED);
+	return err;
+}
+
 s3k_err_t s3k_mon_reg_read(s3k_cidx_t mon_idx, s3k_pid_t pid, s3k_reg_t reg,
 			   uint64_t *val)
 {
@@ -620,6 +629,14 @@ s3k_err_t s3k_try_mon_resume(s3k_cidx_t mon, s3k_pid_t pid)
 	    .mon_state = {mon, pid}
 	   };
 	return do_ecall(S3K_SYS_MON_RESUME, args).err;
+}
+
+s3k_err_t s3k_try_mon_yield(s3k_cidx_t mon, s3k_pid_t pid)
+{
+	sys_args_t args = {
+	    .mon_state = {mon, pid}
+	   };
+	return do_ecall(S3K_SYS_MON_YIELD, args).err;
 }
 
 s3k_err_t s3k_try_mon_reg_read(s3k_cidx_t mon, s3k_pid_t pid, s3k_reg_t reg,
