@@ -7,6 +7,7 @@ ContinuationIndentWidth: 4
 ColumnLimit: 80
 SortIncludes: true
 MaxEmptyLinesToKeep: 1
+ReflowComments: false
 
 AlignAfterOpenBracket: Align
 AlignArrayOfStructures: Left
