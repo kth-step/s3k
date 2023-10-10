@@ -58,10 +58,9 @@ typedef union {
 
 	struct {
 		s3k_cidx_t sock_idx;
-		s3k_cidx_t cbuf_idx;
+		s3k_cidx_t cap_idx;
 		bool send_cap;
-		uint64_t data0, data1, data2, data3;
-		uint64_t serv_time;
+		uint64_t data[4];
 	} sock;
 } sys_args_t;
 
@@ -574,6 +573,15 @@ s3k_err_t s3k_sock_send(s3k_cidx_t sock_idx, const s3k_msg_t *msg)
 	return err;
 }
 
+s3k_reply_t s3k_sock_recv(s3k_cidx_t sock_idx, s3k_cidx_t cap_idx)
+{
+	s3k_reply_t reply;
+	do {
+		reply = s3k_try_sock_recv(sock_idx, cap_idx);
+	} while (reply.err == S3K_ERR_PREEMPTED);
+	return reply;
+}
+
 s3k_reply_t s3k_sock_sendrecv(s3k_cidx_t sock_idx, const s3k_msg_t *msg)
 {
 	s3k_reply_t reply;
@@ -724,17 +732,50 @@ s3k_err_t s3k_try_mon_pmp_unload(s3k_cidx_t mon_idx, s3k_pid_t pid,
 s3k_err_t s3k_try_sock_send(s3k_cidx_t sock_idx, const s3k_msg_t *msg)
 {
 	sys_args_t args = {
-	    .sock = {sock_idx, msg->cap_buf, msg->send_cap, msg->data[0],
-		     msg->data[1], msg->data[2], msg->data[3]}
+	    .sock = {.sock_idx = sock_idx,
+		     .cap_idx = msg->cap_idx,
+		     .send_cap = msg->send_cap,
+		     {msg->data[0], msg->data[1], msg->data[2], msg->data[3]}}
 	      };
 	return do_ecall(S3K_SYS_SOCK_SEND, args).err;
+}
+
+s3k_reply_t s3k_try_sock_recv(s3k_cidx_t sock_idx, s3k_cidx_t cap_idx)
+{
+	sys_args_t args = {
+	    .sock = {.sock_idx = sock_idx, .cap_idx = cap_idx}
+	      };
+	register uint64_t t0 __asm__("t0") = S3K_SYS_SOCK_SENDRECV;
+	register uint64_t a0 __asm__("a0") = args.a0;
+	register uint64_t a1 __asm__("a1") = args.a1;
+	register uint64_t a2 __asm__("a2") = args.a2;
+	register uint64_t a3 __asm__("a3") = args.a3;
+	register uint64_t a4 __asm__("a4") = args.a4;
+	register uint64_t a5 __asm__("a5") = args.a5;
+	register uint64_t a6 __asm__("a6") = args.a6;
+	register uint64_t a7 __asm__("a7") = args.a7;
+	__asm__ volatile("ecall"
+			 : "+r"(t0), "+r"(a0), "+r"(a1), "+r"(a2), "+r"(a3),
+			   "+r"(a4), "+r"(a5)
+			 : "r"(a6), "r"(a7));
+	s3k_reply_t reply;
+	reply.err = t0;
+	reply.tag = a0;
+	reply.cap.raw = a1;
+	reply.data[0] = a2;
+	reply.data[1] = a3;
+	reply.data[2] = a4;
+	reply.data[3] = a5;
+	return reply;
 }
 
 s3k_reply_t s3k_try_sock_sendrecv(s3k_cidx_t sock_idx, const s3k_msg_t *msg)
 {
 	sys_args_t args = {
-	    .sock = {sock_idx, msg->cap_buf, msg->send_cap, msg->data[0],
-		     msg->data[1], msg->data[2], msg->data[3], msg->serv_time}
+	    .sock = {.sock_idx = sock_idx,
+		     .cap_idx = msg->cap_idx,
+		     .send_cap = msg->send_cap,
+		     {msg->data[0], msg->data[1], msg->data[2], msg->data[3]}}
 	      };
 	register uint64_t t0 __asm__("t0") = S3K_SYS_SOCK_SENDRECV;
 	register uint64_t a0 __asm__("a0") = args.a0;

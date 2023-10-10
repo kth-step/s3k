@@ -47,18 +47,19 @@ static err_t sys_mon_pmp_load(proc_t *p, const sys_args_t *args, uint64_t *ret);
 static err_t sys_mon_pmp_unload(proc_t *p, const sys_args_t *args,
 				uint64_t *ret);
 static err_t sys_sock_send(proc_t *p, const sys_args_t *args, uint64_t *ret);
+static err_t sys_sock_recv(proc_t *p, const sys_args_t *args, uint64_t *ret);
 static err_t sys_sock_sendrecv(proc_t *p, const sys_args_t *args,
 			       uint64_t *ret);
 
 typedef err_t (*sys_handler_t)(proc_t *, const sys_args_t *, uint64_t *);
 
 sys_handler_t handlers[] = {
-    sys_get_info,	sys_reg_read,	   sys_reg_write,     sys_sync,
-    sys_cap_read,	sys_cap_move,	   sys_cap_delete,    sys_cap_revoke,
-    sys_cap_derive,	sys_pmp_load,	   sys_pmp_unload,    sys_mon_suspend,
-    sys_mon_resume,	sys_mon_state_get, sys_mon_yield,     sys_mon_reg_read,
-    sys_mon_reg_write,	sys_mon_cap_read,  sys_mon_cap_move,  sys_mon_pmp_load,
-    sys_mon_pmp_unload, sys_sock_send,	   sys_sock_sendrecv,
+    sys_get_info,	sys_reg_read,	   sys_reg_write,    sys_sync,
+    sys_cap_read,	sys_cap_move,	   sys_cap_delete,   sys_cap_revoke,
+    sys_cap_derive,	sys_pmp_load,	   sys_pmp_unload,   sys_mon_suspend,
+    sys_mon_resume,	sys_mon_state_get, sys_mon_yield,    sys_mon_reg_read,
+    sys_mon_reg_write,	sys_mon_cap_read,  sys_mon_cap_move, sys_mon_pmp_load,
+    sys_mon_pmp_unload, sys_sock_send,	   sys_sock_recv,    sys_sock_sendrecv,
 };
 
 void handle_syscall(proc_t *p)
@@ -269,7 +270,7 @@ err_t validate_arguments(uint64_t call, const sys_args_t *args)
 	case SYS_SOCK_SENDRECV:
 		if (!valid_idx(args->sock.sock_idx))
 			return ERR_INVALID_INDEX;
-		if (!valid_idx(args->sock.cbuf_idx))
+		if (!valid_idx(args->sock.cap_idx))
 			return ERR_INVALID_INDEX;
 		return SUCCESS;
 	default:
@@ -456,24 +457,30 @@ err_t sys_sock_send(proc_t *p, const sys_args_t *args, uint64_t *ret)
 {
 	cte_t sock = ctable_get(p->pid, args->sock.sock_idx);
 	const ipc_msg_t msg = {
-	    .cap_buf = ctable_get(p->pid, args->sock.cbuf_idx),
+	    .src_buf = ctable_get(p->pid, args->sock.cap_idx),
 	    .send_cap = args->sock.send_cap,
 	    .data = {args->sock.data[0], args->sock.data[1], args->sock.data[1],
 		     args->sock.data[3]},
-	    .serv_time = args->sock.serv_time,
 	};
-	return cap_sock_send(p, sock, &msg, (proc_t **)ret);
+	return cap_sock_send(sock, &msg, (proc_t **)ret);
+}
+
+err_t sys_sock_recv(proc_t *p, const sys_args_t *args, uint64_t *ret)
+{
+	cte_t sock = ctable_get(p->pid, args->sock.sock_idx);
+	p->cap_buf = ctable_get(p->pid, args->sock.cap_idx);
+	return cap_sock_recv(sock);
 }
 
 err_t sys_sock_sendrecv(proc_t *p, const sys_args_t *args, uint64_t *ret)
 {
 	cte_t sock = ctable_get(p->pid, args->sock.sock_idx);
+	p->cap_buf = ctable_get(p->pid, args->sock.cap_idx);
 	const ipc_msg_t msg = {
-	    .cap_buf = ctable_get(p->pid, args->sock.cbuf_idx),
+	    .src_buf = ctable_get(p->pid, args->sock.cap_idx),
 	    .send_cap = args->sock.send_cap,
 	    .data = {args->sock.data[0], args->sock.data[1], args->sock.data[1],
 		     args->sock.data[3]},
-	    .serv_time = args->sock.serv_time,
 	};
-	return cap_sock_sendrecv(p, sock, &msg, (proc_t **)ret);
+	return cap_sock_sendrecv(sock, &msg, (proc_t **)ret);
 }

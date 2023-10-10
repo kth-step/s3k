@@ -37,6 +37,7 @@ typedef enum {
 
 	// Socket
 	SYS_SOCK_SEND,
+	SYS_SOCK_RECV,
 	SYS_SOCK_SENDRECV,
 } syscall_t;
 
@@ -98,10 +99,9 @@ typedef union {
 
 	struct {
 		cidx_t sock_idx;
-		cidx_t cbuf_idx;
+		cidx_t cap_idx;
 		bool send_cap;
 		uint64_t data[4];
-		uint64_t serv_time;
 	} sock;
 } sys_args_t;
 

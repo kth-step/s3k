@@ -33,6 +33,7 @@ typedef enum {
 
 	// Socket calls
 	S3K_SYS_SOCK_SEND,
+	S3K_SYS_SOCK_RECV,
 	S3K_SYS_SOCK_SENDRECV,
 } s3k_syscall_t;
 
@@ -69,6 +70,7 @@ s3k_err_t s3k_mon_pmp_load(s3k_cidx_t mon_idx, s3k_pid_t pid,
 s3k_err_t s3k_mon_pmp_unload(s3k_cidx_t mon_idx, s3k_pid_t pid,
 			     s3k_cidx_t pmp_idx);
 s3k_err_t s3k_sock_send(s3k_cidx_t sock_idx, const s3k_msg_t *msg);
+s3k_reply_t s3k_sock_recv(s3k_cidx_t sock_idx, s3k_cidx_t cap_cidx);
 s3k_reply_t s3k_sock_sendrecv(s3k_cidx_t sock_idx, const s3k_msg_t *msg);
 
 s3k_err_t s3k_try_cap_move(s3k_cidx_t src, s3k_cidx_t dst);
@@ -96,4 +98,5 @@ s3k_err_t s3k_try_mon_pmp_load(s3k_cidx_t mon_idx, s3k_pid_t pid,
 s3k_err_t s3k_try_mon_pmp_unload(s3k_cidx_t mon_idx, s3k_pid_t pid,
 				 s3k_cidx_t pmp_idx);
 s3k_err_t s3k_try_sock_send(s3k_cidx_t sock_idx, const s3k_msg_t *msg);
+s3k_reply_t s3k_try_sock_recv(s3k_cidx_t sock_idx, s3k_cidx_t cap_cidx);
 s3k_reply_t s3k_try_sock_sendrecv(s3k_cidx_t sock_idx, const s3k_msg_t *msg);

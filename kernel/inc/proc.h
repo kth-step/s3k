@@ -69,6 +69,7 @@ typedef enum {
 	REG_ESP,
 	REG_ECAUSE,
 	REG_EVAL,
+	REG_SERVTIME,
 	REG_WCET,
 	/* Special value for number of registers */
 	REG_CNT,

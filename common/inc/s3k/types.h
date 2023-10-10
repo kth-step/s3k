@@ -184,16 +184,16 @@ typedef enum {
 	S3K_REG_ESP,
 	S3K_REG_ECAUSE,
 	S3K_REG_EVAL,
+	S3K_REG_SERVTIME,
 	S3K_REG_WCET,
 	/* Special value for number of registers */
 	S3K_REG_CNT,
 } s3k_reg_t;
 
 typedef struct {
-	s3k_cidx_t cap_buf;
+	s3k_cidx_t cap_idx;
 	bool send_cap;
 	uint64_t data[4];
-	uint64_t serv_time;
 } s3k_msg_t;
 
 typedef struct {
