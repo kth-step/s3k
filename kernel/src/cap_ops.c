@@ -85,7 +85,7 @@ err_t cap_delete(cte_t c)
 
 void cap_reclaim(cte_t p, cap_t pcap, cte_t c, cap_t ccap)
 {
-	if ((cte_prev(c) != p) || cte_cap(c).raw == ccap.raw)
+	if ((cte_prev(c) != p) || cte_cap(c).raw != ccap.raw)
 		return;
 
 	cte_delete(c);

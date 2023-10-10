@@ -1,10 +1,16 @@
 #include "drivers/uart.h"
 
+#define LINE_STATUS_DATA_READY 0x1
+#define FIFO_CONTROL_REGISTER 0x2
+#define LINE_CONTROL_REGISTER 0x3
+#define LINE_STATUS_REGISTER 0x5
+
 extern volatile char _uart[];
 
 void uart_init(void)
 {
-	/** TODO: Proper init code for uart */
+	_uart[LINE_CONTROL_REGISTER] = 0x3;
+	_uart[FIFO_CONTROL_REGISTER] = 0x1;
 }
 
 int uart_putc(char c)
@@ -15,7 +21,7 @@ int uart_putc(char c)
 
 int uart_getc(void)
 {
-	while (!(_uart[5] & 0x1))
+	while (!(_uart[LINE_STATUS_REGISTER] & LINE_STATUS_DATA_READY))
 		;
 	return _uart[0];
 }
