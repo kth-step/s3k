@@ -297,6 +297,13 @@ err_t sys_get_info(proc_t *p, const sys_args_t *args, uint64_t *ret)
 		*ret = kernel_wcet();
 		kernel_wcet_reset();
 		break;
+	case 3:
+		*ret = kernel_wcet();
+		break;
+	case 4:
+		*ret = kernel_wcet();
+		kernel_wcet_reset();
+		break;
 	default:
 		*ret = 0;
 	}

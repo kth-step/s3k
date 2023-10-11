@@ -32,6 +32,16 @@ void kernel_wcet_reset(void)
 	wcet = 0;
 }
 
+uint64_t kernel_wcet(void)
+{
+	return wcet;
+}
+
+void kernel_wcet_reset(void)
+{
+	wcet = 0;
+}
+
 bool kernel_lock(proc_t *p)
 {
 	kernel_hook_sys_exit(p);
