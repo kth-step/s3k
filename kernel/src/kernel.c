@@ -9,6 +9,7 @@
 #include "sched.h"
 
 static mcslock_t lock;
+static uint64_t wcet;
 
 void kernel_init(void)
 {
@@ -18,6 +19,16 @@ void kernel_init(void)
 	sched_init();
 	proc_init();
 	uart_puts("kernel initialized");
+}
+
+uint64_t kernel_wcet(void)
+{
+	return wcet;
+}
+
+void kernel_wcet_reset(void)
+{
+	wcet = 0;
 }
 
 bool kernel_lock(proc_t *p)
@@ -44,7 +55,6 @@ void kernel_hook_sys_exit(proc_t *p)
 {
 #ifdef INSTRUMENT
 	uint64_t cycles = csrr_mcycle();
-	if (p->regs[REG_WCET] < cycles)
-		p->regs[REG_WCET] = cycles;
+	__asm__ volatile("amomax.d x0,%0,(%1)" ::"r"(cycles), "r"(&wcet));
 #endif
 }

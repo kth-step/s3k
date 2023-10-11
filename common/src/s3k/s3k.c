@@ -376,6 +376,12 @@ uint64_t s3k_get_timeout(void)
 	return do_ecall(S3K_SYS_GET_INFO, args).val;
 }
 
+uint64_t s3k_get_wcet(bool reset)
+{
+	sys_args_t args = {.get_info = {reset ? 4 : 3}};
+	return do_ecall(S3K_SYS_GET_INFO, args).val;
+}
+
 uint64_t s3k_reg_read(s3k_reg_t reg)
 {
 	sys_args_t args = {.reg = {reg}};
