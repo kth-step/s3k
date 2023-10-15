@@ -1,0 +1,79 @@
+#include "../config.h"
+#include "drivers/uart.h"
+#include "s3k/s3k.h"
+#include "s3klib/altio.h"
+
+#define PPP_ESC 0x7C
+#define PPP_BGN 0x7B
+#define PPP_END 0x7D
+
+void ppp_send(char *buf, size_t len);
+size_t ppp_recv(char *buf);
+
+void main(void)
+{
+	s3k_cap_revoke(0x2);
+	alt_puts("uart started");
+	s3k_msg_t msg;
+	s3k_reply_t reply;
+
+	char *buf = SHARED0_MEM;
+
+	while (1) {
+		size_t len = ppp_recv(buf);
+		msg.data[0] = len;
+		reply = s3k_sock_sendrecv(0x5, &msg);
+		if (reply.err != S3K_SUCCESS) {
+			char *s = "error0";
+			if (reply.err < 10)
+				s[5] = '0' + reply.err;
+			else
+				s[5] = 'A' + reply.err - 10;
+			ppp_send(s, 6);
+			continue;
+		}
+		alt_printf("{wcet:0x%X}", s3k_get_wcet(true));
+		ppp_send(buf, reply.data[0]);
+	}
+}
+
+void ppp_send(char *buf, size_t len)
+{
+	uart_putc(PPP_BGN);
+	for (int i = 0; i < len; ++i) {
+		char c = buf[i];
+		switch (c) {
+		case PPP_BGN:
+		case PPP_END:
+		case PPP_ESC:
+			uart_putc(PPP_ESC);
+			c ^= 0x20;
+			/* fallthrough */
+		default:
+			uart_putc(c);
+		}
+	}
+	uart_putc(PPP_END);
+}
+
+size_t ppp_recv(char *buf)
+{
+	size_t i = 0;
+	while (uart_getc() != PPP_BGN)
+		;
+	while (1) {
+		char c = uart_getc();
+		switch (c) {
+		case PPP_BGN:
+			i = 0;
+			break;
+		case PPP_END:
+			return i;
+		case PPP_ESC:
+			c = uart_getc() ^ 0x20;
+			/* fallthrough */
+		default:
+			buf[i++] = c;
+		}
+	}
+}
