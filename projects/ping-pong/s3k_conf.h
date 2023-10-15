@@ -1,6 +1,7 @@
-// Kernel configuration for hello
-#ifndef __S3K_CONF_H__
-#define __S3K_CONF_H__
+#pragma once
+
+#define PLATFORM_VIRT
+#include "plat/config.h"
 
 // Number of user processes
 #define S3K_PROC_CNT 2
@@ -22,5 +23,3 @@
 
 // If debugging, comment
 #define NDEBUG
-
-#endif /* __S3K_CONF_H__ */

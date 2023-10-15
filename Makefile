@@ -1,4 +1,4 @@
-PROJECTS=projects/hello projects/ping-pong
+PROJECTS=projects/hello projects/ping-pong projects/trapped projects/demonstrator
 all:
 	@for i in $(PROJECTS); do \
 		make -C $$i all; \

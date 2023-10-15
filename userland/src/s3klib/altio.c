@@ -1,4 +1,4 @@
-#include "altio/altio.h"
+#include "s3klib/altio.h"
 
 #include "drivers/uart.h"
 
@@ -11,7 +11,8 @@ int alt_getchar(void)
 
 int alt_putchar(char c)
 {
-	return uart_putc(c);
+	uart_putc(c);
+	return c;
 }
 
 int alt_putstr(const char *str)
