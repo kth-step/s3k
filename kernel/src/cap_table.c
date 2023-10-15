@@ -19,7 +19,7 @@ static uint32_t offset(cte_t c)
 
 void ctable_init(void)
 {
-	cap_t init_caps[] = INIT_CAPS;
+	const cap_t init_caps[] = INIT_CAPS;
 	cte_t prev = ctable;
 	for (unsigned int i = 0; i < ARRAY_SIZE(init_caps); ++i)
 		cte_insert(&ctable[i], init_caps[i], prev);

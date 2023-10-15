@@ -2,11 +2,11 @@
 
 #include "cap_table.h"
 #include "csr.h"
-#include "drivers/uart.h"
 #include "kassert.h"
 #include "mcslock.h"
 #include "proc.h"
 #include "sched.h"
+#include "uart.h"
 
 static mcslock_t lock;
 static uint64_t wcet;
@@ -18,7 +18,7 @@ void kernel_init(void)
 	ctable_init();
 	sched_init();
 	proc_init();
-	uart_puts("kernel initialized");
+	uart_write("kernel initialized\n", 128);
 }
 
 uint64_t kernel_wcet(void)

@@ -9,11 +9,11 @@
 #include "cap_types.h"
 #include "cap_util.h"
 #include "csr.h"
-#include "drivers/timer.h"
 #include "error.h"
 #include "kernel.h"
 #include "preempt.h"
 #include "sched.h"
+#include "time.h"
 #include "trap.h"
 
 #include <stdbool.h>

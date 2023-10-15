@@ -3,11 +3,11 @@
 #include "sched.h"
 
 #include "csr.h"
-#include "drivers/timer.h"
 #include "kassert.h"
 #include "kernel.h"
 #include "proc.h"
 #include "semaphore.h"
+#include "time.h"
 #include "trap.h"
 #include "wfi.h"
 

@@ -13,9 +13,16 @@
 .globl _start
 .type _start, @function
 _start:
-	/* Load gloabl pointer and stack pointer */
+	/* Load global pointer */
 	ld_gp
 	ld_sp	t1
+
+	/* If hartid != MIN_HARTID, then jump to wait. */
+	csrr	t0,mhartid
+	li	t1,S3K_MIN_HART
+	li	t2,S3K_MAX_HART
+	bltu	t0,t1,__hang
+	bgtu	t0,t2,__hang
 
 	/* Set some CSRs to 0 */
 	csrw	mstatus,0
@@ -29,7 +36,6 @@ _start:
 	la	t0,trap_entry
 	csrw	mtvec,t0
 
-	/* If hartid != MIN_HARTID, then jump to wait. */
 	csrr	t0,mhartid
 	li	t1,S3K_MIN_HART
 	bne	t0,t1,wait
@@ -44,31 +50,14 @@ zero_bss: /* write zeros to the bss section */
 
 	call	kernel_init
 
-wake:   /* Wake harts MIN_HARTID .. MAX_HARTID. */
-	/* Wake using software interrupt */
-	la	t0,_clint
-	addi	t1,t0, (S3K_MAX_HART * 4)
-	addi	t0,t0, (S3K_MIN_HART * 4)
-	li	t2,1
-1:	sw 	t2,0(t0)
-	addi	t0,t0,4
-	bne	t1,t0,1b
+	la	t0,kernel_ready
+	li	t1,1
+	sw	t1,(t0)
 
 wait:   /* Wait for initilization to finish. */
-	/* Wait on software interrupt */
-	csrw	mie,MIE_MSIE
-	wfi
-	csrr	t0,mip
-	andi 	t0,t0, MIP_MSIP
-	beqz 	t0,wait
-
-	/* Disable software interrupt. */
-	csrw	mie,0
-	la	t0,_clint
-	csrr	t1,mhartid
-	slli	t1,t1,2
-	add	t0,t0,t1
-	sw	x0,(t0)
+	la	t0,kernel_ready
+	lw	t0,(t0)
+	beqz	t0,wait
 
 head_exit:
 	/* Enable counter for instrumentation */
@@ -81,3 +70,10 @@ head_exit:
 	/* Start user processes. */
 	li	a0,0
 	tail	sched
+
+__hang:
+	j	__hang
+
+.section .data
+kernel_ready:
+	.word 0

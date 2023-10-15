@@ -12,11 +12,8 @@ ROOT=..
 S3K_CONF_H?=s3k_conf.h
 
 # Platform specific config
-PLATFORM?=${ROOT}/plat/virt
-include ${PLATFORM}/platform.mk
-
-# Common sources
-COMMON=${ROOT}/common
+PLATFORM?=${ROOT}/plat64
+include ${PLATFORM}/config.mk
 
 # Get toolchain
 include ${ROOT}/tools.mk
@@ -29,12 +26,11 @@ vpath %.S src
 SRCS =head.S trap.S stack.S
 SRCS+=cap_table.c cap_util.c cap_ops.c cap_pmp.c cap_monitor.c cap_ipc.c \
       csr.c exception.c kernel.c proc.c sched.c mcslock.c syscall.c
-SRCS+=${DRIVERS}
 OBJS=${patsubst %, ${BUILD}/${PROGRAM}/%.o, ${SRCS}}
 DEPS=${patsubst %, ${BUILD}/${PROGRAM}/%.d, ${SRCS}}
 
 # Compilation flags
-CFLAGS =-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
+CFLAGS+=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
 CFLAGS+=-std=c11
 CFLAGS+=-Wall -Wextra -Werror
 CFLAGS+=-Wno-unused-parameter
@@ -47,11 +43,11 @@ CFLAGS+=-Wl,--gc-sections
 CFLAGS+=-flto -fwhole-program
 CFLAGS+=--specs=nosys.specs
 CFLAGS+=-ffunction-sections -fdata-sections
-CFLAGS+=-T${PLATFORM}/platform.ld -Tlinker.ld
+CFLAGS+=-Tlinker.ld
 CFLAGS+=-Wl,--no-warn-rwx-segments
+CFLAGS+=-DKERNEL
 
-INC+=-include ${PLAT_CONF_H} -include ${S3K_CONF_H}
-INC+=-Iinc -I${COMMON}/inc
+INC+=-Iinc -I${PLATFORM}/inc -include ${S3K_CONF_H}
 
 ELF=${BUILD}/${PROGRAM}.elf
 BIN=${ELF:.elf=.bin}

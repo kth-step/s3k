@@ -3,8 +3,8 @@
 
 #include "cap_pmp.h"
 #include "csr.h"
-#include "drivers/timer.h"
 #include "kassert.h"
+#include "time.h"
 
 static proc_t _processes[S3K_PROC_CNT];
 extern unsigned char _payload[];

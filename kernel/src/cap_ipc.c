@@ -3,10 +3,10 @@
 #include "cap_ops.h"
 #include "cap_table.h"
 #include "csr.h"
-#include "drivers/timer.h"
 #include "error.h"
 #include "kassert.h"
 #include "proc.h"
+#include "time.h"
 
 #include <stdint.h>
 

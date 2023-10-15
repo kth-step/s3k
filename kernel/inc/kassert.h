@@ -1,5 +1,5 @@
 #pragma once
-#include "drivers/uart.h"
+#include "uart.h"
 
 /**
  * @file kassert.h
@@ -19,7 +19,7 @@
 
 #define _X_(x) #x
 #define KASSERT_FAILURE(FILE, LINE) \
-	uart_puts("Kernel assertion failed at " FILE ":" _X_(LINE) ".");
+	uart_write("Kernel assertion failed at " FILE ":" _X_(LINE) ".\n", 128);
 
 #define KASSERT(EXPR)                                        \
 	do {                                                 \
