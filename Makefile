@@ -8,6 +8,7 @@ clean:
 	@for i in $(PROJECTS); do \
 		make -C $$i clean; \
 	done
+	rm -rf docs
 
 docs:
 	doxygen
