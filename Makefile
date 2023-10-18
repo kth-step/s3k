@@ -17,6 +17,7 @@ clean:
 	for i in ${PROJECTS}; do \
 		make -C $$i clean PLATFORM=${PLATFORM}; \
 	done
+	rm -rf docs
 
 docs:
 	doxygen
