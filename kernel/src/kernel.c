@@ -1,24 +1,25 @@
 #include "kernel.h"
 
+#include "altc/altio.h"
+#include "altc/init.h"
 #include "cap_table.h"
 #include "csr.h"
 #include "kassert.h"
 #include "mcslock.h"
 #include "proc.h"
 #include "sched.h"
-#include "uart.h"
 
 static mcslock_t lock;
 static uint64_t wcet;
 
 void kernel_init(void)
 {
+	alt_init();
 	mcslock_init(&lock);
-	uart_init();
 	ctable_init();
 	sched_init();
 	proc_init();
-	uart_write("kernel initialized\n", 128);
+	alt_puts("kernel initialized\n");
 }
 
 uint64_t kernel_wcet(void)

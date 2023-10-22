@@ -1,9 +1,5 @@
 // Default kernel configuration
-#ifndef __S3K_CONF_H__
-#define __S3K_CONF_H__
-
-#define PLATFORM_VIRT
-
+#pragma once
 #include "plat/config.h"
 
 // Number of user processes
@@ -26,5 +22,3 @@
 
 // If debugging, comment
 #define NDEBUG
-
-#endif /* __S3K_CONF_H__ */

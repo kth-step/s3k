@@ -1,35 +1,6 @@
-#include "s3klib/altio.h"
-
-#include "drivers/uart.h"
+#include "altc/altio.h"
 
 #include <stdarg.h>
-
-int alt_getchar(void)
-{
-	return uart_getc();
-}
-
-int alt_putchar(char c)
-{
-	uart_putc(c);
-	return c;
-}
-
-int alt_putstr(const char *str)
-{
-	int i = 0;
-	while (str[i] != '\0')
-		alt_putchar(str[i++]);
-	return i;
-}
-
-int alt_puts(const char *str)
-{
-	int len = alt_putstr(str);
-	alt_putchar('\r');
-	alt_putchar('\n');
-	return len;
-}
 
 int alt_printf(const char *fmt, ...)
 {

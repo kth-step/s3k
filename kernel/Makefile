@@ -1,57 +1,69 @@
 # See LICENSE file for copyright and license details.
 .POSIX:
 
-# Program name
-BUILD?=build
+# Kernel basename
 PROGRAM?=s3k
 
-# Root of repository
-ROOT=..
-
-# Kernel configuration
+# Kernel config
 S3K_CONF_H?=s3k_conf.h
 
-# Platform specific config
-PLATFORM?=${ROOT}/plat64
-include ${PLATFORM}/config.mk
+# Platform config
+PLATFORM=sifive_unleashed
+
+# Repository root
+ROOT=..
+
+# Build target
+BUILD?=build
 
 # Get toolchain
 include ${ROOT}/tools.mk
 
-# Search path
-vpath %.c src ${COMMON}/src
-vpath %.S src
+# Platform specific config
+include ${ROOT}/common/plat/${PLATFORM}.mk
 
-# Source files
-SRCS =head.S trap.S stack.S
-SRCS+=cap_table.c cap_util.c cap_ops.c cap_pmp.c cap_monitor.c cap_ipc.c \
-      csr.c exception.c kernel.c proc.c sched.c mcslock.c syscall.c
-OBJS=${patsubst %, ${BUILD}/${PROGRAM}/%.o, ${SRCS}}
-DEPS=${patsubst %, ${BUILD}/${PROGRAM}/%.d, ${SRCS}}
-
-# Compilation flags
-CFLAGS+=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
+# CC flags
+CFLAGS=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
 CFLAGS+=-std=c11
+CFLAGS+=-Os -g3
 CFLAGS+=-Wall -Wextra -Werror
 CFLAGS+=-Wno-unused-parameter
 CFLAGS+=-Wshadow -fno-common
 CFLAGS+=-Wno-builtin-declaration-mismatch
-CFLAGS+=-Os -g3
-CFLAGS+=-nostartfiles -ffreestanding
 CFLAGS+=-fno-stack-protector
-CFLAGS+=-Wl,--gc-sections
-CFLAGS+=-flto -fwhole-program
-CFLAGS+=--specs=nosys.specs
-CFLAGS+=-ffunction-sections -fdata-sections
-CFLAGS+=-Tlinker.ld
-CFLAGS+=-Wl,--no-warn-rwx-segments
-CFLAGS+=-DKERNEL
+CFLAGS+=-flto
+CFLAGS+=-DPLATFORM_${PLATFORM}
 
-INC+=-Iinc -I${PLATFORM}/inc -include ${S3K_CONF_H}
+# Include files and directories
+CFLAGS+=-include ${S3K_CONF_H}
+CFLAGS+=-Iinc -I${COMMON_INC}
 
+# LD flags
+LDFLAGS=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
+LDFLAGS+=-Tlinker.ld
+LDFLAGS+=-nostartfiles -ffreestanding
+LDFLAGS+=-flto -fwhole-program
+LDFLAGS+=-Wl,--no-warn-rwx-segment
+LDFLAGS+=-Wl,--gc-sections
+LDFLAGS+=--specs=nosys.specs
+LDFLAGS+=-ffunction-sections -fdata-sections
+LDFLAGS+=-L${COMMON_LIB}
+LDFLAGS+=-laltc -lplat
+
+# Source files
+S_SRCS=${wildcard src/*.S}
+C_SRCS=${wildcard src/*.c}
+ 
+# Object files
+OBJS=${patsubst src/%.S, ${BUILD}/${PROGRAM}/%.o, ${S_SRCS}} \
+     ${patsubst src/%.c, ${BUILD}/${PROGRAM}/%.o, ${C_SRCS}}
+
+# Dependency files
+DEPS=${patsubst %.o, ${BUILD}/obj/%.d, ${OBJS}}
+
+# Targets
 ELF=${BUILD}/${PROGRAM}.elf
 BIN=${ELF:.elf=.bin}
-DEP=${ELF:.elf=.d}
 DA=${ELF:.elf=.da}
 
 all: ${ELF} ${BIN} ${DA}
@@ -60,34 +72,29 @@ elf: ${ELF}
 bin: ${BIN}
 da: ${DA}
 
-${BUILD}/${PROGRAM}/%.S.o: %.S
+${BUILD}/${PROGRAM}/%.o: src/%.S
 	@mkdir -p ${@D}
-	@echo "CC $@"
-	@${CC} ${CFLAGS} ${INC} -MMD -c -o $@ $<
+	${CC} -o $@ $< -c -MMD ${CFLAGS} 
 
-${BUILD}/${PROGRAM}/%.c.o: %.c
+${BUILD}/${PROGRAM}/%.o: src/%.c
 	@mkdir -p ${@D}
-	@echo "CC $@"
-	@${CC} ${CFLAGS} ${INC} -MMD -c -o $@ $<
+	${CC} -o $@ $< -c -MMD ${CFLAGS}
 
 ${ELF}: ${OBJS}
 	@mkdir -p ${@D}
-	@echo "CC $@"
-	@${CC} ${CFLAGS} ${INC} -o $@ ${OBJS}
+	${CC} -o $@ ${OBJS} ${LDFLAGS} 
 
 ${BIN}: ${ELF}
-	@echo "OBJCOPY $@"
-	@${OBJCOPY} -O binary $< $@
+	${OBJCOPY} -O binary $< $@
 
 ${DA}: ${ELF}
-	@echo "OBJDUMP $@"
-	@${OBJDUMP} -D $< > $@
+	${OBJDUMP} -D $< > $@
 
 format:
 	clang-format -i $(shell find -name '*.[hc]' -not -path '*/.*')
 
 clean:
-	rm -f ${ELF} ${BIN} ${DA} ${OBJS} ${DEPS}
+	rm -fr ${BUILD}
 
 .PHONY: all elf bin da format clean
 

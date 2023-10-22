@@ -1,5 +1,5 @@
 #pragma once
-#include "uart.h"
+#include "altc/altio.h"
 
 /**
  * @file kassert.h
@@ -19,7 +19,7 @@
 
 #define _X_(x) #x
 #define KASSERT_FAILURE(FILE, LINE) \
-	uart_write("Kernel assertion failed at " FILE ":" _X_(LINE) ".\n", 128);
+	altio_puts("Kernel assertion failed at " FILE ":" _X_(LINE) ".");
 
 #define KASSERT(EXPR)                                        \
 	do {                                                 \
