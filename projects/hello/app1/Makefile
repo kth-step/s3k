@@ -1,5 +1,5 @@
 PROGRAM=app1
 
-SRCS=start/start.S main.c s3klib/altio.c
+SRCS=main.c
 
 include ../default.mk

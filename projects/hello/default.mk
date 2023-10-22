@@ -2,25 +2,28 @@ BUILD?=build
 PROGRAM?=a
 
 ROOT=../../..
-USERLAND=${ROOT}/userland
-PLATFORM=${ROOT}/plat64
+STARTFILES=${ROOT}/common/start
 
 include ${ROOT}/tools.mk
-include ${PLATFORM}/config.mk
+include ${ROOT}/common/plat/${PLATFORM}.mk
 
-vpath %.c . ${USERLAND}/src
-vpath %.S . ${USERLAND}/src
-
-OBJS=${patsubst %, ${BUILD}/${PROGRAM}/%.o, ${SRCS}}
+OBJS=${patsubst %, ${BUILD}/${PROGRAM}/%.o, ${SRCS}} ${STARTFILES}/start.o
 DEPS=${patsubst %, ${BUILD}/${PROGRAM}/%.d, ${SRCS}}
 
-CFLAGS+=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
-CFLAGS+=-nostartfiles -nostdlib
+CFLAGS=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
+CFLAGS+=-DPLATFORM_${PLATFORM}
+CFLAGS+=-nostdlib
 CFLAGS+=-DSTACK_SIZE=1024
-CFLAGS+=-Tlinker.ld
-CFLAGS+=-Wl,--no-warn-rwx-segments
+CFLAGS+=-Os -g3
+CFLAGS+=-Iinc -I${COMMON_INC} -include ${S3K_CONF_H}
 
-INC+=-Iinc -I${PLATFORM}/inc -I${USERLAND}/inc -include ${S3K_CONF_H}
+LDFLAGS=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
+LDFLAGS+=-g3
+LDFLAGS+=-nostartfiles -nostdlib
+LDFLAGS+=-Tlinker.ld
+LDFLAGS+=-Wl,--no-warn-rwx-segments
+LDFLAGS+=-L${COMMON_LIB} -ls3k -laltc -lplat
+
 
 ELF=${BUILD}/${PROGRAM}.elf
 BIN=${ELF:.elf=.bin}
@@ -35,17 +38,16 @@ da: ${DA}
 ${BUILD}/${PROGRAM}/%.S.o: %.S
 	@mkdir -p ${@D}
 	@echo "CC $@"
-	@${CC} ${CFLAGS} ${INC} -MMD -c -o $@ $<
-
+	@${CC} -o $@ $< ${CFLAGS} ${INC} -MMD -c
 ${BUILD}/${PROGRAM}/%.c.o: %.c
 	@mkdir -p ${@D}
 	@echo "CC $@"
-	@${CC} ${CFLAGS} ${INC} -MMD -c -o $@ $<
+	@${CC} -o $@ $< ${CFLAGS} ${INC} -MMD -c
 
 ${ELF}: ${OBJS}
 	@mkdir -p ${@D}
 	@echo "CC $@"
-	@${CC} ${CFLAGS} -MMD ${INC} -o $@ ${OBJS}
+	@${CC} -o $@ ${OBJS} ${LDFLAGS} -MMD ${INC}
 
 ${BIN}: ${ELF}
 	@echo "OBJCOPY $@"

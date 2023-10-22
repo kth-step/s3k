@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 KERNEL=build/s3k
 APP0=build/app0
@@ -20,7 +20,7 @@ riscv64-unknown-elf-gdb				\
 	-ex "add-symbol-file $APP0.elf"		\
 	-ex "add-symbol-file $APP1.elf"		\
 	-ex "j 0x80000000"			\
-	-ex "b _hang"				\
+	-ex "b __hang"				\
 	-ex "b *0x80010000"			\
 	-ex "b *0x80020000"			\
 	-ex "b handle_exception"		\

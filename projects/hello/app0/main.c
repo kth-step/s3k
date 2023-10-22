@@ -1,5 +1,5 @@
+#include "altc/altio.h"
 #include "s3k/s3k.h"
-#include "s3klib/altio.h"
 
 #define APP0_PID 0
 #define APP1_PID 1
@@ -18,7 +18,7 @@
 
 void setup_uart(uint64_t uart_idx)
 {
-	uint64_t uart_addr = s3k_napot_encode(0x10000000, 0x8);
+	uint64_t uart_addr = s3k_napot_encode(UART0_BASE_ADDR, 0x8);
 	// Derive a PMP capability for accessing UART
 	s3k_cap_derive(UART_MEM, uart_idx, s3k_mk_pmp(uart_addr, S3K_MEM_RW));
 	// Load the derive PMP capability to PMP configuration
@@ -30,7 +30,7 @@ void setup_uart(uint64_t uart_idx)
 
 void setup_app1(uint64_t tmp)
 {
-	uint64_t uart_addr = s3k_napot_encode(0x10000000, 0x8);
+	uint64_t uart_addr = s3k_napot_encode(UART0_BASE_ADDR, 0x8);
 	uint64_t app1_addr = s3k_napot_encode(0x80020000, 0x10000);
 
 	// Derive a PMP capability for app1 main memory

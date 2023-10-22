@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 KERNEL=build/s3k
 APP0=build/app0

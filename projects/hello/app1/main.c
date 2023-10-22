@@ -1,5 +1,5 @@
+#include "altc/altio.h"
 #include "s3k/s3k.h"
-#include "s3klib/altio.h"
 
 int main(void)
 {

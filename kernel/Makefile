@@ -8,7 +8,7 @@ PROGRAM?=s3k
 S3K_CONF_H?=s3k_conf.h
 
 # Platform config
-PLATFORM=sifive_unleashed
+PLATFORM?=qemu_virt
 
 # Repository root
 ROOT=..
