@@ -3,10 +3,10 @@
 #include "cap_ops.h"
 #include "cap_table.h"
 #include "csr.h"
+#include "drivers/time.h"
 #include "error.h"
 #include "kassert.h"
 #include "proc.h"
-#include "time.h"
 
 #include <stdint.h>
 
@@ -22,7 +22,7 @@ void set_client(uint64_t chan, proc_t *proc, ipc_mode_t mode)
 	if (mode == IPC_NOYIELD)
 		proc->timeout = UINT64_MAX;
 	else
-		proc->timeout = timer_get(csrr_mhartid());
+		proc->timeout = timeout_get(csrr_mhartid());
 	proc->serv_time = 0;
 	clients[chan] = proc;
 	proc_ipc_wait(proc, chan);

@@ -3,8 +3,8 @@
 
 #include "cap_pmp.h"
 #include "csr.h"
+#include "drivers/time.h"
 #include "kassert.h"
-#include "time.h"
 
 static proc_t _processes[S3K_PROC_CNT];
 extern unsigned char _payload[];
@@ -89,7 +89,7 @@ void proc_ipc_wait(proc_t *proc, chan_t channel)
 bool proc_ipc_acquire(proc_t *proc, chan_t channel)
 {
 	uint64_t curr_time = time_get();
-	uint64_t timeout = timer_get(csrr_mhartid());
+	uint64_t timeout = timeout_get(csrr_mhartid());
 
 	if (proc->serv_time > 0) {
 		// proc is a server for a YIELDING channel with minimum server

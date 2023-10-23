@@ -3,11 +3,11 @@
 #include "sched.h"
 
 #include "csr.h"
+#include "drivers/time.h"
 #include "kassert.h"
 #include "kernel.h"
 #include "proc.h"
 #include "semaphore.h"
-#include "time.h"
 #include "trap.h"
 #include "wfi.h"
 
@@ -123,9 +123,9 @@ void sched(proc_t *p)
 		p = sched_fetch(hartid, &start_time, &end_time);
 	} while (!p);
 
-	timer_set(hartid, start_time);
+	timeout_set(hartid, start_time);
 	while (!(csrr_mip() & MIP_MTIP))
 		wfi();
-	timer_set(hartid, end_time);
+	timeout_set(hartid, end_time);
 	trap_exit(p);
 }

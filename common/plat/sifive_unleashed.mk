@@ -4,4 +4,4 @@ CMODEL=medany
 COMMON_INC=${ROOT}/common/inc
 COMMON_LIB=${ROOT}/common/plat/sifive_unleashed
 STARTFILES=${ROOT}/common/plat/sifive_unleashed/start
-PLAT_SRCS=src/drivers/uart/sifive.c
+PLAT_SRCS=src/drivers/uart/sifive.c src/drivers/time.c

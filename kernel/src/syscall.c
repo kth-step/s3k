@@ -9,11 +9,11 @@
 #include "cap_types.h"
 #include "cap_util.h"
 #include "csr.h"
+#include "drivers/time.h"
 #include "error.h"
 #include "kernel.h"
 #include "preempt.h"
 #include "sched.h"
-#include "time.h"
 #include "trap.h"
 
 #include <stdbool.h>
@@ -288,7 +288,7 @@ err_t sys_get_info(proc_t *p, const sys_args_t *args, uint64_t *ret)
 		*ret = time_get();
 		break;
 	case 2:
-		*ret = timer_get(csrr_mhartid());
+		*ret = timeout_get(csrr_mhartid());
 		break;
 	case 3:
 		*ret = kernel_wcet();
