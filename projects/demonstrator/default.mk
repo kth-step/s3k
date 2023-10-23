@@ -16,6 +16,7 @@ DEPS=${patsubst %, ${BUILD}/${PROGRAM}/%.d, ${SRCS}}
 
 CFLAGS+=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
 CFLAGS+=-nostartfiles -nostdlib
+CFLAGS+=-O2 -g
 CFLAGS+=-DSTACK_SIZE=1024
 CFLAGS+=-Tlinker.ld -T../default.ld
 CFLAGS+=-Wl,--no-warn-rwx-segments
@@ -45,7 +46,7 @@ ${BUILD}/${PROGRAM}/%.c.o: %.c
 ${ELF}: ${OBJS}
 	@mkdir -p ${@D}
 	@echo "CC $@"
-	${CC} ${CFLAGS} -MMD ${INC} -o $@ ${OBJS}
+	@${CC} ${CFLAGS} -MMD ${INC} -o $@ ${OBJS}
 
 ${BIN}: ${ELF}
 	@echo "OBJCOPY $@"

@@ -1,6 +1,6 @@
 #pragma once
 
-#define PLATFORM_VIRT
+#define PLATFORM_HIFIVE_UNLEASHED
 
 #include "plat/config.h"
 
@@ -20,8 +20,8 @@
 #define S3K_SLOT_LEN (S3K_RTC_HZ / S3K_SLOT_CNT / 10ull)
 
 // Scheduler time
-#define S3K_SCHED_TIME (S3K_SLOT_LEN / 100)
+#define S3K_SCHED_TIME 1
 
 // If debugging, comment
-#define NDEBUG
+//#define NDEBUG
 #define INSTRUMENT

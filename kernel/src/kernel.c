@@ -19,7 +19,7 @@ void kernel_init(void)
 	ctable_init();
 	sched_init();
 	proc_init();
-	alt_puts("kernel initialized\n");
+	alt_puts("kernel initialized");
 }
 
 uint64_t kernel_wcet(void)

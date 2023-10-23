@@ -6,6 +6,7 @@ import os
 import struct
 import threading
 import shlex
+import socket
 
 # Constants for PPP Encoding
 PPP_ESC = b'\x7C'
@@ -20,7 +21,7 @@ CMD_RUN = 0x4
 CMD_RESET = 0x5
 
 # Initializing serial connection
-ser = serial.serial_for_url("socket://localhost:4321")
+ser = serial.serial_for_url("socket://localhost:8888")
 
 # Function for sending data with PPP encoding
 def ppp_send(data, file=sys.stdout.buffer):
@@ -51,8 +52,10 @@ def ppp_recv(file=sys.stdin.buffer):
     """
     data = bytearray()
 
-    while file.read(1) != PPP_BGN:
-        pass
+    while True:
+        c = file.read(1)
+        if c == PPP_BGN:
+            break
 
     while True:
         c = file.read(1)

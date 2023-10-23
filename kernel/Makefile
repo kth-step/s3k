@@ -94,7 +94,7 @@ format:
 	clang-format -i $(shell find -name '*.[hc]' -not -path '*/.*')
 
 clean:
-	rm -fr ${BUILD}
+	rm -rf $(BUILD)
 
 .PHONY: all elf bin da format clean
 

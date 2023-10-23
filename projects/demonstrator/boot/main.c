@@ -198,6 +198,10 @@ void main(void)
 	s3k_pmp_load(5, 1);
 	s3k_sync_mem();
 	uart_init();
+	while(1) {
+		char c = alt_getchar();
+		alt_putchar(c);
+	}
 
 	alt_puts("setting up memory ...");
 	/* Copy binary of monitor process, setup PMP and program counter. */
