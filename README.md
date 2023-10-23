@@ -5,38 +5,74 @@ s3k is a separation kernel targetting embedded RISC-V systems.
 
 - [Documentation](https://kth-step.github.io/s3k/) built with doxygen.
 
+Configuration
+-------------
+
+Set your compiler toolchain in `tools.mk`. By default we have the following:
+```
+CC=riscv64-unknown-elf-gcc
+AR=riscv64-unknown-elf-ar
+LD=riscv64-unknown-elf-ld
+SIZE=riscv64-unknown-elf-size
+OBJDUMP=riscv64-unknown-elf-objdump
+OBJCOPY=riscv64-unknown-elf-objcopy
+```
+
+Build and Run
+-------------
+
+For building and running the `hello` project
+```bash
+# Build common libraries
+make common
+# Go to project directory and build the project
+cd projects/hello
+make
+# Run the program using QEMU
+./scripts/qemu.sh
+```
+
+Requirements
+------------
+
+- [RISC-V GNU Toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain) 
+  - We recommend that you clone the repository and build the toolchains as follows:
+    ```
+    ./configure --prefix=/opt/riscv --enable-multilib
+    sudo make
+    ```
+    This puts `riscv64-unknown-elf-*` tools in `/opt/riscv/bin`.
+  - You should then add `/opt/riscv/bin` to the `PATH` variable, e.g., `PATH=/opt/riscv/bin:$PATH`.
+  - You can make the toolchain user only by setting `--prefix=$HOME/.opt/riscv` and `PATH=$HOME/.opt/riscv/bin:$PATH`.
+    Then you do not need to build the toolchain with `sudo`.
+- QEMU System RISC-V - Build or install QEMU with RISC-V.
+  - You should have something like `qemu-system-riscv64` installed. It allows us to use our custom kernel.
+  - You should not use `qemu-riscv64`, this only runs/simulates a Linux kernel.
 
 Repository structure
 --------------------
+
 - kernel - The kernel source code.
   - src - C and assembly files
   - inc - Header files
   - linker.ld - Linker script
   - Makefile - Kernel's makefile
   - s3k_conf.h - Default kernel configuration
-- plat64 - Configuration for RISC-V 64-bit platforms.
-  - inc/plat - Platform configurations as header files
-  - config.mk - For compiler flags.
+- common - Libraries for the kernel
+  - inc - header files
+    - drivers - UART and timer driver
+    - s3k - Kernel API library
+    - altc - Minimal library needed by the kernel
+    - plat - Platform configurations
+  - src - Source files for libraries in inc
+    - start - startup files for applications
+  - plat/<platform>.mk - Compiler flag and more for a platform.
 - projects - Example projects using the kernel
   - demonstrator - bigger example project
   - hello - Hello, world example with two processes
   - ping-ping - IPC example
   - trapped - Trap handling example
   - wcet - deprecated project (for now)
-- userland - Userland libraries for the project applications
-  - inc - header files
-    - drivers - UART driver
-    - s3k - Kernel API
-    - s3klib - Userland library
-  - src - C and assembly files
-    - s3k - Kernel API
-    - s3klib - Userland library
-    - start - application boot code
 - API.md - Kernel API
 - LICENSE - MIT License file
 - tools.mk - Set the compiler tools here
-
-Configuration
--------------
-
-s3k is configured by using `config.mk`.
