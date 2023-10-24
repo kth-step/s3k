@@ -16,7 +16,7 @@
 trap_entry:
 	/* Save user tp to scratch, load PCB pointer */
 	csrrw	a0,mscratch,a0
-	beqz	a0,__hang
+	beqz	a0,_machine_yield
 
 	sd	ra,PROC_RA(a0)
 	sd	sp,PROC_SP(a0)
@@ -79,14 +79,19 @@ _syscall:
 	csrw	mstatus,x0
 	tail	handle_syscall
 
+_machine_yield:
+	csrrw	a0,mscratch,a0
+	ld_sp	t0
+	csrr	t0,mcause
+
 _yield:
-	li t1,(7 | 1 << 63)
-	bne t0,t1,__hang
+	li	t1,0x8000000000000007
+	bne	t0,t1,__hang
 	/* Call scheduler */
 	tail	sched
 
 trap_exit:
-	
+	csrw	mstatus,MSTATUS_MIE
 	/* Load PMP registers */
 	ld	s0,PROC_PMPADDR0(a0)
 	ld	s1,PROC_PMPADDR1(a0)
@@ -108,6 +113,7 @@ trap_exit:
 	csrw	pmpcfg0,s8
 	beqz	s8,trap_exit
 trap_resume:
+	csrw	mstatus,MSTATUS_MIE
 
 	/* Load call-used registers, ra, sp, gp, tp, pc */
 	ld	t0,PROC_PC(a0)

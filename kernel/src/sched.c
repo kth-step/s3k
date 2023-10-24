@@ -123,9 +123,9 @@ void sched(proc_t *p)
 		p = sched_fetch(hartid, &start_time, &end_time);
 	} while (!p);
 
-	timeout_set(hartid, start_time);
-	while (!(csrr_mip() & MIP_MTIP))
-		wfi();
 	timeout_set(hartid, end_time);
+	while (time_get() < start_time)
+		;
+
 	trap_exit(p);
 }
