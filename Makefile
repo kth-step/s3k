@@ -1,4 +1,4 @@
-SUBDIRS=kernel common projects/hello projects/trapped projects/ping-pong projects/demonstrator
+SUBDIRS=common kernel projects/hello projects/trapped projects/ping-pong projects/demonstrator
 
 all:
 	for i in $(SUBDIRS); do \
