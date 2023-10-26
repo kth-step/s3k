@@ -1,21 +1,39 @@
-BUILD      ?=build
-S3K_CONF_H ?=s3k_conf.h
+export PLATFORM?=qemu_virt
+export ROOT=${abspath ../..}
+export BUILD=${abspath build}
+export S3K_CONF_H=${abspath s3k_conf.h}
 
-SUBDIRS=../../kernel boot monitor uartppp crypto app0 app1
+include ${ROOT}/common/plat/${PLATFORM}.mk
 
-all: ${SUBDIRS}
+APPS=app0 app1
 
-boot: monitor uartppp crypto
+ELFS=${patsubst %, ${BUILD}/%.elf, kernel ${APPS}}
 
-${SUBDIRS}:
-	@${MAKE} -C $@ all \
-		BUILD=${abspath ${BUILD}} \
-		S3K_CONF_H=${abspath ${S3K_CONF_H}}
-
-qemu gdb: all
-	./scripts/$@.sh
+all: kernel ${APPS}
 
 clean:
-	rm -rf ${BUILD}
+	${MAKE} -C ${ROOT}/common clean
+	${MAKE} -C ${ROOT}/kernel clean
+	for prog in ${APPS}; do \
+		${MAKE} -f build.mk PROGRAM=$$prog clean; \
+	done
 
-.PHONY: all clean ${SUBDIRS} qemu gdb
+common:
+	${MAKE} -C ${ROOT}/common
+
+kernel: common
+	${MAKE} -C ${ROOT}/kernel
+
+qemu: kernel ${APPS}
+	ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh
+
+qemu-gdb: kernel ${APPS}
+	ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh -s -S
+
+gdb: kernel ${APPS}
+	ELFS="${ELFS}" ${ROOT}/scripts/gdb.sh
+
+${APPS}: common
+	${MAKE} -f build.mk PROGRAM=$@
+
+.PHONY: all clean qemu kernel common ${APPS}

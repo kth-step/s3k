@@ -2,28 +2,14 @@
 .POSIX:
 
 # Kernel basename
-PROGRAM?=s3k
+PROGRAM?=kernel
 
-# Kernel config
-S3K_CONF_H?=s3k_conf.h
-
-# Platform config
-PLATFORM?=qemu_virt
-
-# Repository root
-ROOT=..
-
-# Build target
-BUILD?=build
-
-# Get toolchain
 include ${ROOT}/tools.mk
-
-# Platform specific config
 include ${ROOT}/common/plat/${PLATFORM}.mk
 
 # CC flags
 CFLAGS=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
+CFLAGS+=-DPLATFORM_${PLATFORM}
 CFLAGS+=-std=c11
 CFLAGS+=-Os -g3
 CFLAGS+=-Wall -Wextra -Werror
@@ -32,7 +18,6 @@ CFLAGS+=-Wshadow -fno-common
 CFLAGS+=-Wno-builtin-declaration-mismatch
 CFLAGS+=-fno-stack-protector
 CFLAGS+=-flto
-CFLAGS+=-DPLATFORM_${PLATFORM}
 
 # Include files and directories
 CFLAGS+=-include ${S3K_CONF_H}
@@ -53,7 +38,7 @@ LDFLAGS+=-laltc -lplat
 # Source files
 S_SRCS=${wildcard src/*.S}
 C_SRCS=${wildcard src/*.c}
- 
+
 # Object files
 OBJS=${patsubst src/%.S, ${BUILD}/${PROGRAM}/%.o, ${S_SRCS}} \
      ${patsubst src/%.c, ${BUILD}/${PROGRAM}/%.o, ${C_SRCS}}
@@ -63,14 +48,13 @@ DEPS=${patsubst %.o, ${BUILD}/obj/%.d, ${OBJS}}
 
 # Targets
 ELF=${BUILD}/${PROGRAM}.elf
-BIN=${ELF:.elf=.bin}
-DA=${ELF:.elf=.da}
 
-all: ${ELF} ${BIN} ${DA}
+all: ${ELF}
 
 elf: ${ELF}
-bin: ${BIN}
-da: ${DA}
+
+clean:
+	rm -f ${ELF} ${OBJS} ${DEPS}
 
 ${BUILD}/${PROGRAM}/%.o: src/%.S
 	@mkdir -p ${@D}
@@ -83,18 +67,6 @@ ${BUILD}/${PROGRAM}/%.o: src/%.c
 ${ELF}: ${OBJS}
 	@mkdir -p ${@D}
 	${CC} -o $@ ${OBJS} ${LDFLAGS} 
-
-${BIN}: ${ELF}
-	${OBJCOPY} -O binary $< $@
-
-${DA}: ${ELF}
-	${OBJDUMP} -D $< > $@
-
-format:
-	clang-format -i $(shell find -name '*.[hc]' -not -path '*/.*')
-
-clean:
-	rm -rf $(BUILD)
 
 .PHONY: all elf bin da format clean
 

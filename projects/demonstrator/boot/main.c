@@ -1,7 +1,6 @@
 #include "../config.h"
-#include "drivers/uart.h"
+#include "altc/altio.h"
 #include "s3k/s3k.h"
-#include "s3klib/altio.h"
 #include "string.h"
 
 #include <stddef.h>
@@ -197,11 +196,6 @@ void main(void)
 		   S3K_MEM_RW);
 	s3k_pmp_load(5, 1);
 	s3k_sync_mem();
-	uart_init();
-	while(1) {
-		char c = alt_getchar();
-		alt_putchar(c);
-	}
 
 	alt_puts("setting up memory ...");
 	/* Copy binary of monitor process, setup PMP and program counter. */

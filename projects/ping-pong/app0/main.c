@@ -1,6 +1,6 @@
+#include "altc/altio.h"
 #include "s3k/s3k.h"
-#include "s3klib/altio.h"
-#include "s3klib/mem.h"
+#include "string.h"
 
 #define APP0_PID 0
 #define APP1_PID 1

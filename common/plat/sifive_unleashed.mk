@@ -1,7 +1,9 @@
-ARCH=rv64imac_zicsr
-ABI=lp64
-CMODEL=medany
-COMMON_INC=${ROOT}/common/inc
-COMMON_LIB=${ROOT}/common/plat/sifive_unleashed
-STARTFILES=${ROOT}/common/plat/sifive_unleashed/start
+export ARCH=rv64imac_zicsr
+export ABI=lp64
+export CMODEL=medany
+export QEMU_MACHINE=sifive_u
+export QEMU_SMP=5
+export COMMON_INC=${ROOT}/common/inc
+export COMMON_LIB=${BUILD}/common
+export STARTFILES=${BUILD}/common/start
 PLAT_SRCS=src/drivers/uart/sifive.c src/drivers/time.c

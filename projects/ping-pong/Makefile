@@ -1,17 +1,39 @@
+export PLATFORM?=qemu_virt
+export ROOT=${abspath ../..}
 export BUILD=${abspath build}
 export S3K_CONF_H=${abspath s3k_conf.h}
 
-DIRS=../../kernel app0 app1
+include ${ROOT}/common/plat/${PLATFORM}.mk
 
-all: ${DIRS}
+APPS=app0 app1
 
-${DIRS}:
-	@${MAKE} -C $@
+ELFS=${patsubst %, ${BUILD}/%.elf, kernel ${APPS}}
 
-gdb qemu: all
-	./scripts/$@.sh
+all: kernel ${APPS}
 
 clean:
-	rm -rf ${BUILD}
+	${MAKE} -C ${ROOT}/common clean
+	${MAKE} -C ${ROOT}/kernel clean
+	for prog in ${APPS}; do \
+		${MAKE} -f build.mk PROGRAM=$$prog clean; \
+	done
 
-.PHONY: all clean ${DIRS} gdb qemu
+common:
+	${MAKE} -C ${ROOT}/common
+
+kernel: common
+	${MAKE} -C ${ROOT}/kernel
+
+qemu: kernel ${APPS}
+	ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh
+
+qemu-gdb: kernel ${APPS}
+	ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh -s -S
+
+gdb: kernel ${APPS}
+	ELFS="${ELFS}" ${ROOT}/scripts/gdb.sh
+
+${APPS}: common
+	${MAKE} -f build.mk PROGRAM=$@
+
+.PHONY: all clean qemu kernel common ${APPS}

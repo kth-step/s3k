@@ -1,7 +1,6 @@
 #include "../config.h"
-#include "drivers/uart.h"
+#include "altc/altio.h"
 #include "s3k/s3k.h"
-#include "s3klib/altio.h"
 
 #define PPP_ESC 0x7C
 #define PPP_BGN 0x7B
@@ -17,7 +16,7 @@ void main(void)
 	s3k_msg_t msg;
 	s3k_reply_t reply;
 
-	while(1) {
+	while (1) {
 		char c = alt_getchar();
 		alt_putchar(c);
 	}
@@ -44,30 +43,30 @@ void main(void)
 
 void ppp_send(char *buf, size_t len)
 {
-	uart_putc(PPP_BGN);
+	alt_putchar(PPP_BGN);
 	for (int i = 0; i < len; ++i) {
 		char c = buf[i];
 		switch (c) {
 		case PPP_BGN:
 		case PPP_END:
 		case PPP_ESC:
-			uart_putc(PPP_ESC);
+			alt_putchar(PPP_ESC);
 			c ^= 0x20;
 			/* fallthrough */
 		default:
-			uart_putc(c);
+			alt_putchar(c);
 		}
 	}
-	uart_putc(PPP_END);
+	alt_putchar(PPP_END);
 }
 
 size_t ppp_recv(char *buf)
 {
 	size_t i = 0;
-	while (uart_getc() != PPP_BGN)
+	while (alt_getchar() != PPP_BGN)
 		;
 	while (1) {
-		char c = uart_getc();
+		char c = alt_getchar();
 		switch (c) {
 		case PPP_BGN:
 			i = 0;
@@ -75,7 +74,7 @@ size_t ppp_recv(char *buf)
 		case PPP_END:
 			return i;
 		case PPP_ESC:
-			c = uart_getc() ^ 0x20;
+			c = alt_getchar() ^ 0x20;
 			/* fallthrough */
 		default:
 			buf[i++] = c;

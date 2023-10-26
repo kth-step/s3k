@@ -19,7 +19,7 @@
 
 #define _X_(x) #x
 #define KASSERT_FAILURE(FILE, LINE) \
-	altio_puts("Kernel assertion failed at " FILE ":" _X_(LINE) ".");
+	alt_puts("Kernel assertion failed at " FILE ":" _X_(LINE) ".");
 
 #define KASSERT(EXPR)                                        \
 	do {                                                 \
