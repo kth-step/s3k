@@ -21,29 +21,36 @@ ALTC_OBJS=${call SRCS2OBJS, ${ALTC_SRCS}}
 S3K_OBJS=${call SRCS2OBJS, ${S3K_SRCS}}
 START_OBJS=${call SRCS2OBJS, ${START_SRCS}}
 
-all: ${BUILD}/libplat.a ${BUILD}/libaltc.a ${BUILD}/libs3k.a ${START_OBJS}
+TARGETS=${BUILD}/libplat.a ${BUILD}/libaltc.a ${BUILD}/libs3k.a ${START_OBJS}
+
+
+all: ${TARGETS}
+clean:
+	rm -rf ${TARGETS}
 
 ${BUILD}/libplat.a: ${PLAT_OBJS}
-	echo ${PLAT_OBJS}
 	@mkdir -p ${@D}
-	${AR} cr $@ $^
+	@echo -e "AR\t${@F}"
+	@${AR} cr $@ $^
 
 ${BUILD}/libaltc.a: ${ALTC_OBJS}
 	@mkdir -p ${@D}
-	${AR} cr $@ $^
+	@echo -e "AR\t${@F}"
+	@${AR} cr $@ $^
 
 ${BUILD}/libs3k.a: ${S3K_OBJS}
 	@mkdir -p ${@D}
-	${AR} cr $@ $^
+	@echo -e "AR\t${@F}"
+	@${AR} cr $@ $^
 
 ${BUILD}/%.o: src/%.c
 	@mkdir -p ${@D}
-	${CC} -o $@ $< -c ${CFLAGS}
+	@echo -e "CC\t${@F}"
+	@${CC} -o $@ $< -c ${CFLAGS}
 
 ${BUILD}/%.o: src/%.S
 	@mkdir -p ${@D}
-	${CC} -o $@ $< -c ${CFLAGS}
-clean:
-	rm -rf ${BUILD}
+	@echo -e "CC\t${@F}"
+	@${CC} -o $@ $< -c ${CFLAGS}
 
 .PHONY: all clean

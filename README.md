@@ -24,9 +24,11 @@ Build and Run
 For building and running the `hello` project
 ```bash
 # Build common libraries kernel and hello project
-make PROJECT=hello
+cd projects/hello
+# Build the project
+make
 # Run the program using QEMU
-make qemu PROJECT=hello
+make qemu
 ```
 
 Requirements

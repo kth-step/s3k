@@ -44,30 +44,38 @@ OBJS=${patsubst src/%.S, ${BUILD}/${PROGRAM}/%.o, ${S_SRCS}} \
      ${patsubst src/%.c, ${BUILD}/${PROGRAM}/%.o, ${C_SRCS}}
 
 # Dependency files
-DEPS=${patsubst %.o, ${BUILD}/obj/%.d, ${OBJS}}
+DEPS=${OBJS:.o=.d}
 
 # Targets
 ELF=${BUILD}/${PROGRAM}.elf
+BIN=${ELF:.elf=.bin}
 
-all: ${ELF}
-
+all: ${ELF} ${BIN}
 elf: ${ELF}
+bin: ${BIN}
 
 clean:
 	rm -f ${ELF} ${OBJS} ${DEPS}
 
 ${BUILD}/${PROGRAM}/%.o: src/%.S
 	@mkdir -p ${@D}
-	${CC} -o $@ $< -c -MMD ${CFLAGS} 
+	@echo -e "CC\t${@F}"
+	@${CC} -o $@ $< -c -MMD ${CFLAGS} 
 
 ${BUILD}/${PROGRAM}/%.o: src/%.c
 	@mkdir -p ${@D}
-	${CC} -o $@ $< -c -MMD ${CFLAGS}
+	@echo -e "CC\t${@F}"
+	@${CC} -o $@ $< -c -MMD ${CFLAGS}
 
-${ELF}: ${OBJS}
+%.elf: ${OBJS}
 	@mkdir -p ${@D}
-	${CC} -o $@ ${OBJS} ${LDFLAGS} 
+	@echo -e "CC\t${@F}"
+	@${CC} -o $@ ${OBJS} ${LDFLAGS}
 
-.PHONY: all elf bin da format clean
+%.bin: %.elf
+	@echo -e "OBJCOPY\t${@F}"
+	@${OBJCOPY} -O binary $< $@
+
+.PHONY: all common elf bin da format clean
 
 -include ${DEPS}

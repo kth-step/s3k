@@ -5,11 +5,11 @@
 .section .data
 
 monitor_bin:
-.incbin "../build/monitor.bin"
+.incbin "build/monitor.bin"
 crypto_bin:
-.incbin "../build/crypto.bin"
+.incbin "build/crypto.bin"
 uart_bin:
-.incbin "../build/uart.bin"
+.incbin "build/uartppp.bin"
 end_bin:
 
 monitor_bin_len:

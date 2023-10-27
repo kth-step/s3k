@@ -16,11 +16,6 @@ void main(void)
 	s3k_msg_t msg;
 	s3k_reply_t reply;
 
-	while (1) {
-		char c = alt_getchar();
-		alt_putchar(c);
-	}
-
 	char *buf = SHARED0_MEM;
 
 	while (1) {

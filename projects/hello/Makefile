@@ -12,28 +12,28 @@ ELFS=${patsubst %, ${BUILD}/%.elf, kernel ${APPS}}
 all: kernel ${APPS}
 
 clean:
-	${MAKE} -C ${ROOT}/common clean
-	${MAKE} -C ${ROOT}/kernel clean
-	for prog in ${APPS}; do \
+	@${MAKE} -C ${ROOT}/common clean
+	@${MAKE} -C ${ROOT}/kernel clean
+	@for prog in ${APPS}; do \
 		${MAKE} -f build.mk PROGRAM=$$prog clean; \
 	done
 
 common:
-	${MAKE} -C ${ROOT}/common
+	@${MAKE} -C ${ROOT}/common
 
 kernel: common
-	${MAKE} -C ${ROOT}/kernel
+	@${MAKE} -C ${ROOT}/kernel
 
 qemu: kernel ${APPS}
-	ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh
+	@ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh
 
 qemu-gdb: kernel ${APPS}
-	ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh -s -S
+	@ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh -s -S
 
 gdb: kernel ${APPS}
-	ELFS="${ELFS}" ${ROOT}/scripts/gdb.sh
+	@ELFS="${ELFS}" ${ROOT}/scripts/gdb.sh
 
 ${APPS}: common
-	${MAKE} -f build.mk PROGRAM=$@
+	@${MAKE} -f build.mk PROGRAM=$@
 
-.PHONY: all clean qemu kernel common ${APPS}
+.PHONY: all clean qemu qemu-gdb gdb kernel common ${APPS}
