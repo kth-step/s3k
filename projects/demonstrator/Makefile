@@ -1,15 +1,15 @@
 .POSIX:
 
-export PLATFORM?=qemu_virt
-export ROOT=${abspath ../..}
-export BUILD=${abspath build}
-export S3K_CONF_H=${abspath s3k_conf.h}
+export PLATFORM   ?=qemu_virt
+export ROOT       :=${abspath ../..}
+export BUILD      :=${abspath build}
+export S3K_CONF_H :=${abspath s3k_conf.h}
 
 include ${ROOT}/common/plat/${PLATFORM}.mk
 
 APPS=boot app0 app1 monitor crypto uartppp
 
-ELFS=${patsubst %,${BUILD}/%.elf,kernel boot}
+ELFS:=${patsubst %,${BUILD}/%.elf,kernel boot}
 
 all: kernel ${APPS}
 

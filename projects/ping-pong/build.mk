@@ -1,34 +1,35 @@
 .POSIX:
 
-BUILD?=build
-PROGRAM?=a
+BUILD   ?=build
+PROGRAM ?=a
 
 include ${ROOT}/tools.mk
 include ${ROOT}/common/plat/${PLATFORM}.mk
 
-C_SRCS=${wildcard ${PROGRAM}/*.c}
-S_SRCS=${wildcard ${PROGRAM}/*.S}
-OBJS=${patsubst %.c, ${BUILD}/%.o, ${C_SRCS}} \
-     ${patsubst %.S, ${BUILD}/%.o, ${S_SRCS}} \
-     ${STARTFILES}/start.o
-DEPS=${OBJS:.o=.d}
+C_SRCS:=${wildcard ${PROGRAM}/*.c}
+S_SRCS:=${wildcard ${PROGRAM}/*.S}
 
-CFLAGS=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
-CFLAGS+=-DPLATFORM_${PLATFORM}
-CFLAGS+=-nostdlib
-CFLAGS+=-DSTACK_SIZE=1024
-CFLAGS+=-Os -g3 -flto
-CFLAGS+=-I${COMMON_INC} -include ${S3K_CONF_H}
+OBJS:=${patsubst %.c, ${BUILD}/%.o, ${C_SRCS}} \
+			${patsubst %.S, ${BUILD}/%.o, ${S_SRCS}} \
+			${STARTFILES}/start.o
+DEPS:=${OBJS:.o=.d}
 
-LDFLAGS=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
-LDFLAGS+=-nostdlib
-LDFLAGS+=-flto
-LDFLAGS+=-T${PROGRAM}.ld -Tdefault.ld
-LDFLAGS+=-Wl,--no-warn-rwx-segments
-LDFLAGS+=-L${COMMON_LIB} -ls3k -laltc -lplat
+CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
+				-DPLATFORM_${PLATFORM} \
+				-nostdlib \
+				-DSTACK_SIZE=1024 \
+				-Os -g3 -flto \
+				-I${COMMON_INC} -include ${S3K_CONF_H}
 
-ELF=${BUILD}/${PROGRAM}.elf
-BIN=${ELF:.elf=.bin}
+LDFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
+				 -nostdlib \
+				 -flto \
+				 -T${PROGRAM}.ld -Tdefault.ld \
+				 -Wl,--no-warn-rwx-segments \
+				 -L${COMMON_LIB} -ls3k -laltc -lplat \
+
+ELF:=${BUILD}/${PROGRAM}.elf
+BIN:=${ELF:.elf=.bin}
 
 all: ${ELF} ${BIN}
 
@@ -50,7 +51,6 @@ ${BUILD}/${PROGRAM}/%.o: ${PROGRAM}/%.c
 %.bin: %.elf
 	${OBJCOPY} -O binary $< $@
 
-.PHONY: all elf clean
+.PHONY: all clean
 
 -include ${DEPS}
-

@@ -2,7 +2,7 @@
 export ROOT=${abspath .}
 
 
-PROJECTS=projects/hello projects/trapped projects/ping-pong
+PROJECTS:=projects/hello projects/trapped projects/ping-pong
 PLATFORM?=qemu_virt
 
 include tools.mk

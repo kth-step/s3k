@@ -2,53 +2,52 @@
 .POSIX:
 
 # Kernel basename
+ROOT=..
 PROGRAM?=kernel
 
 include ${ROOT}/tools.mk
 include ${ROOT}/common/plat/${PLATFORM}.mk
 
 # CC flags
-CFLAGS=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
-CFLAGS+=-DPLATFORM_${PLATFORM}
-CFLAGS+=-std=c11
-CFLAGS+=-Os -g3
-CFLAGS+=-Wall -Wextra -Werror
-CFLAGS+=-Wno-unused-parameter
-CFLAGS+=-Wshadow -fno-common
-CFLAGS+=-Wno-builtin-declaration-mismatch
-CFLAGS+=-fno-stack-protector
-CFLAGS+=-flto
-
-# Include files and directories
-CFLAGS+=-include ${S3K_CONF_H}
-CFLAGS+=-Iinc -I${COMMON_INC}
+CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
+				-DPLATFORM_${PLATFORM} \
+				-std=c11 \
+				-Os -g3 \
+				-Wall -Wextra -Werror \
+				-Wno-unused-parameter \
+				-Wshadow -fno-common \
+				-Wno-builtin-declaration-mismatch \
+				-fno-stack-protector \
+				-flto \
+				-include ${S3K_CONF_H} \
+				-Iinc -I${COMMON_INC}
 
 # LD flags
-LDFLAGS=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
-LDFLAGS+=-Tlinker.ld
-LDFLAGS+=-nostartfiles -ffreestanding
-LDFLAGS+=-flto -fwhole-program
-LDFLAGS+=-Wl,--no-warn-rwx-segment
-LDFLAGS+=-Wl,--gc-sections
-LDFLAGS+=--specs=nosys.specs
-LDFLAGS+=-ffunction-sections -fdata-sections
-LDFLAGS+=-L${COMMON_LIB}
-LDFLAGS+=-laltc -lplat
+LDFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
+				 -Tlinker.ld \
+				 -nostartfiles -ffreestanding \
+				 -flto -fwhole-program \
+				 -Wl,--no-warn-rwx-segment \
+				 -Wl,--gc-sections \
+				 --specs=nosys.specs \
+				 -ffunction-sections -fdata-sections \
+				 -L${COMMON_LIB} \
+				 -laltc -lplat
 
 # Source files
-S_SRCS=${wildcard src/*.S}
-C_SRCS=${wildcard src/*.c}
+S_SRCS:=${wildcard src/*.S}
+C_SRCS:=${wildcard src/*.c}
 
 # Object files
-OBJS=${patsubst src/%.S, ${BUILD}/${PROGRAM}/%.o, ${S_SRCS}} \
-     ${patsubst src/%.c, ${BUILD}/${PROGRAM}/%.o, ${C_SRCS}}
+OBJS:=${patsubst src/%.S, ${BUILD}/${PROGRAM}/%.o, ${S_SRCS}} \
+			${patsubst src/%.c, ${BUILD}/${PROGRAM}/%.o, ${C_SRCS}}
 
 # Dependency files
-DEPS=${OBJS:.o=.d}
+DEPS:=${OBJS:.o=.d}
 
 # Targets
-ELF=${BUILD}/${PROGRAM}.elf
-BIN=${ELF:.elf=.bin}
+ELF:=${BUILD}/${PROGRAM}.elf
+BIN:=${ELF:.elf=.bin}
 
 all: ${ELF} ${BIN}
 elf: ${ELF}

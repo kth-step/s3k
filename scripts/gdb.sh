@@ -11,7 +11,7 @@ for elf in $ELFS; do
 	echo "add-symbol-file $elf"
 done
 `
-target extended-remote :1234
+target extended-remote :3333
 layout split
 fs cmd
 EOF

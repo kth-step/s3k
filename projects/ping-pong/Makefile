@@ -1,13 +1,13 @@
-export PLATFORM?=qemu_virt
-export ROOT=${abspath ../..}
-export BUILD=${abspath build}
-export S3K_CONF_H=${abspath s3k_conf.h}
+export PLATFORM   ?=qemu_virt
+export ROOT       :=${abspath ../..}
+export BUILD      :=${abspath build}
+export S3K_CONF_H :=${abspath s3k_conf.h}
 
 include ${ROOT}/common/plat/${PLATFORM}.mk
 
 APPS=app0 app1
 
-ELFS=${patsubst %, ${BUILD}/%.elf, kernel ${APPS}}
+ELFS:=${patsubst %, ${BUILD}/%.elf, kernel ${APPS}}
 
 all: kernel ${APPS}
 
@@ -28,7 +28,7 @@ qemu: kernel ${APPS}
 	@ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh
 
 qemu-gdb: kernel ${APPS}
-	@ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh -s -S
+	@ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh -gdb tcp::3333 -S
 
 gdb: kernel ${APPS}
 	@ELFS="${ELFS}" ${ROOT}/scripts/gdb.sh
