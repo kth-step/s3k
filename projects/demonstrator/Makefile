@@ -1,4 +1,5 @@
 .POSIX:
+
 export PLATFORM?=qemu_virt
 export ROOT=${abspath ../..}
 export BUILD=${abspath build}

@@ -1,3 +1,5 @@
+.POSIX:
+
 include plat/${PLATFORM}.mk
 BUILD=build/${PLATFORM}
 
@@ -25,32 +27,28 @@ TARGETS=${BUILD}/libplat.a ${BUILD}/libaltc.a ${BUILD}/libs3k.a ${START_OBJS}
 
 
 all: ${TARGETS}
+
 clean:
 	rm -rf ${TARGETS}
 
 ${BUILD}/libplat.a: ${PLAT_OBJS}
 	@mkdir -p ${@D}
-	@echo -e "AR\t${@F}"
-	@${AR} cr $@ $^
+	${AR} cr $@ $^
 
 ${BUILD}/libaltc.a: ${ALTC_OBJS}
 	@mkdir -p ${@D}
-	@echo -e "AR\t${@F}"
-	@${AR} cr $@ $^
+	${AR} cr $@ $^
 
 ${BUILD}/libs3k.a: ${S3K_OBJS}
 	@mkdir -p ${@D}
-	@echo -e "AR\t${@F}"
-	@${AR} cr $@ $^
+	${AR} cr $@ $^
 
 ${BUILD}/%.o: src/%.c
 	@mkdir -p ${@D}
-	@echo -e "CC\t${@F}"
-	@${CC} -o $@ $< -c ${CFLAGS}
+	${CC} -o $@ $< -c ${CFLAGS}
 
 ${BUILD}/%.o: src/%.S
 	@mkdir -p ${@D}
-	@echo -e "CC\t${@F}"
-	@${CC} -o $@ $< -c ${CFLAGS}
+	${CC} -o $@ $< -c ${CFLAGS}
 
 .PHONY: all clean

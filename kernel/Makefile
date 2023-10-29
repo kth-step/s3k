@@ -59,22 +59,18 @@ clean:
 
 ${BUILD}/${PROGRAM}/%.o: src/%.S
 	@mkdir -p ${@D}
-	@echo -e "CC\t${@F}"
-	@${CC} -o $@ $< -c -MMD ${CFLAGS} 
+	${CC} -o $@ $< -c -MMD ${CFLAGS} 
 
 ${BUILD}/${PROGRAM}/%.o: src/%.c
 	@mkdir -p ${@D}
-	@echo -e "CC\t${@F}"
-	@${CC} -o $@ $< -c -MMD ${CFLAGS}
+	${CC} -o $@ $< -c -MMD ${CFLAGS}
 
 %.elf: ${OBJS}
 	@mkdir -p ${@D}
-	@echo -e "CC\t${@F}"
-	@${CC} -o $@ ${OBJS} ${LDFLAGS}
+	${CC} -o $@ ${OBJS} ${LDFLAGS}
 
 %.bin: %.elf
-	@echo -e "OBJCOPY\t${@F}"
-	@${OBJCOPY} -O binary $< $@
+	${OBJCOPY} -O binary $< $@
 
 .PHONY: all common elf bin da format clean
 

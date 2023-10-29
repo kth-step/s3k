@@ -1,3 +1,4 @@
+.POSIX:
 export ROOT=${abspath .}
 
 

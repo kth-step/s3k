@@ -1,3 +1,5 @@
+.POSIX:
+
 BUILD?=build
 PROGRAM?=a
 
@@ -15,12 +17,12 @@ CFLAGS=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
 CFLAGS+=-DPLATFORM_${PLATFORM}
 CFLAGS+=-nostdlib
 CFLAGS+=-DSTACK_SIZE=1024
-CFLAGS+=-Os -g3
+CFLAGS+=-Os -g3 -flto
 CFLAGS+=-I${COMMON_INC} -include ${S3K_CONF_H}
 
 LDFLAGS=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL}
-LDFLAGS+=-g3
-LDFLAGS+=-nostartfiles -nostdlib
+LDFLAGS+=-nostdlib
+LDFLAGS+=-flto
 LDFLAGS+=-T${PROGRAM}.ld -Tdefault.ld
 LDFLAGS+=-Wl,--no-warn-rwx-segments
 LDFLAGS+=-L${COMMON_LIB} -ls3k -laltc -lplat
@@ -35,22 +37,18 @@ clean:
 
 ${BUILD}/${PROGRAM}/%.o: ${PROGRAM}/%.S
 	@mkdir -p ${@D}
-	@echo -e "CC\t${@F}"
-	@${CC} -o $@ $< ${CFLAGS} ${INC} -MMD -c
+	${CC} -o $@ $< ${CFLAGS} ${INC} -MMD -c
 
 ${BUILD}/${PROGRAM}/%.o: ${PROGRAM}/%.c
 	@mkdir -p ${@D}
-	@echo -e "CC\t${@F}"
-	@${CC} -o $@ $< ${CFLAGS} ${INC} -MMD -c
+	${CC} -o $@ $< ${CFLAGS} ${INC} -MMD -c
 
 %.elf: ${OBJS}
 	@mkdir -p ${@D}
-	@echo -e "CC\t${@F}"
-	@${CC} -o $@ ${OBJS} ${LDFLAGS} -MMD ${INC}
+	${CC} -o $@ ${OBJS} ${LDFLAGS} ${INC}
 
 %.bin: %.elf
-	@echo -e "OBJCOPY\t${@F}"
-	@${OBJCOPY} -O binary $< $@
+	${OBJCOPY} -O binary $< $@
 
 .PHONY: all elf clean
 
