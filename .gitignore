@@ -1,5 +1,4 @@
 docs
-*.elf
 *.a
 *.da
 *.o
@@ -8,4 +7,5 @@ docs
 *.out
 *.elf
 *.bin
+*.hex
 *.res
