@@ -1,8 +1,7 @@
 .POSIX:
-
 export PLATFORM   ?=qemu_virt
 export ROOT       :=${abspath ../..}
-export BUILD      :=${abspath build}
+export BUILD      :=${abspath build/${PLATFORM}}
 export S3K_CONF_H :=${abspath s3k_conf.h}
 
 include ${ROOT}/common/plat/${PLATFORM}.mk
@@ -38,6 +37,10 @@ qemu-gdb: kernel ${APPS}
 
 gdb: kernel ${APPS}
 	@ELFS="${ELFS}" ${ROOT}/scripts/gdb.sh
+
+gdb-openocd: kernel ${APPS}
+	@ELFS="${ELFS}" ${ROOT}/scripts/gdb-openocd.sh
+
 
 
 .PHONY: all clean qemu qemu-gdb gdb kernel common ${APPS}

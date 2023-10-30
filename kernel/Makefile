@@ -48,10 +48,9 @@ DEPS:=${OBJS:.o=.d}
 # Targets
 ELF:=${BUILD}/${PROGRAM}.elf
 BIN:=${ELF:.elf=.bin}
+HEX:=${ELF:.elf=.hex}
 
-all: ${ELF} ${BIN}
-elf: ${ELF}
-bin: ${BIN}
+all: ${ELF} ${BIN} ${HEX}
 
 clean:
 	rm -f ${ELF} ${OBJS} ${DEPS}
@@ -71,6 +70,9 @@ ${BUILD}/${PROGRAM}/%.o: src/%.c
 %.bin: %.elf
 	${OBJCOPY} -O binary $< $@
 
-.PHONY: all common elf bin da format clean
+%.hex: %.elf
+	${OBJCOPY} -O ihex $< $@
+
+.PHONY: all common da format clean
 
 -include ${DEPS}

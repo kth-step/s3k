@@ -8,11 +8,10 @@ include ${ROOT}/common/plat/${PLATFORM}.mk
 
 C_SRCS:=${wildcard ${PROGRAM}/*.c}
 S_SRCS:=${wildcard ${PROGRAM}/*.S}
-
-OBJS:=${patsubst %.c, ${BUILD}/%.o, ${C_SRCS}} \
-			${patsubst %.S, ${BUILD}/%.o, ${S_SRCS}} \
-			${STARTFILES}/start.o
-DEPS:=${OBJS:.o=.d}
+OBJS  :=${patsubst %.c, ${BUILD}/%.o, ${C_SRCS}} \
+				${patsubst %.S, ${BUILD}/%.o, ${S_SRCS}} \
+				${STARTFILES}/start.o
+DEPS  :=${OBJS:.o=.d}
 
 CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 				-DPLATFORM_${PLATFORM} \
@@ -30,8 +29,9 @@ LDFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 
 ELF:=${BUILD}/${PROGRAM}.elf
 BIN:=${ELF:.elf=.bin}
+HEX:=${ELF:.elf=.hex}
 
-all: ${ELF} ${BIN}
+all: ${ELF} ${BIN} ${HEX}
 
 clean:
 	rm -f ${ELF} ${OBJS} ${DEPS}
@@ -50,6 +50,9 @@ ${BUILD}/${PROGRAM}/%.o: ${PROGRAM}/%.c
 
 %.bin: %.elf
 	${OBJCOPY} -O binary $< $@
+
+%.hex: %.elf
+	${OBJCOPY} -O ihex $< $@
 
 .PHONY: all clean
 

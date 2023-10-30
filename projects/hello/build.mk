@@ -29,8 +29,9 @@ LDFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 
 ELF:=${BUILD}/${PROGRAM}.elf
 BIN:=${ELF:.elf=.bin}
+HEX:=${ELF:.elf=.hex}
 
-all: ${ELF} ${BIN}
+all: ${ELF} ${BIN} ${HEX}
 
 clean:
 	rm -f ${ELF} ${OBJS} ${DEPS}
@@ -49,6 +50,9 @@ ${BUILD}/${PROGRAM}/%.o: ${PROGRAM}/%.c
 
 %.bin: %.elf
 	${OBJCOPY} -O binary $< $@
+
+%.hex: %.elf
+	${OBJCOPY} -O ihex $< $@
 
 .PHONY: all clean
 
