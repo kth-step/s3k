@@ -1,7 +1,7 @@
 # Doxyfile 1.9.6
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "S3K"
-PROJECT_NUMBER         = 0.1
+PROJECT_NUMBER         = 1.0.0-alpha
 PROJECT_BRIEF          = "The Simply Secure Separation Kernel"
 TAB_SIZE               = 8
 OPTIMIZE_OUTPUT_FOR_C  = YES
@@ -9,8 +9,8 @@ REFERENCES_LINK_SOURCE = YES
 SOURCE_TOOLTIPS        = YES
 USE_HTAGS              = NO
 VERBATIM_HEADERS       = YES
-INPUT                  = ./
-OUTPUT_DIRECTORY       = docs
+INPUT                  = ./kernel
+OUTPUT_DIRECTORY       = doxygen/
 FILE_PATTERNS          = *.c *.h *.S
 RECURSIVE              = YES
 GENERATE_LATEX         = NO

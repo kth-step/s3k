@@ -32,7 +32,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Install doxygen
-        run: sudo apt install doxygen
+        run: sudo apt install doxygen graphviz
       - name: Build
         run: doxygen
       - name: Setup Pages
@@ -41,7 +41,7 @@ jobs:
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload entire repository
-          path: 'docs'
+          path: 'doxygen'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1

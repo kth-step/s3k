@@ -1,4 +1,4 @@
-docs
+doxygen
 *.a
 *.da
 *.o

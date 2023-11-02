@@ -19,10 +19,11 @@ clean:
 	done
 	rm -rf docs
 
-docs:
+doxygen: doxygen/index.html
+doxygen/index.html: ${wildcard kernel/inc/*.h kernel/src/*.S kernel/src/*.c}
 	doxygen
 
 format:
 	clang-format -i $(shell find -name '*.[hc]' -not -path '*/.*')
 
-.PHONY: all docs clean common ${PROJECTS}
+.PHONY: all doxygen clean common ${PROJECTS}
