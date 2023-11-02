@@ -636,7 +636,7 @@ s3k_err_t s3k_try_pmp_load(s3k_cidx_t idx, s3k_pmp_slot_t slot)
 s3k_err_t s3k_try_pmp_unload(s3k_cidx_t idx)
 {
 	sys_args_t args = {.pmp = {idx}};
-	return do_ecall(S3K_SYS_PMP_LOAD, args).err;
+	return do_ecall(S3K_SYS_PMP_UNLOAD, args).err;
 }
 
 s3k_err_t s3k_try_mon_suspend(s3k_cidx_t mon, s3k_pid_t pid)
