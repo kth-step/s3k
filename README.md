@@ -3,7 +3,9 @@ s3k - Simple Secure Separation Kernel
 
 s3k is a separation kernel targetting embedded RISC-V systems.
 
-- [Documentation](https://kth-step.github.io/s3k/) built with doxygen.
+- [Documentation Index](https://github.com/kth-step/s3k/wiki)
+- [S3K Design](https://github.com/kth-step/s3k/wiki/S3K-Design)
+- [S3K API](https://github.com/kth-step/s3k/wiki/S3K-API)
 
 Configuration
 -------------
