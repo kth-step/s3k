@@ -8,30 +8,31 @@ include ${ROOT}/common/plat/${PLATFORM}.mk
 
 C_SRCS:=${wildcard ${PROGRAM}/*.c}
 S_SRCS:=${wildcard ${PROGRAM}/*.S}
-OBJS  :=${patsubst %.c, ${BUILD}/%.o, ${C_SRCS}} \
-				${patsubst %.S, ${BUILD}/%.o, ${S_SRCS}} \
-				${STARTFILES}/start.o
+OBJS  :=${patsubst %.c,${BUILD}/%.o,${C_SRCS}} \
+	${patsubst %.S,${BUILD}/%.o,${S_SRCS}} \
+	${STARTFILES}/start.o
 DEPS  :=${OBJS:.o=.d}
 
 CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
-				-DPLATFORM_${PLATFORM} \
-				-nostdlib \
-				-DSTACK_SIZE=1024 \
-				-Os -g3 -flto \
-				-I${COMMON_INC} -include ${S3K_CONF_H}
+	-DPLATFORM_${PLATFORM} \
+	-nostdlib \
+	-DSTACK_SIZE=1024 \
+	-Os -g3 -flto \
+	-I${COMMON_INC} -include ${S3K_CONF_H}
 
 LDFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
-				 -nostdlib \
-				 -flto \
-				 -T${PROGRAM}.ld -Tdefault.ld \
-				 -Wl,--no-warn-rwx-segments \
-				 -L${COMMON_LIB} -ls3k -laltc -lplat \
+	 -nostdlib \
+	 -flto \
+	 -T${PROGRAM}.ld -Tdefault.ld \
+	 -Wl,--no-warn-rwx-segments \
+	 -L${COMMON_LIB} -ls3k -laltc -lplat \
 
 ELF:=${BUILD}/${PROGRAM}.elf
 BIN:=${ELF:.elf=.bin}
 HEX:=${ELF:.elf=.hex}
+DA :=${ELF:.elf=.da}
 
-all: ${ELF} ${BIN}
+all: ${ELF} ${BIN} ${HEX} ${DA}
 
 clean:
 	rm -f ${ELF} ${OBJS} ${DEPS}
@@ -53,6 +54,9 @@ ${BUILD}/${PROGRAM}/%.o: ${PROGRAM}/%.c
 
 %.hex: %.elf
 	${OBJCOPY} -O ihex $< $@
+
+%.da: %.elf
+	${OBJDUMP} -D $< > $@
 
 .PHONY: all clean
 
