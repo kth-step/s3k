@@ -26,4 +26,10 @@ SECTIONS {
 		*(.bss .bss.*)
 		_end = .;
 	} > RAM
+
+	.stach : ALIGN(8) {
+		. += __stack_size;
+		__stack_pointer = .;
+		_end = .;
+	}
 }
