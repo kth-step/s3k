@@ -6,4 +6,4 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: sudo apt install clang-format
-      - run: clang-format --dry-run --Werror $(shell find -wholename "*.[chC]" -not -path '*/.*')
+      - run: clang-format --dry-run --Werror $(find -wholename "*.[ch]" -not -path '*/.*')

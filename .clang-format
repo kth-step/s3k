@@ -1,66 +1,36 @@
+---
 Language: Cpp
-
 UseTab: Always
 TabWidth: 8
 IndentWidth: 8
 ContinuationIndentWidth: 4
 ColumnLimit: 80
+SortIncludes: true
+MaxEmptyLinesToKeep: 1
+ReflowComments: false
 
 AlignAfterOpenBracket: Align
+AlignArrayOfStructures: Left
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 AlignEscapedNewlines: Left
 AlignOperands: true
 AlignTrailingComments: true
-AlignArrayOfStructures: Left
-Cpp11BracedListStyle: true
 AllowAllParametersOfDeclarationOnNextLine: false
-
-
 AllowShortBlocksOnASingleLine: false
 AllowShortCaseLabelsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
-
 BinPackArguments: true
 BinPackParameters: true
-
-BreakBeforeBraces: Linux
 BreakBeforeBinaryOperators: true
+BreakBeforeBraces: Linux
 BreakBeforeTernaryOperators: false
-
 BreakStringLiterals: false
-
+IncludeBlocks: Regroup
 IndentCaseLabels: false
-
-PointerAlignment: Right
-
-SpaceAfterCStyleCast: false
-
-SpaceBeforeAssignmentOperators: true
-
-SpaceBeforeParens: ControlStatements
-
-SpaceInEmptyParentheses: false
-
-SpacesBeforeTrailingComments: 1
-
-SpacesInCStyleCastParentheses: false
-
-SpacesInContainerLiterals: false
-
-SpacesInParentheses: false
-
-SpacesInSquareBrackets: false
-
-Cpp11BracedListStyle: false
-
-MaxEmptyLinesToKeep: 1
 KeepEmptyLinesAtTheStartOfBlocks: false
-
-SeparateDefinitionBlocks: Always
-
 PenaltyBreakAssignment: 10
 PenaltyBreakBeforeFirstCallParameter: 30
 PenaltyBreakComment: 10
@@ -68,6 +38,14 @@ PenaltyBreakFirstLessLess: 0
 PenaltyBreakString: 10
 PenaltyExcessCharacter: 100
 PenaltyReturnTypeOnItsOwnLine: 60
-
-SortIncludes: true
-IncludeBlocks: Regroup
+PointerAlignment: Right
+SeparateDefinitionBlocks: Always
+SpaceAfterCStyleCast: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+SpacesInContainerLiterals: false
+SpacesInCStyleCastParentheses: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false

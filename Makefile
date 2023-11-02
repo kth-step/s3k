@@ -1,62 +1,27 @@
-# See LICENSE file for copyright and license details.
 .POSIX:
+export ROOT=${abspath .}
 
-include config.mk
 
-vpath %.c src
-vpath %.S src
+PROJECTS:=projects/hello projects/trapped projects/ping-pong
+PLATFORM?=qemu_virt
 
-AS_SRCS=head.S trap.S
-C_SRCS=cap.c cnode.c current.c csr.c exception.c init.c proc.c schedule.c \
-       syscall.c syscall_lock.c syscall_monitor.c  syscall_ipc.c ticket_lock.c \
-       timer.c wfi.c altio.c kassert.c
-OBJS=$(patsubst %.S, $(OBJ_DIR)/%.o, ${AS_SRCS}) \
-     $(patsubst %.c, $(OBJ_DIR)/%.o, ${C_SRCS})
-DEPS=${OBJS:.o=.d}
+include tools.mk
+include common/plat/${PLATFORM}.mk
 
-all: options kernel dasm
+all: ${PROJECTS}
 
-options:
-	@printf "build options:\n"
-	@printf "CC        = ${CC}\n"
-	@printf "LDFLAGS   = ${LDFLAGS}\n"
-	@printf "ASFLAGS   = ${ASFLAGS}\n"
-	@printf "CFLAGS    = ${CFLAGS}\n"
-	@printf "INC       = ${INC}\n"
-	@printf "CONFIG_H  = ${abspath ${CONFIG_H}}\n"
-	@printf "BUILD_DIR = ${abspath ${BUILD_DIR}}\n"
-
-kernel: $(BUILD_DIR)/s3k.elf 
-
-dasm: $(BUILD_DIR)/s3k.da
-
-test:
-	$(MAKE) -C test
-
-format:
-	clang-format -i $(shell find -wholename "*.[chC]" -not -path '*/.*')
+common ${PROJECTS}:
+	make -C $@ all PLATFORM=${PLATFORM}
 
 clean:
-	rm -rf $(BUILD_DIR)
+	for i in ${PROJECTS}; do \
+		make -C $$i clean PLATFORM=${PLATFORM}; \
+	done
 
-$(OBJ_DIR)/%.o: %.S
-	@mkdir -p ${@D}
-	@printf "CC ${@F}\n"
-	@${CC} ${ASFLAGS} ${INC} -MMD -c -o $@ $<
+docs:
+	doxygen
 
-$(OBJ_DIR)/%.o: %.c
-	@mkdir -p ${@D}
-	@printf "CC ${@F}\n"
-	@${CC} ${CFLAGS} ${INC} -MMD -c -o $@ $<
+format:
+	clang-format -i $(shell find -name '*.[hc]' -not -path '*/.*')
 
-$(BUILD_DIR)/s3k.elf: ${OBJS}
-	@printf "CC ${@F}\n"
-	@${CC} ${LDFLAGS} -o $@ $^
-
-$(BUILD_DIR)/s3k.da: $(BUILD_DIR)/s3k.elf
-	@printf "OBJDUMP ${<F} ${@F}\n"
-	@${OBJDUMP} -d $< > $@
-
-.PHONY: all options clean dasm docs test kernel
-
--include ${DEPS}
+.PHONY: all docs clean common ${PROJECTS}

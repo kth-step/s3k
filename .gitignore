@@ -1,6 +1,4 @@
 docs
-test_detail.json
-*.elf
 *.a
 *.da
 *.o
@@ -8,4 +6,6 @@ test_detail.json
 *.su
 *.out
 *.elf
+*.bin
+*.hex
 *.res
