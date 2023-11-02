@@ -1,4 +1,5 @@
 .POSIX:
+
 export PLATFORM   ?=qemu_virt
 export ROOT       :=${abspath ../..}
 export BUILD      :=${abspath build/${PLATFORM}}
@@ -17,7 +18,7 @@ clean:
 	@${MAKE} -C ${ROOT}/kernel clean
 	@for prog in ${APPS}; do \
 		${MAKE} -f build.mk PROGRAM=$$prog clean; \
-	done
+		done
 
 common:
 	@${MAKE} -C ${ROOT}/common

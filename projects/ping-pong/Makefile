@@ -1,4 +1,5 @@
 .POSIX:
+
 export PLATFORM   ?=qemu_virt
 export ROOT       :=${abspath ../..}
 export BUILD      :=${abspath build/${PLATFORM}}
@@ -8,7 +9,7 @@ include ${ROOT}/common/plat/${PLATFORM}.mk
 
 APPS=app0 app1
 
-ELFS:=${patsubst %, ${BUILD}/%.elf, kernel ${APPS}}
+ELFS:=${patsubst %,${BUILD}/%.elf,kernel ${APPS}}
 
 all: kernel ${APPS}
 
@@ -17,7 +18,7 @@ clean:
 	@${MAKE} -C ${ROOT}/kernel clean
 	@for prog in ${APPS}; do \
 		${MAKE} -f build.mk PROGRAM=$$prog clean; \
-	done
+		done
 
 common:
 	@${MAKE} -C ${ROOT}/common
