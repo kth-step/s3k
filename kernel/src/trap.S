@@ -1,4 +1,4 @@
-// See LICENSE file for copyright and license details.
+# See LICENSE file for copyright and license details.
 #include "macro.inc"
 #include "offsets.h"
 #include "csr.h"
@@ -14,7 +14,7 @@
 .section .text.trap
 .balign 16
 trap_entry:
-	/* Save user tp to scratch, load PCB pointer */
+	# Save user tp to scratch, load PCB pointer
 	csrrw	a0,mscratch,a0
 	beqz	a0,_machine_yield
 
@@ -27,7 +27,7 @@ trap_entry:
 	sd	t2,PROC_T2(a0)
 	sd	s0,PROC_S0(a0)
 	sd	s1,PROC_S1(a0)
-	/*sd	a0,PROC_A0(a0)*/
+	# sd	a0,PROC_A0(a0)
 	sd	a1,PROC_A1(a0)
 	sd	a2,PROC_A2(a0)
 	sd	a3,PROC_A3(a0)
@@ -55,7 +55,7 @@ trap_entry:
 	sd	t2,PROC_A0(a0)
 
 
-	/* Load the global and stack pointer of the kernel. */
+	# Load the global and stack pointer of the kernel.
 	ld_gp
 	ld_sp	t0
 
@@ -68,7 +68,7 @@ trap_entry:
 	beq	t0,t1,_syscall
 
 _exception:
-	/* Otherwise, it is exception. */
+	# Otherwise, it is exception.
 	csrr	a1,mcause
 	csrr	a2,mepc
 	csrr	a3,mtval
@@ -87,12 +87,12 @@ _machine_yield:
 _yield:
 	li	t1,0x8000000000000007
 	bne	t0,t1,__hang
-	/* Call scheduler */
+	# Call scheduler
 	tail	sched
 
 trap_exit:
 	csrw	mstatus,MSTATUS_MIE
-	/* Load PMP registers */
+	# Load PMP registers
 	ld	s0,PROC_PMPADDR0(a0)
 	ld	s1,PROC_PMPADDR1(a0)
 	ld	s2,PROC_PMPADDR2(a0)
@@ -115,7 +115,6 @@ trap_exit:
 trap_resume:
 	csrw	mstatus,MSTATUS_MIE
 
-	/* Load call-used registers, ra, sp, gp, tp, pc */
 	ld	t0,PROC_PC(a0)
 	csrw	mepc,t0
 
@@ -128,7 +127,7 @@ trap_resume:
 	ld	t2,PROC_T2(a0)
 	ld	s0,PROC_S0(a0)
 	ld	s1,PROC_S1(a0)
-	/*ld	a0,PROC_A0(a0) */
+	# ld	a0,PROC_A0(a0)
 	ld	a1,PROC_A1(a0)
 	ld	a2,PROC_A2(a0)
 	ld	a3,PROC_A3(a0)
@@ -151,13 +150,13 @@ trap_resume:
 	ld	t5,PROC_T5(a0)
 	ld	t6,PROC_T6(a0)
 
-	/* disable interrupt */
+	# disable interrupt
 	csrw	mstatus,0
 
-	/* Save PCB pointer */
+	# Save PCB pointer
 	csrw	mscratch,a0
 
-	/* Load user tp */
+	# Load user tp
 	ld	a0,PROC_A0(a0)
 
 	mret
