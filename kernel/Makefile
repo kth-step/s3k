@@ -58,7 +58,7 @@ clean:
 
 ${BUILD}/${PROGRAM}/%.o: src/%.S
 	@mkdir -p ${@D}
-	${CC} -o $@ $< -c -MMD ${CFLAGS} 
+	${CC} -o $@ $< -c -MMD ${CFLAGS}
 
 ${BUILD}/${PROGRAM}/%.o: src/%.c
 	@mkdir -p ${@D}

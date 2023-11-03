@@ -1,4 +1,4 @@
-// See LICENSE file for copyright and license details.
+# See LICENSE file for copyright and license details.
 #include "macro.inc"
 #include "offsets.h"
 #include "csr.h"
@@ -85,17 +85,17 @@ zero_bss: /* write zeros to the bss section */
 	li	t1,1
 	sw	t1,(t0)
 
-wait:   /* Wait for initilization to finish. */
+wait:   # Wait for initilization to finish.
 	la	t0,kernel_ready
 	lw	t0,(t0)
 	beqz	t0,wait
 
 head_exit:
-	/* Enable timer interrupts */
+	# Enable timer interrupts
 	li	t0,MIE_MTIE
 	csrw	mie,t0
 
-	/* Start user processes. */
+	# Start user processes.
 	li	a0,0
 	tail	sched
 
