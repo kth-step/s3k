@@ -3,6 +3,7 @@
 #include "sched.h"
 
 #include "csr.h"
+#include "current.h"
 #include "drivers/time.h"
 #include "kassert.h"
 #include "kernel.h"
@@ -66,25 +67,21 @@ slot_info_t slot_info_get(uint64_t hartid, uint64_t slot)
 static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 			   uint64_t *end_time)
 {
-	semaphore_acquire(&sched_semaphore);
-
 	// Get time slot (in global sense)
-	uint64_t slot = time_get() / S3K_SLOT_LEN;
+	uint64_t slot = (time_get() + S3K_SCHED_TIME) / S3K_SLOT_LEN;
 	// Get time slot information
 	slot_info_t si = slot_info_get(hartid, slot);
-	// Check if time slot is first in time slice.
-	bool first = (slot_info_get(hartid, slot - 1).length == 0);
 
 	// If length = 0, then slice is deleted.
 	if (si.length == 0)
-		goto fail;
+		return NULL;
 
 	// Have priority over harts with lower ID when scheduling length is
 	// longer.
 	for (uint64_t i = S3K_MIN_HART; i < hartid; i++) {
 		slot_info_t other_si = slot_info_get(i, slot);
 		if (si.pid == other_si.pid && si.length <= other_si.length)
-			goto fail;
+			return NULL;
 	}
 
 	// Have priority over harts with higher ID when scheduling length is
@@ -92,7 +89,7 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 	for (uint64_t i = hartid + 1; i < S3K_MAX_HART; i++) {
 		slot_info_t other_si = slot_info_get(i, slot);
 		if (si.pid == other_si.pid && si.length < other_si.length)
-			goto fail;
+			return NULL;
 	}
 
 	// Get the process.
@@ -100,32 +97,31 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 
 	// Try to acquire the process.
 	if (!proc_acquire(p))
-		goto fail;
-	semaphore_release(&sched_semaphore);
-	*start_time = slot * S3K_SLOT_LEN + (first ? S3K_SCHED_TIME : 0);
-	*end_time = (slot + si.length) * S3K_SLOT_LEN;
+		return NULL;
+	*start_time = slot * S3K_SLOT_LEN;
+	*end_time = (slot + si.length) * S3K_SLOT_LEN - S3K_SCHED_TIME;
 	p->timeout = *end_time;
 	return p;
-
-fail:
-	semaphore_release(&sched_semaphore);
-	return NULL;
 }
 
-void sched(proc_t *p)
+void sched(void)
 {
 	uint64_t hartid = csrr_mhartid();
 	uint64_t start_time, end_time;
-	if (p)
-		proc_release(p);
+	if (current)
+		proc_release(current);
+	current = NULL;
+
+	proc_t *p;
 
 	do {
+		semaphore_acquire(&sched_semaphore);
 		p = sched_fetch(hartid, &start_time, &end_time);
+		semaphore_release(&sched_semaphore);
 	} while (!p);
 
 	timeout_set(hartid, end_time);
 	while (time_get() < start_time)
 		;
-
-	trap_exit(p);
+	proc_swap(p);
 }

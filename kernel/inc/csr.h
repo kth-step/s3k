@@ -16,6 +16,9 @@
 
 #ifndef __ASSEMBLER__
 #include <stdint.h>
+uint64_t csrr_mcause(void);
+uint64_t csrr_mtval(void);
+uint64_t csrr_mepc(void);
 uint64_t csrr_mhartid(void);
 uint64_t csrr_mip(void);
 uint64_t csrr_mcycle(void);
