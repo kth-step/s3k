@@ -83,48 +83,165 @@ err_t cap_delete(cte_t c)
 	return SUCCESS;
 }
 
-void cap_reclaim(cte_t p, cap_t pcap, cte_t c, cap_t ccap)
+err_t cap_revoke_time(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 {
-	if ((cte_prev(c) != p) || cte_cap(c).raw != ccap.raw)
-		return;
+	if (ccap.type == CAPTY_TIME) {
+		if (pcap.time.hart != ccap.time.hart)
+			return YIELD;
 
-	cte_delete(c);
+		if (pcap.time.end <= ccap.time.bgn)
+			return YIELD;
 
-	switch (ccap.type) {
-	case CAPTY_TIME: {
+		// delete the child
+		cte_delete(child);
+
+		// Update parent.
 		pcap.time.mrk = ccap.time.mrk;
-		uint64_t pid = cte_pid(p);
+		cte_set_cap(parent, pcap);
+
+		// Update schedule.
+		uint64_t pid = cte_pid(parent);
 		uint64_t end = pcap.time.end;
 		uint64_t hartid = pcap.time.hart;
 		uint64_t from = pcap.time.mrk;
 		uint64_t to = pcap.time.end;
 		sched_update(pid, end, hartid, from, to);
-	} break;
-	case CAPTY_MEMORY:
+
+		return SUCCESS;
+	}
+	return YIELD;
+}
+
+err_t cap_revoke_memory(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
+{
+	if (ccap.type == CAPTY_MEMORY) {
+		if (pcap.mem.tag != ccap.mem.tag)
+			return YIELD;
+
+		if (pcap.mem.end <= ccap.mem.bgn)
+			return YIELD;
+
+		// delete the child
+		cte_delete(child);
+
+		// Update parent.
 		pcap.mem.mrk = ccap.mem.mrk;
 		pcap.mem.lck = ccap.mem.lck;
-		break;
-	case CAPTY_PMP:
+		cte_set_cap(parent, pcap);
+
+		return SUCCESS;
+	} else if (ccap.type == CAPTY_PMP) {
+		uint64_t begin, end;
+		pmp_napot_decode(ccap.pmp.addr, &begin, &end);
+		if (pcap.mem.end < begin)
+			return YIELD;
+		// delete the child
+		cte_delete(child);
+
+		// Clear PMP config
 		if (ccap.pmp.used) {
-			proc_pmp_unload(proc_get(cte_pid(c)), ccap.pmp.slot);
+			proc_pmp_unload(proc_get(cte_pid(child)),
+					ccap.pmp.slot);
 		}
-		return;
-	case CAPTY_MONITOR:
+
+		return SUCCESS;
+	}
+	return YIELD;
+}
+
+err_t cap_revoke_monitor(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
+{
+	if (ccap.type == CAPTY_MONITOR) {
+		if (pcap.mon.end <= ccap.mon.bgn)
+			return YIELD;
+
+		// delete the child
+		cte_delete(child);
+
+		// Update parent.
 		pcap.mon.mrk = ccap.mon.mrk;
-		break;
-	case CAPTY_CHANNEL:
+		cte_set_cap(parent, pcap);
+
+		return SUCCESS;
+	}
+	return YIELD;
+}
+
+err_t cap_revoke_channel(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
+{
+	if (ccap.type == CAPTY_CHANNEL) {
+		if (pcap.chan.end <= ccap.chan.bgn)
+			return YIELD;
+
+		// delete the child
+		cte_delete(child);
+
+		// Update parent.
 		pcap.chan.mrk = ccap.chan.mrk;
-		break;
+		cte_set_cap(parent, pcap);
+
+		return SUCCESS;
+	}
+
+	if (ccap.type == CAPTY_SOCKET) {
+		if (pcap.chan.end <= ccap.sock.chan)
+			return YIELD;
+
+		// delete the child
+		cte_delete(child);
+
+		// Clear socket
+		cap_sock_clear(ccap, proc_get(cte_pid(child)));
+
+		return SUCCESS;
+	}
+
+	return YIELD;
+}
+
+err_t cap_revoke_socket(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
+{
+	if (ccap.type == CAPTY_SOCKET) {
+		if (pcap.sock.tag != 0)
+			return ERR_INVALID_CAPABILITY;
+		if (pcap.sock.chan != ccap.sock.chan)
+			return YIELD;
+
+		// delete the child
+		cte_delete(child);
+
+		// Clear socket
+		cap_sock_clear(ccap, proc_get(cte_pid(child)));
+
+		return SUCCESS;
+	}
+
+	return YIELD;
+}
+
+err_t cap_revoke(cte_t parent)
+{
+	cte_t child = cte_next(parent);
+	cap_t pcap = cte_cap(parent);
+	cap_t ccap = cte_cap(child);
+	switch (pcap.type) {
+	case CAPTY_NONE:
+		return ERR_EMPTY;
+	case CAPTY_TIME:
+		return cap_revoke_time(parent, pcap, child, ccap);
+	case CAPTY_MEMORY:
+		return cap_revoke_memory(parent, pcap, child, ccap);
+	case CAPTY_PMP:
+		return ERR_INVALID_CAPABILITY;
+	case CAPTY_MONITOR:
+		return cap_revoke_monitor(parent, pcap, child, ccap);
+	case CAPTY_CHANNEL:
+		return cap_revoke_channel(parent, pcap, child, ccap);
 	case CAPTY_SOCKET:
-		cap_sock_clear(ccap, proc_get(cte_pid(c)));
-		return;
+		return cap_revoke_socket(parent, pcap, child, ccap);
 	default:
 		KASSERT(0);
 	}
-
-	cte_set_cap(p, pcap);
-
-	return;
 }
 
 err_t cap_reset(cte_t c)
