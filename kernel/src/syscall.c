@@ -301,19 +301,17 @@ void sys_cap_revoke(proc_t *const p, const sys_args_t *args)
 {
 	cte_t c = ctable_get(p->pid, args->cap.idx);
 	p->regs[REG_T0] = ERR_PREEMPTED;
-	while (1) {
-		cap_t cap = cte_cap(c);
-		cte_t next = cte_next(c);
-		cap_t ncap = cte_cap(next);
-		if (!cap.type)
-			break;
-		// If ncap can not be revoked, we have no more children.
-		if (!cap_is_revokable(cap, ncap))
-			break;
+	err_t err;
+	do {
 		if (!kernel_lock_acquire())
 			return;
-		cap_reclaim(c, cap, next, ncap);
+		err = cap_revoke(c);
 		kernel_lock_release();
+	} while (!err);
+
+	if (err > 0) {
+		p->regs[REG_T0] = err;
+		return;
 	}
 
 	// We should reach here if we have no more children.
