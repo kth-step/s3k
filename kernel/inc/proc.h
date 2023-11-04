@@ -91,7 +91,6 @@ typedef struct {
 	pid_t pid;
 	/** Process state. */
 	proc_state_t state;
-	qnode_t qnode;
 
 	/** Scheduling information */
 
@@ -115,8 +114,6 @@ typedef struct {
 
 /**
  * Initializes all processes in the system.
- *
- * @param payload A pointer to the boot loader's code.
  *
  * @note This function should be called only once during system startup.
  */
@@ -178,3 +175,5 @@ bool proc_pmp_avail(proc_t *proc, pmp_slot_t slot);
 void proc_pmp_load(proc_t *proc, pmp_slot_t slot, rwx_t cfg, napot_t addr);
 void proc_pmp_unload(proc_t *proc, pmp_slot_t slot);
 void proc_pmp_sync(proc_t *proc);
+
+void proc_swap(proc_t *proc);

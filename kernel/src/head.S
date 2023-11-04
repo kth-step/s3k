@@ -64,7 +64,7 @@ _start:
 	csrw	satp,0
 
 	/* Set trap entry. */
-	la	t0,trap_entry
+	la	t0,__hang
 	csrw	mtvec,t0
 
 	csrr	t0,mhartid
@@ -96,8 +96,12 @@ head_exit:
 	csrw	mie,t0
 
 	# Start user processes.
-	li	a0,0
-	tail	sched
+	la	t0,trap_entry
+	csrw	mtvec,t0
+	li	tp,0
+	csrw	mscratch,0
+	call	sched
+	j	trap_exit
 
 __hang:
 	j	__hang

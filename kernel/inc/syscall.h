@@ -1,6 +1,8 @@
 #pragma once
 
 #include "cap_types.h"
+#include "current.h"
+#include "macro.h"
 #include "proc.h"
 
 #include <stdint.h>
@@ -107,4 +109,4 @@ typedef union {
 
 _Static_assert(sizeof(sys_args_t) == 64, "sys_args_t has the wrong size");
 
-void handle_syscall(proc_t *p) __attribute__((noreturn));
+void handle_syscall(void);
