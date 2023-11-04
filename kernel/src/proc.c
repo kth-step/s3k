@@ -3,6 +3,7 @@
 
 #include "cap_pmp.h"
 #include "csr.h"
+#include "current.h"
 #include "drivers/time.h"
 #include "kassert.h"
 
@@ -129,4 +130,25 @@ void proc_pmp_load(proc_t *proc, pmp_slot_t slot, pmp_slot_t rwx, napot_t addr)
 void proc_pmp_unload(proc_t *proc, pmp_slot_t slot)
 {
 	proc->pmpcfg[slot] = 0;
+}
+
+void proc_pmp_sync(proc_t *proc)
+{
+	csrw_pmpaddr0(proc->pmpaddr[0]);
+	csrw_pmpaddr1(proc->pmpaddr[1]);
+	csrw_pmpaddr2(proc->pmpaddr[2]);
+	csrw_pmpaddr3(proc->pmpaddr[3]);
+	csrw_pmpaddr4(proc->pmpaddr[4]);
+	csrw_pmpaddr5(proc->pmpaddr[5]);
+	csrw_pmpaddr6(proc->pmpaddr[6]);
+	csrw_pmpaddr7(proc->pmpaddr[7]);
+	csrw_pmpcfg0(*(uint64_t *)proc->pmpcfg);
+}
+
+void proc_swap(proc_t *proc)
+{
+	if (current)
+		proc_release(current);
+	current = proc;
+	proc_pmp_sync(proc);
 }

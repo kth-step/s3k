@@ -69,7 +69,6 @@ void setup_uart(s3k_cidx_t uart_idx)
 	// Load the derive PMP capability to PMP configuration
 	s3k_pmp_load(uart_idx, 1);
 	// Synchronize PMP unit (hardware) with PMP configuration
-	// false => not full synchronization.
 	s3k_sync_mem();
 }
 

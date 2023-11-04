@@ -1,5 +1,26 @@
 #include "csr.h"
 
+uint64_t csrr_mcause(void)
+{
+	uint64_t val;
+	__asm__ volatile("csrr %0,mcause" : "=r"(val));
+	return val;
+}
+
+uint64_t csrr_mtval(void)
+{
+	uint64_t val;
+	__asm__ volatile("csrr %0,mtval" : "=r"(val));
+	return val;
+}
+
+uint64_t csrr_mepc(void)
+{
+	uint64_t val;
+	__asm__ volatile("csrr %0,mepc" : "=r"(val));
+	return val;
+}
+
 uint64_t csrr_mhartid(void)
 {
 	uint64_t val;
