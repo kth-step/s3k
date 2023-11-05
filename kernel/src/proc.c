@@ -27,87 +27,69 @@ proc_t *proc_get(pid_t pid)
 	return &_processes[pid];
 }
 
+proc_state_t proc_get_state(proc_t *proc)
+{
+	proc_state_t state = proc->state;
+	if ((state == PSF_BLOCKED) && time_get() >= proc->timeout)
+		return 0;
+	return state;
+}
+
 bool proc_acquire(proc_t *proc)
 {
-	// Set the busy flag if expected state
-	uint64_t expected = proc->state;
-	uint64_t desired = PSF_BUSY;
-	uint64_t curr_time = time_get();
+	proc_state_t expected = proc->state;
+	proc_state_t desired = PSF_BUSY;
 
-	// If state == 0, then process is ready.
-	bool is_ready = (expected == 0);
-	// If state is blocked, then process logically ready on timeout.
-	bool is_timeout
-	    = ((expected & PSF_BLOCKED) && curr_time >= proc->timeout);
-
-	if (!is_ready && !is_timeout)
+	if (expected & (PSF_BUSY | PSF_SUSPENDED))
 		return false;
 
-	bool succ = __atomic_compare_exchange(&proc->state, &expected, &desired,
-					      false /* not weak */,
-					      __ATOMIC_ACQUIRE /* succ */,
-					      __ATOMIC_RELAXED /* fail */);
-	if (is_timeout && succ)
-		proc->regs[REG_T0] = ERR_TIMEOUT;
-	return succ;
+	if ((expected == PSF_BLOCKED) && time_get() < proc->timeout)
+		return false;
+
+	return __atomic_compare_exchange(&proc->state, &expected, &desired,
+					 false, __ATOMIC_ACQUIRE,
+					 __ATOMIC_RELAXED);
 }
 
 void proc_release(proc_t *proc)
 {
-	// Unset the busy flag.
 	KASSERT(proc->state & PSF_BUSY);
 	__atomic_fetch_xor(&proc->state, PSF_BUSY, __ATOMIC_RELEASE);
 }
 
 void proc_suspend(proc_t *proc)
 {
-	// Set the suspend flag
-	uint64_t prev_state
-	    = __atomic_fetch_or(&proc->state, PSF_SUSPENDED, __ATOMIC_ACQUIRE);
-
-	// If the process was waiting, we also unset the waiting flag.
-	if ((prev_state & 0xFF) == PSF_BLOCKED) {
-		proc->regs[REG_T0] = ERR_SUSPENDED;
+	proc_state_t prev
+	    = __atomic_fetch_or(&proc->state, PSF_SUSPENDED, __ATOMIC_RELAXED);
+	if (prev & PSF_BLOCKED) {
 		proc->state = PSF_SUSPENDED;
-		__atomic_thread_fence(__ATOMIC_ACQUIRE);
+		proc->regs[REG_T0] = ERR_SUSPENDED;
 	}
 }
 
 void proc_resume(proc_t *proc)
 {
-	// Unset the suspend flag
-	__atomic_fetch_and(&proc->state, (uint64_t)~PSF_SUSPENDED,
-			   __ATOMIC_RELEASE);
+	__atomic_fetch_and(&proc->state, ~PSF_SUSPENDED, __ATOMIC_RELAXED);
 }
 
-void proc_ipc_wait(proc_t *proc, chan_t channel)
+void proc_ipc_wait(proc_t *proc, chan_t chan)
 {
 	KASSERT(proc->state == PSF_BUSY);
-	proc->state = PSF_BLOCKED | PSF_BUSY | ((uint64_t)channel << 32);
+	proc->state = PSF_BLOCKED | ((uint64_t)chan << 48);
 }
 
-bool proc_ipc_acquire(proc_t *proc, chan_t channel)
+bool proc_ipc_acquire(proc_t *proc, chan_t chan)
 {
-	uint64_t curr_time = time_get();
-	uint64_t timeout = timeout_get(csrr_mhartid());
+	proc_state_t expected = PSF_BLOCKED | ((uint64_t)chan << 48);
+	proc_state_t desired = PSF_BUSY;
 
-	if (proc->serv_time > 0) {
-		// proc is a server for a YIELDING channel with minimum server
-		// time.
-		if (proc->serv_time + curr_time >= timeout)
-			return false; // not enough time
-	}
-
-	// Check if the process has timed out
-	if (curr_time >= proc->timeout)
+	if (proc->state != expected)
 		return false;
-
-	// Try to acquire the process
-	uint64_t expected = PSF_BLOCKED | ((uint64_t)channel << 32);
-	uint64_t desired = PSF_BUSY;
-	return __atomic_compare_exchange(&proc->state, &expected, &desired,
-					 false, __ATOMIC_ACQUIRE,
-					 __ATOMIC_RELAXED);
+	if (time_get() >= proc->timeout)
+		return false;
+	return __atomic_compare_exchange_n(&proc->state, &expected, desired,
+					   false, __ATOMIC_ACQUIRE,
+					   __ATOMIC_RELAXED);
 }
 
 bool proc_is_suspended(proc_t *proc)

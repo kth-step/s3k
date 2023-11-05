@@ -1,7 +1,5 @@
 #include "cap_util.h"
 
-#include "pmp.h"
-
 cap_t cap_mk_time(hart_t hart, time_slot_t bgn, time_slot_t end)
 {
 	cap_t cap;
@@ -84,12 +82,6 @@ static inline bool is_range_prefix(uint64_t a_bgn, uint64_t a_end,
 static inline bool is_bit_subset(uint64_t a, uint64_t b)
 {
 	return (a & b) == a;
-}
-
-static inline addr_t tag_block_to_addr(tag_t tag, block_t block)
-{
-	return ((uint64_t)tag << MAX_BLOCK_SIZE)
-	       + ((uint64_t)block << MIN_BLOCK_SIZE);
 }
 
 static bool cap_time_revokable(cap_t p, cap_t c)

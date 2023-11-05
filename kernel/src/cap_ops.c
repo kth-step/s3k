@@ -2,7 +2,6 @@
 
 #include "cap_ipc.h"
 #include "cap_util.h"
-#include "pmp.h"
 #include "sched.h"
 
 err_t cap_read(cte_t c, cap_t *cap)
@@ -39,7 +38,7 @@ static void ipc_move_hook(cte_t src, cte_t dst)
 	}
 }
 
-err_t cap_move(cte_t src, cte_t dst, cap_t *cap)
+err_t cap_move(cte_t src, cte_t dst)
 {
 	if (!cte_cap(src).type)
 		return ERR_SRC_EMPTY;
@@ -49,7 +48,7 @@ err_t cap_move(cte_t src, cte_t dst, cap_t *cap)
 
 	if (cte_pid(src) != cte_pid(dst))
 		ipc_move_hook(src, dst);
-	cte_move(src, dst, cap);
+	cte_move(src, dst);
 	return SUCCESS;
 }
 
@@ -89,7 +88,7 @@ err_t cap_revoke_time(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 		if (pcap.time.hart != ccap.time.hart)
 			return -1;
 
-		if (pcap.time.end <= ccap.time.bgn)
+		if (ccap.time.end <= pcap.time.bgn)
 			return -1;
 
 		// delete the child
@@ -118,7 +117,7 @@ err_t cap_revoke_memory(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 		if (pcap.mem.tag != ccap.mem.tag)
 			return -1;
 
-		if (pcap.mem.end <= ccap.mem.bgn)
+		if (ccap.mem.end <= pcap.mem.bgn)
 			return -1;
 
 		// delete the child
@@ -133,7 +132,7 @@ err_t cap_revoke_memory(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 	} else if (ccap.type == CAPTY_PMP) {
 		uint64_t begin, end;
 		pmp_napot_decode(ccap.pmp.addr, &begin, &end);
-		if (pcap.mem.end < begin)
+		if (end < tag_block_to_addr(pcap.mem.tag, pcap.mem.bgn))
 			return -1;
 		// delete the child
 		cte_delete(child);
@@ -152,7 +151,7 @@ err_t cap_revoke_memory(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 err_t cap_revoke_monitor(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 {
 	if (ccap.type == CAPTY_MONITOR) {
-		if (pcap.mon.end <= ccap.mon.bgn)
+		if (ccap.mon.end <= pcap.mon.bgn)
 			return -1;
 
 		// delete the child
@@ -184,7 +183,7 @@ err_t cap_revoke_channel(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 	}
 
 	if (ccap.type == CAPTY_SOCKET) {
-		if (pcap.chan.end <= ccap.sock.chan)
+		if (ccap.sock.chan < pcap.chan.bgn)
 			return -1;
 
 		// delete the child

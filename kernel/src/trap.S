@@ -78,9 +78,9 @@ _exception:
 	# If a0 == tp, exit
 	beq	a0,tp,trap_exit
 
-	# Release old process
-	li	t1,1
-	amoxor.d.rl	x0,t1,(tp)
+	li	t1,~1
+	amoand.d.rl	x0,t1,(tp)
+
 
 	# If a0 != NULL, exit
 	bnez	a0,trap_exit_pmp
@@ -119,8 +119,8 @@ _user_yield:
 	bne	t0,t1,__hang
 
 	# release old process
-	li	t1,1
-	amoxor.d.rl	x0,t1,(a0)
+	li	t1,~1
+	amoand.d.rl	x0,t1,(a0)
 
 	# call scheduler
 	call	sched

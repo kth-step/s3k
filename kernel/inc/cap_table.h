@@ -19,6 +19,6 @@ cte_t cte_next(cte_t c);
 cte_t cte_prev(cte_t c);
 cap_t cte_cap(cte_t c);
 uint64_t cte_pid(cte_t c);
-void cte_move(cte_t src, cte_t dst, cap_t *cap);
+void cte_move(cte_t src, cte_t dst);
 cap_t cte_delete(cte_t c);
 void cte_insert(cte_t c, cap_t cap, cte_t prev);

@@ -2,7 +2,6 @@
 #include "cap_types.h"
 #include "error.h"
 #include "kernel.h"
-#include "pmp.h"
 
 err_t cap_pmp_load(cte_t pmp, pmp_slot_t slot)
 {

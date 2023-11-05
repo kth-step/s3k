@@ -12,7 +12,7 @@ include ${ROOT}/common/plat/${PLATFORM}.mk
 CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 	-DPLATFORM_${PLATFORM} \
 	-std=c11 \
-	-Og -g3 \
+	-O2 -g3 \
 	-Wall -Wextra -Werror \
 	-Wno-unused-parameter \
 	-Wshadow -fno-common \
