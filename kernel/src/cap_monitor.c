@@ -58,9 +58,11 @@ err_t cap_monitor_yield(cte_t mon, pid_t pid, proc_t **next)
 {
 	err_t err = check_monitor(mon, pid, false);
 	if (!err) {
+		proc_t *monitor = *next;
 		proc_t *proc = proc_get(pid);
 		if (proc_acquire(proc)) {
 			*next = proc;
+			proc_release(monitor);
 			return SUCCESS;
 		}
 		return ERR_INVALID_STATE;
@@ -95,9 +97,8 @@ err_t cap_monitor_cap_read(cte_t mon, cte_t src, cap_t *cap)
 err_t cap_monitor_cap_move(cte_t mon, cte_t src, cte_t dst)
 {
 	err_t err = check_monitor_move(mon, src, dst);
-	cap_t cap;
 	if (!err)
-		err = cap_move(src, dst, &cap);
+		err = cap_move(src, dst);
 	return err;
 }
 

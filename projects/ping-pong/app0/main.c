@@ -44,7 +44,8 @@ void setup_app1(uint64_t tmp)
 	s3k_mon_pmp_load(MONITOR, APP1_PID, 1, 1);
 
 	// derive a time slice capability
-	s3k_cap_derive(HART0_TIME, tmp, s3k_mk_time(S3K_MIN_HART, 0, S3K_SLOT_CNT / 2));
+	s3k_cap_derive(HART0_TIME, tmp,
+		       s3k_mk_time(S3K_MIN_HART, 0, S3K_SLOT_CNT / 2));
 	s3k_mon_cap_move(MONITOR, APP0_PID, tmp, APP1_PID, 2);
 
 	// Write start PC of app1 to PC
@@ -54,16 +55,19 @@ void setup_app1(uint64_t tmp)
 void setup_socket(uint64_t socket, uint64_t tmp)
 {
 	s3k_cap_derive(CHANNEL, socket,
-		       s3k_mk_socket(0, S3K_IPC_NOYIELD,
+		       s3k_mk_socket(0, S3K_IPC_YIELD,
 				     S3K_IPC_SDATA | S3K_IPC_CDATA, 0));
 	s3k_cap_derive(socket, tmp,
-		       s3k_mk_socket(0, S3K_IPC_NOYIELD,
+		       s3k_mk_socket(0, S3K_IPC_YIELD,
 				     S3K_IPC_SDATA | S3K_IPC_CDATA, 1));
 	s3k_mon_cap_move(MONITOR, APP0_PID, tmp, APP1_PID, 3);
 }
 
 int main(void)
 {
+	s3k_cap_delete(HART1_TIME);
+	s3k_cap_delete(HART2_TIME);
+	s3k_cap_delete(HART3_TIME);
 	// Setup UART access
 	setup_uart(10);
 
@@ -85,7 +89,7 @@ int main(void)
 	s3k_msg_t msg;
 	s3k_reply_t reply;
 	memcpy(msg.data, "pong", 5);
-	s3k_reg_write(S3K_REG_SERVTIME, 1500);
+	s3k_reg_write(S3K_REG_SERVTIME, 4500);
 	while (1) {
 		do {
 			reply = s3k_sock_sendrecv(11, &msg);

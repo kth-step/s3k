@@ -259,8 +259,10 @@ proc_t *sys_sync(proc_t *const p, const sys_args_t *args)
 {
 	// Full sync invokes scheduler,
 	// otherwise only update memory.
-	if (args->sync.full)
+	if (args->sync.full) {
+		proc_release(p);
 		return NULL;
+	}
 	proc_pmp_sync(p);
 	return p;
 }
@@ -279,7 +281,7 @@ proc_t *sys_cap_move(proc_t *const p, const sys_args_t *args)
 	p->regs[REG_T0] = ERR_PREEMPTED;
 	if (!kernel_lock_acquire())
 		return NULL;
-	p->regs[REG_T0] = cap_move(src, dst, (cap_t *)&p->regs[REG_A0]);
+	p->regs[REG_T0] = cap_move(src, dst);
 	kernel_lock_release();
 	return p;
 }
@@ -479,7 +481,7 @@ proc_t *sys_sock_send(proc_t *const p, const sys_args_t *args)
 {
 	cte_t sock = ctable_get(p->pid, args->sock.sock_idx);
 	const ipc_msg_t msg = {
-	    .src_buf = ctable_get(p->pid, args->sock.cap_idx),
+	    .cap_buf = ctable_get(p->pid, args->sock.cap_idx),
 	    .send_cap = args->sock.send_cap,
 	    .data = {args->sock.data[0], args->sock.data[1], args->sock.data[1],
 		     args->sock.data[3]},
@@ -496,12 +498,12 @@ proc_t *sys_sock_send(proc_t *const p, const sys_args_t *args)
 proc_t *sys_sock_recv(proc_t *const p, const sys_args_t *args)
 {
 	cte_t sock = ctable_get(p->pid, args->sock.sock_idx);
-	p->cap_buf = ctable_get(p->pid, args->sock.cap_idx);
+	cte_t cap_buf = ctable_get(p->pid, args->sock.cap_idx);
 	p->regs[REG_T0] = ERR_PREEMPTED;
 	proc_t *next = p;
 	if (!kernel_lock_acquire())
 		return NULL;
-	p->regs[REG_T0] = cap_sock_recv(sock, &next);
+	p->regs[REG_T0] = cap_sock_recv(sock, cap_buf, &next);
 	kernel_lock_release();
 	return next;
 }
@@ -509,9 +511,8 @@ proc_t *sys_sock_recv(proc_t *const p, const sys_args_t *args)
 proc_t *sys_sock_sendrecv(proc_t *const p, const sys_args_t *args)
 {
 	cte_t sock = ctable_get(p->pid, args->sock.sock_idx);
-	p->cap_buf = ctable_get(p->pid, args->sock.cap_idx);
 	const ipc_msg_t msg = {
-	    .src_buf = ctable_get(p->pid, args->sock.cap_idx),
+	    .cap_buf = ctable_get(p->pid, args->sock.cap_idx),
 	    .send_cap = args->sock.send_cap,
 	    .data = {args->sock.data[0], args->sock.data[1], args->sock.data[1],
 		     args->sock.data[3]},

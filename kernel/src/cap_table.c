@@ -72,17 +72,16 @@ uint64_t cte_pid(cte_t c)
 	return offset(c) / S3K_CAP_CNT;
 }
 
-void cte_move(cte_t src, cte_t dst, cap_t *cap)
+void cte_move(cte_t src, cte_t dst)
 {
-	*cap = src->cap;
 	if (src == dst)
 		return;
-	cte_set_cap(src, (cap_t){0});
+	dst->cap.raw = src->cap.raw;
+	src->cap.raw = 0;
 	cte_set_prev(dst, cte_prev(src));
 	cte_set_next(dst, cte_next(src));
 	cte_prev(dst)->next = offset(dst);
 	cte_next(dst)->prev = offset(dst);
-	cte_set_cap(dst, *cap);
 }
 
 cap_t cte_delete(cte_t c)
