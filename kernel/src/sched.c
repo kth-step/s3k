@@ -3,7 +3,6 @@
 #include "sched.h"
 
 #include "csr.h"
-#include "current.h"
 #include "drivers/time.h"
 #include "kassert.h"
 #include "kernel.h"
@@ -104,24 +103,19 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 	return p;
 }
 
-void sched(void)
+proc_t *sched(void)
 {
 	uint64_t hartid = csrr_mhartid();
 	uint64_t start_time, end_time;
-	if (current)
-		proc_release(current);
-	current = NULL;
-
-	proc_t *p;
-
+	proc_t *next;
 	do {
 		semaphore_acquire(&sched_semaphore);
-		p = sched_fetch(hartid, &start_time, &end_time);
+		next = sched_fetch(hartid, &start_time, &end_time);
 		semaphore_release(&sched_semaphore);
-	} while (!p);
+	} while (!next);
 
 	timeout_set(hartid, end_time);
 	while (time_get() < start_time)
 		;
-	proc_swap(p);
+	return next;
 }

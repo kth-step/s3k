@@ -7,6 +7,7 @@
 .extern sched
 .extern trap_entry
 .extern trap_exit
+.extern trap_exit_pmp
 
 .section .text.init,"ax",@progbits
 
@@ -98,10 +99,9 @@ head_exit:
 	# Start user processes.
 	la	t0,trap_entry
 	csrw	mtvec,t0
-	li	tp,0
 	csrw	mscratch,0
 	call	sched
-	j	trap_exit
+	j	trap_exit_pmp
 
 __hang:
 	j	__hang

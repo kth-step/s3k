@@ -2,7 +2,6 @@
 #include "exception.h"
 
 #include "csr.h"
-#include "current.h"
 #include "kernel.h"
 #include "proc.h"
 #include "trap.h"
@@ -13,41 +12,41 @@
 #define SRET 0x10200073
 #define URET 0x00200073
 
-void handle_exception(void)
+proc_t *handle_exception(proc_t *p)
 {
 	/* Check if it is a return from exception */
-	kernel_preempt_disable();
-	current->regs[REG_ECAUSE] = csrr_mcause();
-	current->regs[REG_EVAL] = csrr_mtval();
-	current->regs[REG_EPC] = current->regs[REG_PC];
-	current->regs[REG_ESP] = current->regs[REG_SP];
-	current->regs[REG_PC] = current->regs[REG_TPC];
-	current->regs[REG_SP] = current->regs[REG_TSP];
-	kernel_preempt_enable();
+	p->regs[REG_ECAUSE] = csrr_mcause();
+	p->regs[REG_EVAL] = csrr_mtval();
+	p->regs[REG_EPC] = p->regs[REG_PC];
+	p->regs[REG_ESP] = p->regs[REG_SP];
+	p->regs[REG_PC] = p->regs[REG_TPC];
+	p->regs[REG_SP] = p->regs[REG_TSP];
+	if (!p->regs[REG_PC]) {
+		proc_suspend(p);
+		return NULL;
+	}
+	return p;
 }
 
-static void handle_trap_return(void)
+static proc_t *handle_trap_return(proc_t *p)
 {
-	kernel_preempt_disable();
-	current->regs[REG_PC] = current->regs[REG_EPC];
-	current->regs[REG_SP] = current->regs[REG_ESP];
-	current->regs[REG_ECAUSE] = 0;
-	current->regs[REG_EVAL] = 0;
-	current->regs[REG_EPC] = 0;
-	current->regs[REG_ESP] = 0;
-	kernel_preempt_enable();
+	p->regs[REG_PC] = p->regs[REG_EPC];
+	p->regs[REG_SP] = p->regs[REG_ESP];
+	p->regs[REG_ECAUSE] = 0;
+	p->regs[REG_EVAL] = 0;
+	p->regs[REG_EPC] = 0;
+	p->regs[REG_ESP] = 0;
+	return p;
 }
 
-void handle_illegal_instruction(void)
+proc_t *handle_illegal_instruction(proc_t *p)
 {
 	switch (csrr_mtval()) {
 	case MRET:
 	case SRET:
 	case URET:
-		handle_trap_return();
-		break;
+		return handle_trap_return(p);
 	default:
-		handle_exception();
-		break;
+		return handle_exception(p);
 	}
 }

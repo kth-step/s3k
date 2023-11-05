@@ -4,7 +4,6 @@
 #include "altc/init.h"
 #include "cap_table.h"
 #include "csr.h"
-#include "current.h"
 #include "kassert.h"
 #include "mcslock.h"
 #include "proc.h"

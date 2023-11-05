@@ -10,6 +10,5 @@
 
 #include <stdint.h>
 
-void handle_exception(void);
-
-void handle_illegal_instruction(void);
+proc_t *handle_exception(proc_t *);
+proc_t *handle_illegal_instruction(proc_t *);
