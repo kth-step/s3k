@@ -44,9 +44,8 @@ void setup_app1(uint64_t tmp)
 	s3k_mon_pmp_load(MONITOR, APP1_PID, 1, 1);
 
 	// derive a time slice capability
-	// s3k_cap_derive(HART0_TIME, tmp, s3k_mk_time(S3K_MIN_HART, 0,
-	// S3K_SLOT_CNT / 2));
-	s3k_mon_cap_move(MONITOR, APP0_PID, HART1_TIME, APP1_PID, 2);
+	s3k_cap_derive(HART0_TIME, tmp, s3k_mk_time(S3K_MIN_HART, 0, S3K_SLOT_CNT / 2));
+	s3k_mon_cap_move(MONITOR, APP0_PID, tmp, APP1_PID, 2);
 
 	// Write start PC of app1 to PC
 	s3k_mon_reg_write(MONITOR, APP1_PID, S3K_REG_PC, 0x80020000);
@@ -55,10 +54,10 @@ void setup_app1(uint64_t tmp)
 void setup_socket(uint64_t socket, uint64_t tmp)
 {
 	s3k_cap_derive(CHANNEL, socket,
-		       s3k_mk_socket(0, S3K_IPC_YIELD,
+		       s3k_mk_socket(0, S3K_IPC_NOYIELD,
 				     S3K_IPC_SDATA | S3K_IPC_CDATA, 0));
 	s3k_cap_derive(socket, tmp,
-		       s3k_mk_socket(0, S3K_IPC_YIELD,
+		       s3k_mk_socket(0, S3K_IPC_NOYIELD,
 				     S3K_IPC_SDATA | S3K_IPC_CDATA, 1));
 	s3k_mon_cap_move(MONITOR, APP0_PID, tmp, APP1_PID, 3);
 }
