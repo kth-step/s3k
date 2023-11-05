@@ -51,7 +51,7 @@ BIN:=${ELF:.elf=.bin}
 HEX:=${ELF:.elf=.hex}
 DA :=${ELF:.elf=.da}
 
-all: ${ELF} ${BIN} ${HEX}
+all: ${ELF} ${BIN} ${HEX} ${DA}
 
 clean:
 	rm -f ${ELF} ${OBJS} ${DEPS}

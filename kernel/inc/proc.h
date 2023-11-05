@@ -80,6 +80,8 @@ typedef enum {
  * Contains all information needed manage a process except the capabilities.
  */
 typedef struct {
+	/** Process state. */
+	proc_state_t state;
 	/** The registers of the process (RISC-V registers and virtual
 	 * registers). */
 	uint64_t regs[REG_CNT];
@@ -89,8 +91,6 @@ typedef struct {
 	/** Instrumentation registers */
 	/** Process ID. */
 	pid_t pid;
-	/** Process state. */
-	proc_state_t state;
 
 	/** Scheduling information */
 
@@ -175,5 +175,3 @@ bool proc_pmp_avail(proc_t *proc, pmp_slot_t slot);
 void proc_pmp_load(proc_t *proc, pmp_slot_t slot, rwx_t cfg, napot_t addr);
 void proc_pmp_unload(proc_t *proc, pmp_slot_t slot);
 void proc_pmp_sync(proc_t *proc);
-
-void proc_swap(proc_t *proc);
