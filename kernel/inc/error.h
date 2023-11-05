@@ -1,7 +1,6 @@
 #pragma once
 
 typedef enum {
-	YIELD = -1,
 	SUCCESS = 0,
 	ERR_EMPTY,
 	ERR_SRC_EMPTY,

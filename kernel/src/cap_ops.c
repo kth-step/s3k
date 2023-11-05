@@ -87,10 +87,10 @@ err_t cap_revoke_time(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 {
 	if (ccap.type == CAPTY_TIME) {
 		if (pcap.time.hart != ccap.time.hart)
-			return YIELD;
+			return -1;
 
 		if (pcap.time.end <= ccap.time.bgn)
-			return YIELD;
+			return -1;
 
 		// delete the child
 		cte_delete(child);
@@ -109,17 +109,17 @@ err_t cap_revoke_time(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 
 		return SUCCESS;
 	}
-	return YIELD;
+	return -1;
 }
 
 err_t cap_revoke_memory(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 {
 	if (ccap.type == CAPTY_MEMORY) {
 		if (pcap.mem.tag != ccap.mem.tag)
-			return YIELD;
+			return -1;
 
 		if (pcap.mem.end <= ccap.mem.bgn)
-			return YIELD;
+			return -1;
 
 		// delete the child
 		cte_delete(child);
@@ -134,7 +134,7 @@ err_t cap_revoke_memory(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 		uint64_t begin, end;
 		pmp_napot_decode(ccap.pmp.addr, &begin, &end);
 		if (pcap.mem.end < begin)
-			return YIELD;
+			return -1;
 		// delete the child
 		cte_delete(child);
 
@@ -146,14 +146,14 @@ err_t cap_revoke_memory(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 
 		return SUCCESS;
 	}
-	return YIELD;
+	return -1;
 }
 
 err_t cap_revoke_monitor(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 {
 	if (ccap.type == CAPTY_MONITOR) {
 		if (pcap.mon.end <= ccap.mon.bgn)
-			return YIELD;
+			return -1;
 
 		// delete the child
 		cte_delete(child);
@@ -164,14 +164,14 @@ err_t cap_revoke_monitor(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 
 		return SUCCESS;
 	}
-	return YIELD;
+	return -1;
 }
 
 err_t cap_revoke_channel(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 {
 	if (ccap.type == CAPTY_CHANNEL) {
 		if (pcap.chan.end <= ccap.chan.bgn)
-			return YIELD;
+			return -1;
 
 		// delete the child
 		cte_delete(child);
@@ -185,7 +185,7 @@ err_t cap_revoke_channel(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 
 	if (ccap.type == CAPTY_SOCKET) {
 		if (pcap.chan.end <= ccap.sock.chan)
-			return YIELD;
+			return -1;
 
 		// delete the child
 		cte_delete(child);
@@ -196,7 +196,7 @@ err_t cap_revoke_channel(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 		return SUCCESS;
 	}
 
-	return YIELD;
+	return -1;
 }
 
 err_t cap_revoke_socket(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
@@ -205,7 +205,7 @@ err_t cap_revoke_socket(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 		if (pcap.sock.tag != 0)
 			return ERR_INVALID_CAPABILITY;
 		if (pcap.sock.chan != ccap.sock.chan)
-			return YIELD;
+			return -1;
 
 		// delete the child
 		cte_delete(child);
@@ -216,7 +216,7 @@ err_t cap_revoke_socket(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 		return SUCCESS;
 	}
 
-	return YIELD;
+	return -1;
 }
 
 err_t cap_revoke(cte_t parent)

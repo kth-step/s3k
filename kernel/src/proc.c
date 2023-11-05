@@ -3,7 +3,6 @@
 
 #include "cap_pmp.h"
 #include "csr.h"
-#include "current.h"
 #include "drivers/time.h"
 #include "kassert.h"
 
@@ -57,7 +56,7 @@ void proc_release(proc_t *proc)
 {
 	// Unset the busy flag.
 	KASSERT(proc->state & PSF_BUSY);
-	__atomic_fetch_and(&proc->state, (uint64_t)~PSF_BUSY, __ATOMIC_RELEASE);
+	__atomic_fetch_xor(&proc->state, PSF_BUSY, __ATOMIC_RELEASE);
 }
 
 void proc_suspend(proc_t *proc)
@@ -143,12 +142,4 @@ void proc_pmp_sync(proc_t *proc)
 	csrw_pmpaddr6(proc->pmpaddr[6]);
 	csrw_pmpaddr7(proc->pmpaddr[7]);
 	csrw_pmpcfg0(*(uint64_t *)proc->pmpcfg);
-}
-
-void proc_swap(proc_t *proc)
-{
-	if (current)
-		proc_release(current);
-	current = proc;
-	proc_pmp_sync(proc);
 }
