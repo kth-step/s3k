@@ -16,11 +16,17 @@ static uint64_t wcet;
 void kernel_init(void)
 {
 	alt_init();
+	alt_puts("> uart initialized");
 	mcslock_init(&lock);
+	alt_puts("> mcslock initialized");
 	ctable_init();
+	alt_puts("> ctable initialized");
 	sched_init();
+	alt_puts("> scheduler initialized");
 	proc_init();
-	alt_puts("kernel initialized");
+	alt_puts("> processes initialized");
+	alt_puts("> kernel initialization complete");
+	alt_puts("> starting boot process");
 }
 
 uint64_t kernel_wcet(void)
