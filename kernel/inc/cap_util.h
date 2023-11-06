@@ -29,3 +29,4 @@ static inline uint64_t pmp_napot_encode(uint64_t base, uint64_t size)
 
 bool cap_is_valid(cap_t cap);
 bool cap_is_derivable(cap_t parent, cap_t child);
+void cap_print(cap_t cap);
