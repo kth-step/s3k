@@ -26,7 +26,9 @@ void ctable_init(void)
 #endif
 	for (unsigned int i = 0; i < ARRAY_SIZE(init_caps); ++i) {
 #if !defined(NDEBUG) && VERBOSE > 0
-		alt_printf("  0x%x: 0x%X\n", i, init_caps[i].raw);
+		alt_printf("  0x%x: ", i);
+		cap_print(init_caps[i]);
+		alt_printf("\n");
 #endif
 		cte_insert(&ctable[i], init_caps[i], prev);
 	}
