@@ -34,25 +34,34 @@ void sched_init(void)
 		sched_update(pid, end, hartid, from, to);
 }
 
-void sched_update(uint64_t pid, uint64_t end, uint64_t hartid, uint64_t from,
+void sched_update(uint64_t pid, uint64_t end, uint64_t hart, uint64_t from,
 		  uint64_t to)
 {
 	// Acquire all resources, blocking everyone else.
 	semaphore_acquire_n(&sched_semaphore, S3K_HART_CNT);
+#if !defined(NDEBUG) && VERBOSE > 0
+	alt_printf(
+	    "> sched_update(pid=0x%X,end=0x%X,hart=0x%X,from=0x%X,to=0x%X)\n",
+	    pid, end, hart, from, to);
+#endif
 	for (uint64_t i = from; i < to; i++) {
-		slots[hartid - S3K_MIN_HART][i].pid = pid & 0xFF;
-		slots[hartid - S3K_MIN_HART][i].length = (end - i) & 0xFF;
+		slots[hart - S3K_MIN_HART][i].pid = pid & 0xFF;
+		slots[hart - S3K_MIN_HART][i].length = (end - i) & 0xFF;
 	}
 	// Release the resources.
 	semaphore_release_n(&sched_semaphore, S3K_HART_CNT);
 }
 
-void sched_delete(uint64_t hartid, uint64_t from, uint64_t to)
+void sched_delete(uint64_t hart, uint64_t from, uint64_t to)
 {
 	semaphore_acquire_n(&sched_semaphore, S3K_HART_CNT);
+#if !defined(NDEBUG) && VERBOSE > 0
+	alt_printf("> sched_delete(hart=0x%X,from=0x%X,to=0x%X)\n", hart, from,
+		   to);
+#endif
 	for (uint64_t i = from; i < to; ++i) {
-		slots[hartid - S3K_MIN_HART][i].pid = 0;
-		slots[hartid - S3K_MIN_HART][i].length = 0;
+		slots[hart - S3K_MIN_HART][i].pid = 0;
+		slots[hart - S3K_MIN_HART][i].length = 0;
 	}
 	// Release the resources.
 	semaphore_release_n(&sched_semaphore, S3K_HART_CNT);
@@ -97,6 +106,9 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 	// Try to acquire the process.
 	if (!proc_acquire(p))
 		return NULL;
+#if !defined(NDEBUG) && VERBOSE > 1
+	alt_printf("> sched(hart=0x%X,pid=0x%X,slot=0x%X)\n", hartid, si.pid, slot);
+#endif
 	*start_time = slot * S3K_SLOT_LEN;
 	*end_time = (slot + si.length) * S3K_SLOT_LEN - S3K_SCHED_TIME;
 	p->timeout = *end_time;
