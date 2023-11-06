@@ -1,9 +1,16 @@
 #include "cap_util.h"
 
 #include "altc/altio.h"
+#include "kassert.h"
 
 cap_t cap_mk_time(hart_t hart, time_slot_t bgn, time_slot_t end)
 {
+	KASSERT(bgn < end);
+#if S3K_MIN_HART > 0
+	KASSERT(hart >= S3K_MIN_HART);
+#endif
+	KASSERT(hart <= S3K_MAX_HART);
+	KASSERT(end <= S3K_SLOT_CNT);
 	cap_t cap;
 	cap.type = CAPTY_TIME;
 	cap.time.hart = hart;
@@ -16,6 +23,8 @@ cap_t cap_mk_time(hart_t hart, time_slot_t bgn, time_slot_t end)
 cap_t cap_mk_memory(addr_t bgn, addr_t end, rwx_t rwx)
 {
 	uint64_t tag = bgn >> MAX_BLOCK_SIZE;
+	KASSERT(bgn < end);
+	KASSERT(end <= (tag + 1) << MAX_BLOCK_SIZE);
 	cap_t cap;
 	cap.mem.type = CAPTY_MEMORY;
 	cap.mem.tag = tag;
@@ -40,6 +49,8 @@ cap_t cap_mk_pmp(napot_t addr, rwx_t rwx)
 
 cap_t cap_mk_monitor(pid_t bgn, pid_t end)
 {
+	KASSERT(bgn < end);
+	KASSERT(end <= S3K_PROC_CNT);
 	cap_t cap;
 	cap.mon.type = CAPTY_MONITOR;
 	cap.mon.bgn = bgn;
@@ -50,6 +61,8 @@ cap_t cap_mk_monitor(pid_t bgn, pid_t end)
 
 cap_t cap_mk_channel(chan_t bgn, chan_t end)
 {
+	KASSERT(bgn < end);
+	KASSERT(end <= S3K_CHAN_CNT);
 	cap_t cap;
 	cap.chan.type = CAPTY_CHANNEL;
 	cap.chan.bgn = bgn;
