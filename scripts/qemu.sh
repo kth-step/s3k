@@ -27,6 +27,7 @@ case ${PLATFORM} in
 		QEMU_MACHINE=sifive_u
 		QEMU_SMP=5
 		QEMU_OPTIONS="$@"
+		warning "Platform sifive_unleashed uses harts 1, 2, 3, and 4. Hart 0 is not unused."
 		;;
 	*)
 		warning "Unknown platform ${PLATFORM}!"
