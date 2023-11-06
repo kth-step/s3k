@@ -60,9 +60,11 @@ proc_t *handle_syscall(proc_t *proc)
 {
 	// System call arguments.
 	const sys_args_t *args = (sys_args_t *)&proc->regs[REG_A0];
+
 	// System call number.
 	uint64_t call = proc->regs[REG_T0];
-	// Validate kernel arguments, preemptively.
+
+	// Validate kernel arguments.
 	err_t err = validate_arguments(call, args);
 
 	// Increment PC
