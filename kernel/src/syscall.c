@@ -309,18 +309,8 @@ proc_t *sys_cap_revoke(proc_t *const p, const sys_args_t *args)
 			return NULL;
 		err = cap_revoke(c);
 		kernel_lock_release();
-	} while (!err);
-
-	if (err > 0) {
-		p->regs[REG_T0] = err;
-		return p;
-	}
-
-	// We should reach here if we have no more children.
-	if (!kernel_lock_acquire())
-		return NULL;
-	p->regs[REG_T0] = cap_reset(c);
-	kernel_lock_release();
+	} while (err < 0);
+	p->regs[REG_T0] = err;
 	return p;
 }
 
