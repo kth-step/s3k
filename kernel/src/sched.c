@@ -107,7 +107,8 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 	if (!proc_acquire(p))
 		return NULL;
 #if !defined(NDEBUG) && VERBOSE > 1
-	alt_printf("> sched(hart=0x%X,pid=0x%X,slot=0x%X)\n", hartid, si.pid, slot % S3K_SLOT_CNT);
+	alt_printf("> sched(hart=0x%X,pid=0x%X,slot=0x%X)\n", hartid, si.pid,
+		   slot % S3K_SLOT_CNT);
 #endif
 	*start_time = slot * S3K_SLOT_LEN;
 	*end_time = (slot + si.length) * S3K_SLOT_LEN - S3K_SCHED_TIME;
