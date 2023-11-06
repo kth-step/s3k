@@ -130,9 +130,9 @@ err_t cap_revoke_memory(cte_t parent, cap_t pcap, cte_t child, cap_t ccap)
 
 		return SUCCESS;
 	} else if (ccap.type == CAPTY_PMP) {
-		uint64_t begin, end;
-		pmp_napot_decode(ccap.pmp.addr, &begin, &end);
-		if (end < tag_block_to_addr(pcap.mem.tag, pcap.mem.bgn))
+		uint64_t base, size;
+		pmp_napot_decode(ccap.pmp.addr, &base, &size);
+		if (base + size < tag_block_to_addr(pcap.mem.tag, pcap.mem.bgn))
 			return -1;
 		// delete the child
 		cte_delete(child);
