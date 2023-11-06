@@ -66,10 +66,6 @@ static err_t do_send(cap_t cap, const ipc_msg_t *msg, proc_t **next)
 			proc_release(recv);
 		}
 		return SUCCESS;
-	} else if (is_server) {
-		if (msg->send_cap)
-			cap_delete(msg->cap_buf);
-		return SUCCESS;
 	}
 	return ERR_NO_RECEIVER;
 }
@@ -131,6 +127,8 @@ static err_t replyrecv(cte_t sock, cap_t cap, const ipc_msg_t *msg,
 	if (err == ERR_PREEMPTED) {
 		*next = NULL;
 		return err;
+	} else if (err == ERR_NO_RECEIVER && msg->send_cap) {
+		cap_delete(msg->cap_buf);
 	}
 	do_recv(cap, cap_buf, server);
 	if (*next == server)
