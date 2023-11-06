@@ -1,5 +1,7 @@
 #include "cap_util.h"
 
+#include "altc/altio.h"
+
 cap_t cap_mk_time(hart_t hart, time_slot_t bgn, time_slot_t end)
 {
 	cap_t cap;
@@ -19,7 +21,7 @@ cap_t cap_mk_memory(addr_t bgn, addr_t end, rwx_t rwx)
 	cap.mem.tag = tag;
 	cap.mem.bgn = (bgn - (tag << MAX_BLOCK_SIZE)) >> MIN_BLOCK_SIZE;
 	cap.mem.end = (end - (tag << MAX_BLOCK_SIZE)) >> MIN_BLOCK_SIZE;
-	cap.mem.mrk = bgn;
+	cap.mem.mrk = cap.mem.bgn;
 	cap.mem.rwx = rwx;
 	cap.mem.lck = false;
 	return cap;
@@ -65,6 +67,48 @@ cap_t cap_mk_socket(chan_t chan, ipc_mode_t mode, ipc_perm_t perm, uint32_t tag)
 	cap.sock.perm = perm;
 	cap.sock.tag = tag;
 	return cap;
+}
+
+void cap_print(cap_t cap)
+{
+	switch (cap.type) {
+	case CAPTY_NONE:
+		alt_printf("NONE{}");
+		break;
+	case CAPTY_TIME:
+		alt_printf("TIME{hart=%x,bgn=%x,end=%x,mrk=%x}", cap.time.hart,
+			   cap.time.bgn, cap.time.end, cap.time.mrk);
+		break;
+	case CAPTY_MEMORY: {
+		uint64_t bgn = tag_block_to_addr(cap.mem.tag, cap.mem.bgn);
+		uint64_t end = tag_block_to_addr(cap.mem.tag, cap.mem.end);
+		uint64_t mrk = tag_block_to_addr(cap.mem.tag, cap.mem.mrk);
+		alt_printf("MEMORY{bgn=%X,end=%X,mrk=%x,rwx=%X,lck=%x}", bgn,
+			   end, mrk, cap.mem.rwx, cap.mem.lck);
+	} break;
+	case CAPTY_PMP: {
+		uint64_t base, size;
+		pmp_napot_decode(cap.pmp.addr, &base, &size);
+		alt_printf("PMP{bgn=%X,end=%X,rwx=%x,used=%x,slot=%x}", base,
+			   base + size, cap.pmp.rwx, cap.pmp.used,
+			   cap.pmp.slot);
+	} break;
+	case CAPTY_MONITOR:
+		alt_printf("MONITOR{bgn=%x,end=%x,mrk=%x}", cap.mon.bgn,
+			   cap.mon.end, cap.mon.mrk);
+		break;
+	case CAPTY_CHANNEL:
+		alt_printf("CHANNEL{bgn=%x,end=%x,mrk=%x}", cap.chan.bgn,
+			   cap.chan.end, cap.chan.mrk);
+		break;
+	case CAPTY_SOCKET:
+		alt_printf("SOCKET{chan=%x,tag=%x,perm=%x,mode=%x}",
+			   cap.sock.chan, cap.sock.tag, cap.sock.perm,
+			   cap.sock.mode);
+		break;
+	default:
+		alt_printf("UNKNOWN{raw=%X}", cap.raw);
+	}
 }
 
 static inline bool is_range_subset(uint64_t a_bgn, uint64_t a_end,
