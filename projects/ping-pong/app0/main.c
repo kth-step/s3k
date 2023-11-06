@@ -89,7 +89,7 @@ int main(void)
 	s3k_msg_t msg;
 	s3k_reply_t reply;
 	memcpy(msg.data, "pong", 5);
-	s3k_reg_write(S3K_REG_SERVTIME, 4500);
+	s3k_reg_write(S3K_REG_SERVTIME, 100);
 	while (1) {
 		do {
 			reply = s3k_sock_sendrecv(11, &msg);
