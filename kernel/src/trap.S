@@ -62,7 +62,9 @@ trap_entry:
 	csrr	t0,mcause
 	bltz	t0,_user_yield
 
+#ifndef NPREMPT
 	csrs	mstatus,MSTATUS_MIE
+#endif
 
 _exception:
 	# Save current process
@@ -72,19 +74,22 @@ _exception:
 1:	auipc	ra,%pcrel_hi(_exception_table)
 	slli	t0,t0,2
 	add	ra,ra,t0
+#ifndef NPREEMPT
 	csrc	mstatus,MSTATUS_MIE	# disable preemption
+#endif
 	jalr	ra,%pcrel_lo(1b)(ra)	# Call handler
 
 	# If a0 == tp, exit
 	beq	a0,tp,trap_exit
 
+	# Release the old process
 	li	t1,~1
 	amoand.d.rl	x0,t1,(tp)
-
 
 	# If a0 != NULL, exit
 	bnez	a0,trap_exit_pmp
 
+	# We have a yield
 	call sched
 
 	j	trap_exit_pmp
@@ -126,6 +131,9 @@ _user_yield:
 	call	sched
 
 trap_exit_pmp:
+#ifndef NPREMPT
+	csrw	mstatus,MSTATUS_MIE
+#endif
 	ld	s0,PROC_PMPADDR0(a0)
 	ld	s1,PROC_PMPADDR1(a0)
 	ld	s2,PROC_PMPADDR2(a0)
@@ -146,6 +154,9 @@ trap_exit_pmp:
 	csrw	pmpcfg0,s8
 
 trap_exit:
+#ifndef NPREMPT
+	csrw	mstatus,MSTATUS_MIE
+#endif
 	ld	t0,PROC_PC(a0)
 	csrw	mepc,t0
 

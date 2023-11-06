@@ -36,7 +36,11 @@ void kernel_wcet_reset(void)
 bool kernel_lock_acquire(void)
 {
 	uint64_t i = csrr_mhartid();
+#ifndef NPREMPT
 	return mcslock_try_acquire(&lock, &nodes[i]);
+#else
+	return mcslock_acquire(&lock, &nodes[i]);
+#endif
 }
 
 void kernel_lock_release(void)
