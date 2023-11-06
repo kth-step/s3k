@@ -1,6 +1,6 @@
 .POSIX:
 
-export PLATFORM   ?=qemu_virt
+export PLATFORM   ?=qemu_virt4
 export ROOT       :=${abspath ../..}
 export BUILD      :=${abspath build/${PLATFORM}}
 export S3K_CONF_H :=${abspath s3k_conf.h}

@@ -21,8 +21,15 @@ void ctable_init(void)
 {
 	const cap_t init_caps[] = INIT_CAPS;
 	cte_t prev = ctable;
-	for (unsigned int i = 0; i < ARRAY_SIZE(init_caps); ++i)
+#if !defined(NDEBUG) && VERBOSE > 0
+	alt_puts("> Initial capabilities:");
+#endif
+	for (unsigned int i = 0; i < ARRAY_SIZE(init_caps); ++i) {
+#if !defined(NDEBUG) && VERBOSE > 0
+		alt_printf("  0x%x: 0x%X\n", i, init_caps[i].raw);
+#endif
 		cte_insert(&ctable[i], init_caps[i], prev);
+	}
 }
 
 cte_t ctable_get(uint64_t pid, uint64_t index)
