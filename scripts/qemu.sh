@@ -15,4 +15,4 @@ if [[ -z "$QEMU_SMP" ]]; then
 fi
 
 qemu-system-riscv64 -M $QEMU_MACHINE -smp $QEMU_SMP -m 128M -nographic -bios none \
-	$LOADER $@
+	$LOADER $QEMU_OPTIONS $@
