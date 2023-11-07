@@ -52,33 +52,27 @@ err_t cap_move(cte_t src, cte_t dst)
 	return SUCCESS;
 }
 
-static void delete_hook(cte_t c, cap_t cap)
+err_t cap_delete(cte_t c)
 {
-	// Clean-up resources
+	cap_t cap = cte_cap(c);
+	proc_t *p = proc_get(cte_pid(c));
 	switch (cap.type) {
-	case CAPTY_TIME: {
-		uint64_t hartid = cap.time.hart;
-		uint64_t from = cap.time.mrk;
-		uint64_t end = cap.time.end;
-		sched_delete(hartid, from, end);
-	} break;
+	case CAPTY_NONE:
+		return ERR_EMPTY;
+	case CAPTY_TIME:
+		sched_delete(cap.time.hart, cap.time.mrk, cap.time.end);
+		break;
 	case CAPTY_PMP:
 		if (cap.pmp.used)
-			proc_pmp_unload(proc_get(cte_pid(c)), cap.pmp.slot);
+			proc_pmp_unload(p, cap.pmp.slot);
 		break;
 	case CAPTY_SOCKET:
-		cap_sock_clear(cap, proc_get(cte_pid(c)));
+		cap_sock_clear(cap, p);
 		break;
 	default:
 		break;
 	}
-}
-
-err_t cap_delete(cte_t c)
-{
-	if (!cte_cap(c).type)
-		return ERR_EMPTY;
-	delete_hook(c, cte_delete(c));
+	cte_delete(c);
 	return SUCCESS;
 }
 
