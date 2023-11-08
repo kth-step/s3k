@@ -61,8 +61,11 @@ int main(void)
 	// Setup app1 capabilities and PC
 	setup_app1(11);
 
+	char buf[12];
+	alt_snprintf(buf, 64, "hello, world from app%x", 0);
+
 	// Write hello world.
-	alt_puts("hello, world from app0");
+	alt_puts(buf);
 
 	// BYE!
 	alt_puts("bye from app0");
