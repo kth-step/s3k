@@ -452,7 +452,7 @@ s3k_err_t s3k_try_mon_reg_read(s3k_cidx_t mon, s3k_pid_t pid, s3k_reg_t reg,
 	    .mon_reg = {mon, pid, reg}
 	      };
 	s3k_ret_t ret
-	    = do_ecall(S3K_SYS_MON_REG_READ, args, sizeof(args.mon_state));
+	    = do_ecall(S3K_SYS_MON_REG_READ, args, sizeof(args.mon_reg));
 	*val = ret.val;
 	return ret.err;
 }
@@ -464,7 +464,7 @@ s3k_err_t s3k_try_mon_reg_write(s3k_cidx_t mon, s3k_pid_t pid, s3k_reg_t reg,
 	    .mon_reg = {mon, pid, reg, val}
 	   };
 	s3k_ret_t ret
-	    = do_ecall(S3K_SYS_MON_REG_WRITE, args, sizeof(args.mon_state));
+	    = do_ecall(S3K_SYS_MON_REG_WRITE, args, sizeof(args.mon_reg));
 	return ret.err;
 }
 
