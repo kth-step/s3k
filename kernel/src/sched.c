@@ -6,6 +6,7 @@
 #include "drivers/time.h"
 #include "kassert.h"
 #include "kernel.h"
+#include "kprintf.h"
 #include "proc.h"
 #include "semaphore.h"
 #include "trap.h"
@@ -40,9 +41,8 @@ void sched_update(uint64_t pid, uint64_t end, uint64_t hart, uint64_t from,
 	// Acquire all resources, blocking everyone else.
 	semaphore_acquire_n(&sched_semaphore, S3K_HART_CNT);
 #if !defined(NDEBUG) && VERBOSE > 0
-	alt_printf(
-	    "> sched_update(pid=0x%X,end=0x%X,hart=0x%X,from=0x%X,to=0x%X)\n",
-	    pid, end, hart, from, to);
+	kprintf("> sched_update(pid=%D,end=%D,hart=%D,from=%D,to=%D)\n", pid,
+		end, hart, from, to);
 #endif
 	for (uint64_t i = from; i < to; i++) {
 		slots[hart - S3K_MIN_HART][i].pid = pid & 0xFF;
@@ -56,8 +56,7 @@ void sched_delete(uint64_t hart, uint64_t from, uint64_t to)
 {
 	semaphore_acquire_n(&sched_semaphore, S3K_HART_CNT);
 #if !defined(NDEBUG) && VERBOSE > 0
-	alt_printf("> sched_delete(hart=0x%X,from=0x%X,to=0x%X)\n", hart, from,
-		   to);
+	kprintf("> sched_delete(hart=%D,from=%D,to=%D)\n", hart, from, to);
 #endif
 	for (uint64_t i = from; i < to; ++i) {
 		slots[hart - S3K_MIN_HART][i].pid = 0;
@@ -107,8 +106,8 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 	if (!proc_acquire(p))
 		return NULL;
 #if !defined(NDEBUG) && VERBOSE > 1
-	alt_printf("> sched(hart=0x%X,pid=0x%X,slot=0x%X)\n", hartid, si.pid,
-		   slot % S3K_SLOT_CNT);
+	kprintf("> sched(hart=%d,pid=%d,slot=%D)\n", hartid, si.pid,
+		slot % S3K_SLOT_CNT);
 #endif
 	*start_time = slot * S3K_SLOT_LEN;
 	*end_time = (slot + si.length) * S3K_SLOT_LEN - S3K_SCHED_TIME;

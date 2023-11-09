@@ -22,13 +22,13 @@ void ctable_init(void)
 	const cap_t init_caps[] = INIT_CAPS;
 	cte_t prev = ctable;
 #if !defined(NDEBUG) && VERBOSE > 0
-	alt_puts("> Initial capabilities:");
+	kputstr("> Initial capabilities:\n");
 #endif
 	for (unsigned int i = 0; i < ARRAY_SIZE(init_caps); ++i) {
 #if !defined(NDEBUG) && VERBOSE > 0
-		alt_printf("  0x%x: ", i);
-		cap_print(init_caps[i]);
-		alt_printf("\n");
+		char buf[128];
+		cap_snprint(buf, 128, init_caps[i]);
+		kprintf("  %d: %s\n", i, buf);
 #endif
 		cte_insert(&ctable[i], init_caps[i], prev);
 	}
