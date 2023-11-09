@@ -1,5 +1,5 @@
 #pragma once
-#include "altc/altio.h"
+#include "kprintf.h"
 
 /**
  * @file kassert.h
@@ -17,9 +17,8 @@
  */
 #ifndef NDEBUG
 
-#define _X_(x) #x
 #define KASSERT_FAILURE(FILE, LINE) \
-	alt_puts("Kernel assertion failed at " FILE ":" _X_(LINE) ".");
+	kprintf("Kernel assertion failed at %s:%d.\n", FILE, LINE);
 
 #define KASSERT(EXPR)                                        \
 	do {                                                 \

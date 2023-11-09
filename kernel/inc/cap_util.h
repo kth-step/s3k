@@ -1,6 +1,8 @@
 #pragma once
 #include "cap_types.h"
 
+#include <stddef.h>
+
 cap_t cap_mk_time(hart_t hart, time_slot_t bgn, time_slot_t end);
 cap_t cap_mk_memory(addr_t bgn, addr_t end, rwx_t rwx);
 cap_t cap_mk_pmp(napot_t addr, rwx_t rwx);
@@ -29,4 +31,4 @@ static inline uint64_t pmp_napot_encode(uint64_t base, uint64_t size)
 
 bool cap_is_valid(cap_t cap);
 bool cap_is_derivable(cap_t parent, cap_t child);
-void cap_print(cap_t cap);
+void cap_snprint(char *restrict buf, size_t size, cap_t cap);

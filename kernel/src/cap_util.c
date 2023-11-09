@@ -82,45 +82,49 @@ cap_t cap_mk_socket(chan_t chan, ipc_mode_t mode, ipc_perm_t perm, uint32_t tag)
 	return cap;
 }
 
-void cap_print(cap_t cap)
+void cap_snprint(char *restrict buf, size_t size, cap_t cap)
 {
 	switch (cap.type) {
 	case CAPTY_NONE:
-		alt_printf("NONE{}");
+		alt_snprintf(buf, size, "NONE{}");
 		break;
 	case CAPTY_TIME:
-		alt_printf("TIME{hart=%x,bgn=%x,end=%x,mrk=%x}", cap.time.hart,
-			   cap.time.bgn, cap.time.end, cap.time.mrk);
+		alt_snprintf(buf, size, "TIME{hart=%d,bgn=%d,end=%d,mrk=%d}",
+			     cap.time.hart, cap.time.bgn, cap.time.end,
+			     cap.time.mrk);
 		break;
 	case CAPTY_MEMORY: {
 		uint64_t bgn = tag_block_to_addr(cap.mem.tag, cap.mem.bgn);
 		uint64_t end = tag_block_to_addr(cap.mem.tag, cap.mem.end);
 		uint64_t mrk = tag_block_to_addr(cap.mem.tag, cap.mem.mrk);
-		alt_printf("MEMORY{bgn=%X,end=%X,mrk=%x,rwx=%X,lck=%x}", bgn,
-			   end, mrk, cap.mem.rwx, cap.mem.lck);
+		alt_snprintf(buf, size,
+			     "MEMORY{bgn=0x%X,end=0x%X,mrk=0x%X,rwx=%d,lck=%x}",
+			     bgn, end, mrk, cap.mem.rwx, cap.mem.lck);
 	} break;
 	case CAPTY_PMP: {
-		uint64_t base, size;
-		pmp_napot_decode(cap.pmp.addr, &base, &size);
-		alt_printf("PMP{bgn=%X,end=%X,rwx=%x,used=%x,slot=%x}", base,
-			   base + size, cap.pmp.rwx, cap.pmp.used,
-			   cap.pmp.slot);
+		uint64_t base, _size;
+		pmp_napot_decode(cap.pmp.addr, &base, &_size);
+		alt_snprintf(buf, size,
+			     "PMP{bgn=0x%X,end=0x%X,rwx=%d,used=%d,slot=%d}",
+			     base, base + _size, cap.pmp.rwx, cap.pmp.used,
+			     cap.pmp.slot);
 	} break;
 	case CAPTY_MONITOR:
-		alt_printf("MONITOR{bgn=%x,end=%x,mrk=%x}", cap.mon.bgn,
-			   cap.mon.end, cap.mon.mrk);
+		alt_snprintf(buf, size, "MONITOR{bgn=%d,end=%d,mrk=%d}",
+			     cap.mon.bgn, cap.mon.end, cap.mon.mrk);
 		break;
 	case CAPTY_CHANNEL:
-		alt_printf("CHANNEL{bgn=%x,end=%x,mrk=%x}", cap.chan.bgn,
-			   cap.chan.end, cap.chan.mrk);
+		alt_snprintf(buf, size, "CHANNEL{bgn=%d,end=%d,mrk=%d}",
+			     cap.chan.bgn, cap.chan.end, cap.chan.mrk);
 		break;
 	case CAPTY_SOCKET:
-		alt_printf("SOCKET{chan=%x,tag=%x,perm=%x,mode=%x}",
-			   cap.sock.chan, cap.sock.tag, cap.sock.perm,
-			   cap.sock.mode);
+		alt_snprintf(buf, size,
+			     "SOCKET{chan=%d,tag=%d,perm=%d,mode=%d}",
+			     cap.sock.chan, cap.sock.tag, cap.sock.perm,
+			     cap.sock.mode);
 		break;
 	default:
-		alt_printf("UNKNOWN{raw=%X}", cap.raw);
+		alt_snprintf(buf, size, "UNKNOWN{raw=0x%X}", cap.raw);
 	}
 }
 

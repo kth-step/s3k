@@ -17,7 +17,7 @@ void proc_init(void)
 	}
 	_processes[0].state = 0;
 	_processes[0].regs[REG_PC] = (uint64_t)_payload;
-	alt_printf("> boot process pc=0x%X\n", _payload);
+	kprintf("> boot process pc=0x%X\n", _payload);
 	KASSERT(cap_pmp_load(ctable_get(0, 0), 0) == SUCCESS);
 }
 

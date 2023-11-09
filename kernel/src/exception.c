@@ -14,6 +14,10 @@
 
 proc_t *handle_exception(proc_t *p)
 {
+#if !defined(NDEBUG) && VERBOSE > 1
+	kprintf("handle_exception(pid=%X,mcause=%X,mtval=%X,mepc=%X)", p->pid,
+		csrr_mcause(), csrr_mtval(), csrr_mepc());
+#endif
 	/* Check if it is a return from exception */
 	p->regs[REG_ECAUSE] = csrr_mcause();
 	p->regs[REG_EVAL] = csrr_mtval();
