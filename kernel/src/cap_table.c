@@ -85,8 +85,8 @@ void cte_move(cte_t src, cte_t dst)
 {
 	if (src == dst)
 		return;
-	dst->cap.raw = src->cap.raw;
-	src->cap.raw = 0;
+	cte_set_cap(dst, cte_cap(src));
+	cte_set_cap(src, (cap_t){0});
 	cte_set_prev(dst, cte_prev(src));
 	cte_set_next(dst, cte_next(src));
 	cte_prev(dst)->next = offset(dst);
