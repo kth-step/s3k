@@ -56,6 +56,7 @@ typedef enum capty {
 	CAPTY_MONITOR = 4, ///< Monitor capability.
 	CAPTY_CHANNEL = 5, ///< IPC Channel capability.
 	CAPTY_SOCKET = 6,  ///< IPC Socket capability.
+	CAPTY_COUNT	   ///< Number of capability types
 } capty_t;
 
 /// Capability description
