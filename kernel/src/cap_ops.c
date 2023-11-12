@@ -188,10 +188,6 @@ err_t cap_derive_time(cte_t src, cap_t cap, cte_t dst, cap_t new_cap)
 {
 	if (new_cap.type != CAPTY_TIME)
 		return ERR_INVALID_DERIVATION;
-	if (new_cap.time.bgn != new_cap.time.mrk)
-		return ERR_INVALID_DERIVATION;
-	if (new_cap.time.bgn >= new_cap.time.end)
-		return ERR_INVALID_DERIVATION;
 	if (new_cap.time.hart != cap.time.hart)
 		return ERR_INVALID_DERIVATION;
 	if (new_cap.time.bgn != cap.time.mrk)
@@ -263,10 +259,6 @@ err_t cap_derive_memory(cte_t src, cap_t cap, cte_t dst, cap_t new_cap)
 {
 	if (new_cap.type == CAPTY_MEMORY) {
 		if (cap.mem.tag != new_cap.mem.tag)
-			return ERR_INVALID_DERIVATION;
-		if (new_cap.mem.bgn != new_cap.mem.mrk)
-			return ERR_INVALID_DERIVATION;
-		if (new_cap.mem.bgn >= new_cap.mem.end)
 			return ERR_INVALID_DERIVATION;
 		if (cap.mem.tag != new_cap.mem.tag)
 			return ERR_INVALID_DERIVATION;
@@ -375,10 +367,6 @@ err_t cap_derive_monitor(cte_t src, cap_t cap, cte_t dst, cap_t new_cap)
 {
 	if (new_cap.type != CAPTY_MONITOR)
 		return ERR_INVALID_DERIVATION;
-	if (new_cap.mon.bgn != new_cap.mon.mrk)
-		return ERR_INVALID_DERIVATION;
-	if (new_cap.mon.bgn >= new_cap.mon.end)
-		return ERR_INVALID_DERIVATION;
 	if (new_cap.mon.bgn < cap.mon.mrk)
 		return ERR_INVALID_DERIVATION;
 	if (new_cap.mon.end >= cap.mon.end)
@@ -435,10 +423,6 @@ err_t cap_revoke_channel(cte_t parent, cap_t pcap)
 err_t cap_derive_channel(cte_t src, cap_t cap, cte_t dst, cap_t new_cap)
 {
 	if (new_cap.type == CAPTY_CHANNEL) {
-		if (new_cap.chan.bgn != new_cap.chan.mrk)
-			return ERR_INVALID_DERIVATION;
-		if (new_cap.chan.bgn >= new_cap.chan.end)
-			return ERR_INVALID_DERIVATION;
 		if (new_cap.chan.bgn < cap.chan.mrk)
 			return ERR_INVALID_DERIVATION;
 		if (new_cap.chan.end >= cap.chan.end)
