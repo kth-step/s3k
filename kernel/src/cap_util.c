@@ -127,3 +127,25 @@ void cap_snprint(char *restrict buf, size_t size, cap_t cap)
 		alt_snprintf(buf, size, "UNKNOWN{raw=0x%X}", cap.raw);
 	}
 }
+
+bool cap_is_valid(const cap_t cap)
+{
+	switch (cap.type)
+	{
+	case CAPTY_TIME:
+		return cap.time.bgn < cap.time.end && cap.time.bgn == cap.time.mrk;
+	case CAPTY_MEMORY:
+		return cap.mem.lck == 0 && cap.mem.bgn < cap.mem.end &&
+		cap.mem.mrk == cap.mem.bgn;
+	case CAPTY_PMP:
+		return cap.pmp.used == 0 && cap.pmp.slot == 0;
+	case CAPTY_MONITOR:
+		return cap.mon.bgn < cap.mon.end && cap.mon.bgn == cap.mon.mrk;
+	case CAPTY_CHANNEL:
+		return cap.mem.bgn < cap.mem.end && cap.mem.bgn == cap.mem.mrk;
+	case CAPTY_SOCKET:
+		return (cap.sock.mode == IPC_YIELD) || (cap.sock.mode == IPC_NOYIELD);
+	default:
+		return false;
+	}
+}
