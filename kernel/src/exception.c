@@ -16,11 +16,11 @@ proc_t *handle_exception(proc_t *p)
 {
 #if !defined(NDEBUG) && VERBOSE > 1
 	kprintf("handle_exception(pid=%X,mcause=%X,mtval=%X,mepc=%X)", p->pid,
-		csrr_mcause(), csrr_mtval(), csrr_mepc());
+		csrr(mcause), csrr(mtval), csrr(mepc));
 #endif
 	/* Check if it is a return from exception */
-	p->regs[REG_ECAUSE] = csrr_mcause();
-	p->regs[REG_EVAL] = csrr_mtval();
+	p->regs[REG_ECAUSE] = csrr(mcause);
+	p->regs[REG_EVAL] = csrr(mtval);
 	p->regs[REG_EPC] = p->regs[REG_PC];
 	p->regs[REG_ESP] = p->regs[REG_SP];
 	p->regs[REG_PC] = p->regs[REG_TPC];
@@ -45,7 +45,7 @@ static proc_t *handle_trap_return(proc_t *p)
 
 proc_t *handle_illegal_instruction(proc_t *p)
 {
-	switch (csrr_mtval()) {
+	switch (csrr(mtval)) {
 	case MRET:
 	case SRET:
 	case URET:
