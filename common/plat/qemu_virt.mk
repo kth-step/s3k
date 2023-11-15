@@ -1,4 +1,4 @@
-export ARCH=rv64imac_zicsr
+export ARCH=rv64imac_zicsr_zifencei
 export ABI=lp64
 export CMODEL=medany
 export COMMON_INC:=${ROOT}/common/inc
