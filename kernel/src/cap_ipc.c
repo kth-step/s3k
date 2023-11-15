@@ -27,7 +27,7 @@ static err_t do_send(cap_t cap, const ipc_msg_t *msg, proc_t **next)
 	cte_t cap_buf = channels[cap.sock.chan].cap_buf;
 
 	uint64_t curr_time = time_get();
-	uint64_t timeout = timeout_get(csrr_mhartid());
+	uint64_t timeout = (*next)->timeout;
 
 	if (curr_time > timeout)
 		return ERR_PREEMPTED;
