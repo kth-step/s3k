@@ -30,6 +30,7 @@ err_t cap_pmp_unload(cte_t pmp)
 		return ERR_EMPTY;
 	if (cap.type != CAPTY_PMP || !cap.pmp.used)
 		return ERR_INVALID_PMP;
+
 	proc_pmp_unload(proc, cap.pmp.slot);
 	cap.pmp.slot = 0;
 	cap.pmp.used = 0;
