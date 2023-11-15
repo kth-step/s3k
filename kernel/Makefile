@@ -12,26 +12,15 @@ include ${ROOT}/common/plat/${PLATFORM}.mk
 CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 	-DPLATFORM_${PLATFORM} \
 	-std=c11 \
-	-O2 -g3 \
+	-Os -g3 \
 	-Wall -Wextra -Werror \
 	-Wno-unused-parameter \
 	-Wshadow -fno-common \
 	-Wno-builtin-declaration-mismatch \
 	-fno-stack-protector \
-	-flto \
+	-flto -fwhole-program \
 	-include ${S3K_CONF_H} \
-	-Iinc -I${COMMON_INC} \
-	-fcall-used-s1 \
-	-fcall-used-s2 \
-	-fcall-used-s3 \
-	-fcall-used-s4 \
-	-fcall-used-s5 \
-	-fcall-used-s6 \
-	-fcall-used-s7 \
-	-fcall-used-s8 \
-	-fcall-used-s9 \
-	-fcall-used-s10 \
-	-fcall-used-s11
+	-Iinc -I${COMMON_INC}
 
 # LD flags
 LDFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \

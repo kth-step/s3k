@@ -1,42 +1,6 @@
 #pragma once
 #include "s3k/types.h"
 
-typedef enum {
-	// Basic Info & Registers
-	S3K_SYS_GET_INFO,  // Retrieve system information
-	S3K_SYS_REG_READ,  // Read from a register
-	S3K_SYS_REG_WRITE, // Write to a register
-	S3K_SYS_SYNC,	   // Synchronize memory and time.
-
-	// Capability Management
-	S3K_SYS_CAP_READ,   // Read the properties of a capability.
-	S3K_SYS_CAP_MOVE,   // Move a capability to a different slot.
-	S3K_SYS_CAP_DELETE, // Delete a capability from the system.
-	S3K_SYS_CAP_REVOKE, // Deletes derived capabilities.
-	S3K_SYS_CAP_DERIVE, // Creates a new capability.
-
-	// PMP calls
-	S3K_SYS_PMP_LOAD,
-	S3K_SYS_PMP_UNLOAD,
-
-	// Monitor calls
-	S3K_SYS_MON_SUSPEND,
-	S3K_SYS_MON_RESUME,
-	S3K_SYS_MON_STATE_GET,
-	S3K_SYS_MON_YIELD,
-	S3K_SYS_MON_REG_READ,
-	S3K_SYS_MON_REG_WRITE,
-	S3K_SYS_MON_CAP_READ,
-	S3K_SYS_MON_CAP_MOVE,
-	S3K_SYS_MON_PMP_LOAD,
-	S3K_SYS_MON_PMP_UNLOAD,
-
-	// Socket calls
-	S3K_SYS_SOCK_SEND,
-	S3K_SYS_SOCK_RECV,
-	S3K_SYS_SOCK_SENDRECV,
-} s3k_syscall_t;
-
 uint64_t s3k_get_pid(void);
 uint64_t s3k_get_time(void);
 uint64_t s3k_get_timeout(void);
