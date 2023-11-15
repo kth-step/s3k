@@ -19,6 +19,11 @@ typedef struct slot_info {
 	uint32_t length;
 } slot_info_t;
 
+struct sched_decision {
+	proc_t *proc;
+	uint64_t end_time;
+};
+
 static slot_info_t slots[S3K_HART_CNT][S3K_SLOT_CNT];
 static semaphore_t sched_semaphore;
 
@@ -71,13 +76,10 @@ slot_info_t slot_info_get(uint64_t hartid, uint64_t slot)
 	return slots[hartid - S3K_MIN_HART][slot % S3K_SLOT_CNT];
 }
 
-static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
-			   uint64_t *end_time)
+static proc_t *sched_fetch(uint64_t hart, uint64_t slot)
 {
-	// Get time slot (in global sense)
-	uint64_t slot = (time_get() + S3K_SCHED_TIME) / S3K_SLOT_LEN;
 	// Get time slot information
-	slot_info_t si = slot_info_get(hartid, slot);
+	slot_info_t si = slot_info_get(hart, slot);
 
 	// If length = 0, then slice is deleted.
 	if (si.length == 0)
@@ -85,7 +87,7 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 
 	// Have priority over harts with lower ID when scheduling length is
 	// longer.
-	for (uint64_t i = S3K_MIN_HART; i < hartid; i++) {
+	for (uint64_t i = S3K_MIN_HART; i < hart; i++) {
 		slot_info_t other_si = slot_info_get(i, slot);
 		if (si.pid == other_si.pid && si.length <= other_si.length)
 			return NULL;
@@ -93,7 +95,7 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 
 	// Have priority over harts with higher ID when scheduling length is
 	// equal or longer.
-	for (uint64_t i = hartid + 1; i < S3K_MAX_HART; i++) {
+	for (uint64_t i = hart + 1; i < S3K_MAX_HART; i++) {
 		slot_info_t other_si = slot_info_get(i, slot);
 		if (si.pid == other_si.pid && si.length < other_si.length)
 			return NULL;
@@ -106,28 +108,31 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 	if (!proc_acquire(p))
 		return NULL;
 #if !defined(NDEBUG) && VERBOSE > 1
-	kprintf("> sched(hart=%d,pid=%d,slot=%D)\n", hartid, si.pid,
+	kprintf("> sched(hart=%d,pid=%d,slot=%D)\n", hart, si.pid,
 		slot % S3K_SLOT_CNT);
 #endif
-	*start_time = slot * S3K_SLOT_LEN;
-	*end_time = (slot + si.length) * S3K_SLOT_LEN - S3K_SCHED_TIME;
-	p->timeout = *end_time;
+	p->timeout = (slot + si.length) * S3K_SLOT_LEN;
 	return p;
 }
 
 proc_t *sched(void)
 {
-	uint64_t hartid = csrr(mhartid);
-	uint64_t start_time, end_time;
-	proc_t *next;
-	do {
+	// Get hart ID
+	uint64_t hart = csrr(mhartid);
+	// Get next time slot
+	uint64_t slot = (time_get() + S3K_SCHED_TIME) / S3K_SLOT_LEN;
+	// Process to run
+	proc_t *next = NULL;
+	while (!next) {
+		while (time_get() < slot * S3K_SLOT_LEN)
+			;
+		// Try schedule process
 		semaphore_acquire(&sched_semaphore);
-		next = sched_fetch(hartid, &start_time, &end_time);
+		next = sched_fetch(hart, slot);
 		semaphore_release(&sched_semaphore);
-	} while (!next);
-
-	timeout_set(hartid, end_time);
-	while (time_get() < start_time)
-		;
+		// Increment time slot if necessary.
+		slot++;
+	}
+	timeout_set(hart, next->timeout - S3K_SCHED_TIME);
 	return next;
 }
