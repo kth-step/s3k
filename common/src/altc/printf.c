@@ -12,7 +12,7 @@ static char *write_dec(char *restrict dst, const char *end,
 		*(dst++) = '0';
 	} else if (dst != end) {
 		int i = 0;
-		char buf[32];
+		char buf[24];
 		while (val) {
 			int tmp = val % 10;
 			buf[i++] = '0' + tmp;
@@ -108,11 +108,11 @@ int alt_snprintf(char *restrict str, size_t size, const char *restrict fmt, ...)
 
 int alt_printf(const char *restrict fmt, ...)
 {
-	char buf[ALT_PRINTF_BUF_SIZE + 1];
+	char buf[ALT_PRINTF_BUF_SIZE];
 	va_list ap;
 	va_start(ap, fmt);
-	int len = alt_vsnprintf(buf, ALT_PRINTF_BUF_SIZE + 1, fmt, ap);
+	int len = alt_vsnprintf(buf, ALT_PRINTF_BUF_SIZE, fmt, ap);
 	va_end(ap);
-	alt_puts(buf);
+	alt_putstr(buf);
 	return len;
 }
