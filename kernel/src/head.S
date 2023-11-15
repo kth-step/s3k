@@ -14,6 +14,7 @@
 .globl _start
 .type _start, @function
 _start:
+head_entry:
 	li	x1,0
 	li	x2,0
 	li	x3,0
@@ -95,6 +96,10 @@ head_exit:
 	# Enable timer interrupts
 	li	t0,MIE_MTIE
 	csrw	mie,t0
+#ifdef INSTRUMENT
+	csrw	mcounteren,0xF
+	csrw	scounteren,0xF
+#endif
 
 	# Start user processes.
 	la	t0,trap_entry
