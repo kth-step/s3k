@@ -62,7 +62,7 @@ trap_entry:
 	csrr	t0,mcause
 	bltz	t0,_user_yield
 
-#ifndef NPREMPT
+#ifndef NPREEMPT
 	csrs	mstatus,MSTATUS_MIE
 #endif
 
@@ -87,10 +87,7 @@ _exception:
 	amoand.d.rl	x0,t1,(tp)
 
 	# If a0 != NULL, exit
-	bnez	a0,trap_exit_pmp
-
-	# We have a yield
-	call sched
+	beqz	a0,_sched
 
 	j	trap_exit_pmp
 
@@ -119,19 +116,22 @@ _machine_yield:
 	csrrw	a0,mscratch,a0
 _user_yield:
 
+#ifdef NDEBUG
 	csrr	t0,mcause
 	li	t1,0x8000000000000007
 	bne	t0,t1,__hang
+#endif
 
 	# release old process
 	li	t1,~1
 	amoand.d.rl	x0,t1,(a0)
 
+_sched:
 	# call scheduler
 	call	sched
 
 trap_exit_pmp:
-#ifndef NPREMPT
+#ifndef NPREEMPT
 	csrw	mstatus,MSTATUS_MIE
 #endif
 	ld	s0,PROC_PMPADDR0(a0)
@@ -154,7 +154,7 @@ trap_exit_pmp:
 	csrw	pmpcfg0,s8
 
 trap_exit:
-#ifndef NPREMPT
+#ifndef NPREEMPT
 	csrw	mstatus,MSTATUS_MIE
 #endif
 	ld	t0,PROC_PC(a0)
@@ -191,9 +191,6 @@ trap_exit:
 	ld	t4,PROC_T4(a0)
 	ld	t5,PROC_T5(a0)
 	ld	t6,PROC_T6(a0)
-
-	# disable interrupt
-	csrw	mstatus,zero
 
 	# Save PCB pointer
 	csrw	mscratch,a0
