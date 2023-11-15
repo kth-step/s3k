@@ -43,40 +43,49 @@ typedef enum {
 } syscall_t;
 
 typedef union {
+	syscall_t call;
+
 	struct {
 		uint64_t a0, a1, a2, a3, a4, a5, a6, a7;
 	};
 
 	struct {
+		syscall_t call;
 		int info;
 	} get_info;
 
 	struct {
+		syscall_t call;
 		regnr_t reg;
 		uint64_t val;
 	} reg;
 
 	struct {
+		syscall_t call;
 		bool full;
 	} sync;
 
 	struct {
+		syscall_t call;
 		cidx_t idx;
 		cidx_t dst_idx;
 		cap_t cap;
 	} cap;
 
 	struct {
-		cidx_t pmp_idx;
-		pmp_slot_t pmp_slot;
+		syscall_t call;
+		cidx_t idx;
+		pmp_slot_t slot;
 	} pmp;
 
 	struct {
+		syscall_t call;
 		cidx_t mon_idx;
 		pid_t pid;
 	} mon_state;
 
 	struct {
+		syscall_t call;
 		cidx_t mon_idx;
 		pid_t pid;
 		regnr_t reg;
@@ -84,6 +93,7 @@ typedef union {
 	} mon_reg;
 
 	struct {
+		syscall_t call;
 		cidx_t mon_idx;
 		pid_t pid;
 		cidx_t idx;
@@ -92,6 +102,7 @@ typedef union {
 	} mon_cap;
 
 	struct {
+		syscall_t call;
 		cidx_t mon_idx;
 		pid_t pid;
 		cidx_t pmp_idx;
@@ -99,6 +110,7 @@ typedef union {
 	} mon_pmp;
 
 	struct {
+		syscall_t call;
 		cidx_t sock_idx;
 		cidx_t cap_idx;
 		bool send_cap;
