@@ -20,7 +20,18 @@ CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 	-fno-stack-protector \
 	-flto \
 	-include ${S3K_CONF_H} \
-	-Iinc -I${COMMON_INC}
+	-Iinc -I${COMMON_INC} \
+	-fcall-used-s1 \
+	-fcall-used-s2 \
+	-fcall-used-s3 \
+	-fcall-used-s4 \
+	-fcall-used-s5 \
+	-fcall-used-s6 \
+	-fcall-used-s7 \
+	-fcall-used-s8 \
+	-fcall-used-s9 \
+	-fcall-used-s10 \
+	-fcall-used-s11
 
 # LD flags
 LDFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
