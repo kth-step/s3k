@@ -41,31 +41,35 @@ void kernel_wcet_reset(void)
 
 bool kernel_lock_acquire(void)
 {
-	uint64_t i = csrr_mhartid();
-#ifndef NPREMPT
+	uint64_t i = csrr(mhartid);
 	return mcslock_try_acquire(&lock, &nodes[i]);
-#else
-	return mcslock_acquire(&lock, &nodes[i]);
-#endif
 }
 
 void kernel_lock_release(void)
 {
-	uint64_t i = csrr_mhartid();
+	uint64_t i = csrr(mhartid);
 	mcslock_release(&lock, &nodes[i]);
 }
 
 bool kernel_preempt(void)
 {
-	return csrr_mip();
+#ifndef NPREEMPT
+	return csrr(mip) & csrr(mie);
+#else
+	return false;
+#endif
 }
 
 void kernel_preempt_enable(void)
 {
-	csrs_mstatus(MSTATUS_MIE);
+#ifndef NPREEMPT
+	csrs(mstatus, MSTATUS_MIE);
+#endif
 }
 
 void kernel_preempt_disable(void)
 {
-	csrc_mstatus(MSTATUS_MIE);
+#ifndef NPREEMPT
+	csrc(mstatus, MSTATUS_MIE);
+#endif
 }
