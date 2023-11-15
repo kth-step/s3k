@@ -116,13 +116,13 @@ void proc_pmp_unload(proc_t *proc, pmp_slot_t slot)
 
 void proc_pmp_sync(proc_t *proc)
 {
-	csrw_pmpaddr0(proc->pmpaddr[0]);
-	csrw_pmpaddr1(proc->pmpaddr[1]);
-	csrw_pmpaddr2(proc->pmpaddr[2]);
-	csrw_pmpaddr3(proc->pmpaddr[3]);
-	csrw_pmpaddr4(proc->pmpaddr[4]);
-	csrw_pmpaddr5(proc->pmpaddr[5]);
-	csrw_pmpaddr6(proc->pmpaddr[6]);
-	csrw_pmpaddr7(proc->pmpaddr[7]);
-	csrw_pmpcfg0(*(uint64_t *)proc->pmpcfg);
+	csrw(pmpaddr0, proc->pmpaddr[0]);
+	csrw(pmpaddr1, proc->pmpaddr[1]);
+	csrw(pmpaddr2, proc->pmpaddr[2]);
+	csrw(pmpaddr3, proc->pmpaddr[3]);
+	csrw(pmpaddr4, proc->pmpaddr[4]);
+	csrw(pmpaddr5, proc->pmpaddr[5]);
+	csrw(pmpaddr6, proc->pmpaddr[6]);
+	csrw(pmpaddr7, proc->pmpaddr[7]);
+	csrw(pmpcfg0, *(uint64_t *)proc->pmpcfg);
 }

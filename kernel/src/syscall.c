@@ -230,7 +230,7 @@ proc_t *sys_get_info(proc_t *const p, const sys_args_t *args)
 		p->regs[REG_A0] = time_get();
 		break;
 	case 2:
-		p->regs[REG_A0] = timeout_get(csrr_mhartid());
+		p->regs[REG_A0] = timeout_get(csrr(mhartid));
 		break;
 	case 3:
 		p->regs[REG_A0] = kernel_wcet();

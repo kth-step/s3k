@@ -117,7 +117,7 @@ static proc_t *sched_fetch(uint64_t hartid, uint64_t *start_time,
 
 proc_t *sched(void)
 {
-	uint64_t hartid = csrr_mhartid();
+	uint64_t hartid = csrr(mhartid);
 	uint64_t start_time, end_time;
 	proc_t *next;
 	do {
