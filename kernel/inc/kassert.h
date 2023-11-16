@@ -18,26 +18,23 @@
 #ifndef NDEBUG
 
 #define KASSERT_FAILURE(FILE, LINE) \
-	kprintf("Kernel assertion failed at %s:%d.\n", FILE, LINE);
+	kprintf(0, "Kernel assertion failed at %s:%d.\n", FILE, LINE);
 
-#define KASSERT(EXPR)                                        \
-	do {                                                 \
-		if (!(EXPR)) {                               \
-			KASSERT_FAILURE(__FILE__, __LINE__); \
-			while (1)                            \
-				;                            \
-		}                                            \
+#define KASSERT(expr)                                \
+	do {                                         \
+		if (expr)                            \
+			break;                       \
+		KASSERT_FAILURE(__FILE__, __LINE__); \
+		while (1)                            \
+			;                            \
 	} while (false)
 
 #else /* NDEBUG */
 
 #define KASSERT(expr)                            \
 	do {                                     \
-		if (!(expr)) {                   \
+		if (!(expr))                     \
 			__builtin_unreachable(); \
-			while (1)                \
-				;                \
-		}                                \
 	} while (false)
 
 #endif /* NDEBUG */

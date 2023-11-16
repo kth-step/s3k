@@ -9,6 +9,7 @@ uint64_t s3k_reg_read(s3k_reg_t reg);
 uint64_t s3k_reg_write(s3k_reg_t reg, uint64_t val);
 void s3k_sync();
 void s3k_sync_mem();
+void s3k_sleep(uint64_t time);
 s3k_err_t s3k_cap_read(s3k_cidx_t idx, s3k_cap_t *cap);
 s3k_err_t s3k_cap_move(s3k_cidx_t src, s3k_cidx_t dst);
 s3k_err_t s3k_cap_delete(s3k_cidx_t idx);
