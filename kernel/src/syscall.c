@@ -19,11 +19,11 @@
 
 #define ARGS 8
 
-static err_t validate_arguments(const sys_args_t *);
 static inline err_t validate_get_info(const sys_args_t *);
 static inline err_t validate_reg_read(const sys_args_t *);
 static inline err_t validate_reg_write(const sys_args_t *);
 static inline err_t validate_sync(const sys_args_t *);
+static inline err_t validate_sleep(const sys_args_t *);
 static inline err_t validate_cap_read(const sys_args_t *);
 static inline err_t validate_cap_move(const sys_args_t *);
 static inline err_t validate_cap_delete(const sys_args_t *);
@@ -49,6 +49,7 @@ static proc_t *handle_get_info(proc_t *const, const sys_args_t *);
 static proc_t *handle_reg_read(proc_t *const, const sys_args_t *);
 static proc_t *handle_reg_write(proc_t *const, const sys_args_t *);
 static proc_t *handle_sync(proc_t *const, const sys_args_t *);
+static proc_t *handle_sleep(proc_t *const, const sys_args_t *);
 static proc_t *handle_cap_read(proc_t *const, const sys_args_t *);
 static proc_t *handle_cap_move(proc_t *const, const sys_args_t *);
 static proc_t *handle_cap_delete(proc_t *const, const sys_args_t *);
@@ -74,40 +75,48 @@ typedef proc_t *(*handler_t)(proc_t *const, const sys_args_t *);
 typedef err_t (*validator_t)(const sys_args_t *);
 
 handler_t handlers[] = {
-    handle_get_info,	 handle_reg_read,      handle_reg_write,
-    handle_sync,	 handle_cap_read,      handle_cap_move,
-    handle_cap_delete,	 handle_cap_revoke,    handle_cap_derive,
-    handle_pmp_load,	 handle_pmp_unload,    handle_mon_suspend,
-    handle_mon_resume,	 handle_mon_state_get, handle_mon_yield,
-    handle_mon_reg_read, handle_mon_reg_write, handle_mon_cap_read,
-    handle_mon_cap_move, handle_mon_pmp_load,  handle_mon_pmp_unload,
-    handle_sock_send,	 handle_sock_recv,     handle_sock_sendrecv,
+    handle_get_info,	   handle_reg_read,	handle_reg_write,
+    handle_sync,	   handle_sleep,	handle_cap_read,
+    handle_cap_move,	   handle_cap_delete,	handle_cap_revoke,
+    handle_cap_derive,	   handle_pmp_load,	handle_pmp_unload,
+    handle_mon_suspend,	   handle_mon_resume,	handle_mon_state_get,
+    handle_mon_yield,	   handle_mon_reg_read, handle_mon_reg_write,
+    handle_mon_cap_read,   handle_mon_cap_move, handle_mon_pmp_load,
+    handle_mon_pmp_unload, handle_sock_send,	handle_sock_recv,
+    handle_sock_sendrecv,
 };
 
 validator_t validators[] = {
-    validate_get_info,	   validate_reg_read,	   validate_reg_write,
-    validate_sync,	   validate_cap_read,	   validate_cap_move,
-    validate_cap_delete,   validate_cap_revoke,	   validate_cap_derive,
-    validate_pmp_load,	   validate_pmp_unload,	   validate_mon_suspend,
-    validate_mon_resume,   validate_mon_state_get, validate_mon_yield,
-    validate_mon_reg_read, validate_mon_reg_write, validate_mon_cap_read,
-    validate_mon_cap_move, validate_mon_pmp_load,  validate_mon_pmp_unload,
-    validate_sock_send,	   validate_sock_recv,	   validate_sock_sendrecv,
+    validate_get_info,	     validate_reg_read,	    validate_reg_write,
+    validate_sync,	     validate_sleep,	    validate_cap_read,
+    validate_cap_move,	     validate_cap_delete,   validate_cap_revoke,
+    validate_cap_derive,     validate_pmp_load,	    validate_pmp_unload,
+    validate_mon_suspend,    validate_mon_resume,   validate_mon_state_get,
+    validate_mon_yield,	     validate_mon_reg_read, validate_mon_reg_write,
+    validate_mon_cap_read,   validate_mon_cap_move, validate_mon_pmp_load,
+    validate_mon_pmp_unload, validate_sock_send,    validate_sock_recv,
+    validate_sock_sendrecv,
 };
 
 proc_t *handle_syscall(proc_t *proc)
 {
 	// System call arguments.
 	const sys_args_t *args = (sys_args_t *)&proc->regs[REG_A0];
+	uint64_t call = proc->regs[REG_T0];
 
 	// Validate system call arguments.
-	err_t err = validate_arguments(args);
+	err_t err = ERR_INVALID_SYSCALL;
+	if (call < ARRAY_SIZE(validators))
+		err = validators[call](args);
+
+	if (kernel_preempt())
+		return NULL;
 
 	// Increment PC
 	proc->regs[REG_PC] += 4;
 	proc->regs[REG_T0] = err;
 	if (!err) // If arguments valid, perform system call.
-		proc = handlers[args->call](proc, args);
+		proc = handlers[call](proc, args);
 	return proc;
 }
 
@@ -129,13 +138,6 @@ static bool valid_pid(pid_t pid)
 static bool valid_reg(reg_t reg)
 {
 	return reg < REG_CNT;
-}
-
-static err_t validate_arguments(const sys_args_t *args)
-{
-	if (args->call < ARRAY_SIZE(validators))
-		return validators[args->call](args);
-	return ERR_INVALID_SYSCALL;
 }
 
 err_t validate_get_info(const sys_args_t *args)
@@ -170,27 +172,27 @@ proc_t *handle_get_info(proc_t *const p, const sys_args_t *args)
 
 err_t validate_reg_read(const sys_args_t *args)
 {
-	if (!valid_reg(args->reg.reg))
+	if (!valid_reg(args->reg_read.reg))
 		return ERR_INVALID_REGISTER;
 	return SUCCESS;
 }
 
 proc_t *handle_reg_read(proc_t *const p, const sys_args_t *args)
 {
-	p->regs[REG_A0] = p->regs[args->reg.reg];
+	p->regs[REG_A0] = p->regs[args->reg_read.reg];
 	return p;
 }
 
 err_t validate_reg_write(const sys_args_t *args)
 {
-	if (!valid_reg(args->reg.reg))
+	if (!valid_reg(args->reg_write.reg))
 		return ERR_INVALID_REGISTER;
 	return SUCCESS;
 }
 
 proc_t *handle_reg_write(proc_t *const p, const sys_args_t *args)
 {
-	p->regs[args->reg.reg] = args->reg.val;
+	p->regs[args->reg_write.reg] = args->reg_write.val;
 	return p;
 }
 
@@ -211,33 +213,45 @@ proc_t *handle_sync(proc_t *const p, const sys_args_t *args)
 	return p;
 }
 
+err_t validate_sleep(const sys_args_t *args)
+{
+	return SUCCESS;
+}
+
+proc_t *handle_sleep(proc_t *const p, const sys_args_t *args)
+{
+	if (args->sleep.time)
+		p->timeout = args->sleep.time;
+	return NULL;
+}
+
 err_t validate_cap_read(const sys_args_t *args)
 {
-	if (!valid_idx(args->cap.idx))
+	if (!valid_idx(args->cap_read.idx))
 		return ERR_INVALID_INDEX;
 	return SUCCESS;
 }
 
 proc_t *handle_cap_read(proc_t *const p, const sys_args_t *args)
 {
-	cte_t c = ctable_get(p->pid, args->cap.idx);
+	cte_t c = ctable_get(p->pid, args->cap_read.idx);
 	p->regs[REG_T0] = cap_read(c, (cap_t *)&p->regs[REG_A0]);
 	return p;
 }
 
 err_t validate_cap_move(const sys_args_t *args)
 {
-	if (!valid_idx(args->cap.idx))
+	if (!valid_idx(args->cap_move.src_idx))
 		return ERR_INVALID_INDEX;
-	if (!valid_idx(args->cap.dst_idx))
+	if (!valid_idx(args->cap_move.dst_idx))
 		return ERR_INVALID_INDEX;
 	return SUCCESS;
 }
 
 proc_t *handle_cap_move(proc_t *const p, const sys_args_t *args)
 {
-	cte_t src = ctable_get(p->pid, args->cap.idx);
-	cte_t dst = ctable_get(p->pid, args->cap.dst_idx);
+	cte_t src = ctable_get(p->pid, args->cap_move.src_idx);
+	cte_t dst = ctable_get(p->pid, args->cap_move.dst_idx);
 	p->regs[REG_T0] = ERR_PREEMPTED;
 	if (!kernel_lock_acquire())
 		return NULL;
@@ -248,14 +262,14 @@ proc_t *handle_cap_move(proc_t *const p, const sys_args_t *args)
 
 err_t validate_cap_delete(const sys_args_t *args)
 {
-	if (!valid_idx(args->cap.idx))
+	if (!valid_idx(args->cap_delete.idx))
 		return ERR_INVALID_INDEX;
 	return SUCCESS;
 }
 
 proc_t *handle_cap_delete(proc_t *const p, const sys_args_t *args)
 {
-	cte_t c = ctable_get(p->pid, args->cap.idx);
+	cte_t c = ctable_get(p->pid, args->cap_delete.idx);
 	p->regs[REG_T0] = ERR_PREEMPTED;
 	if (!kernel_lock_acquire())
 		return NULL;
@@ -266,14 +280,14 @@ proc_t *handle_cap_delete(proc_t *const p, const sys_args_t *args)
 
 err_t validate_cap_revoke(const sys_args_t *args)
 {
-	if (!valid_idx(args->cap.idx))
+	if (!valid_idx(args->cap_revoke.idx))
 		return ERR_INVALID_INDEX;
 	return SUCCESS;
 }
 
 proc_t *handle_cap_revoke(proc_t *const p, const sys_args_t *args)
 {
-	cte_t c = ctable_get(p->pid, args->cap.idx);
+	cte_t c = ctable_get(p->pid, args->cap_revoke.idx);
 	p->regs[REG_T0] = ERR_PREEMPTED;
 	err_t err;
 	do {
@@ -288,57 +302,59 @@ proc_t *handle_cap_revoke(proc_t *const p, const sys_args_t *args)
 
 err_t validate_cap_derive(const sys_args_t *args)
 {
-	if (!valid_idx(args->cap.idx))
+	if (!valid_idx(args->cap_derive.src_idx))
 		return ERR_INVALID_INDEX;
-	if (!valid_idx(args->cap.dst_idx))
+	if (!valid_idx(args->cap_derive.dst_idx))
 		return ERR_INVALID_INDEX;
-	if (!cap_is_valid(args->cap.cap))
+	cap_t cap = { .raw = args->cap_derive.cap_raw };
+	if (!cap_is_valid(cap))
 		return ERR_INVALID_DERIVATION;
 	return SUCCESS;
 }
 
 proc_t *handle_cap_derive(proc_t *const p, const sys_args_t *args)
 {
-	cte_t src = ctable_get(p->pid, args->cap.idx);
-	cte_t dst = ctable_get(p->pid, args->cap.dst_idx);
+	cte_t src = ctable_get(p->pid, args->cap_derive.src_idx);
+	cte_t dst = ctable_get(p->pid, args->cap_derive.dst_idx);
 	p->regs[REG_T0] = ERR_PREEMPTED;
 	if (!kernel_lock_acquire())
 		return NULL;
-	p->regs[REG_T0] = cap_derive(src, dst, args->cap.cap);
+	cap_t cap = { .raw = args->cap_derive.cap_raw };
+	p->regs[REG_T0] = cap_derive(src, dst, cap);
 	kernel_lock_release();
 	return p;
 }
 
 err_t validate_pmp_load(const sys_args_t *args)
 {
-	if (!valid_idx(args->pmp.idx))
+	if (!valid_idx(args->pmp_load.idx))
 		return ERR_INVALID_INDEX;
-	if (!valid_slot(args->pmp.slot))
+	if (!valid_slot(args->pmp_load.slot))
 		return ERR_INVALID_SLOT;
 	return SUCCESS;
 }
 
 proc_t *handle_pmp_load(proc_t *const p, const sys_args_t *args)
 {
-	cte_t pmp = ctable_get(p->pid, args->pmp.idx);
+	cte_t pmp = ctable_get(p->pid, args->pmp_load.idx);
 	p->regs[REG_T0] = ERR_PREEMPTED;
 	if (!kernel_lock_acquire())
 		return NULL;
-	p->regs[REG_T0] = cap_pmp_load(pmp, args->pmp.slot);
+	p->regs[REG_T0] = cap_pmp_load(pmp, args->pmp_load.slot);
 	kernel_lock_release();
 	return p;
 }
 
 err_t validate_pmp_unload(const sys_args_t *args)
 {
-	if (!valid_idx(args->pmp.idx))
+	if (!valid_idx(args->pmp_unload.idx))
 		return ERR_INVALID_INDEX;
 	return SUCCESS;
 }
 
 proc_t *handle_pmp_unload(proc_t *const p, const sys_args_t *args)
 {
-	cte_t pmp = ctable_get(p->pid, args->pmp.idx);
+	cte_t pmp = ctable_get(p->pid, args->pmp_unload.idx);
 	p->regs[REG_T0] = ERR_PREEMPTED;
 	if (!kernel_lock_acquire())
 		return NULL;
@@ -431,65 +447,67 @@ proc_t *handle_mon_yield(proc_t *const p, const sys_args_t *args)
 
 err_t validate_mon_reg_read(const sys_args_t *args)
 {
-	if (!valid_idx(args->mon_reg.mon_idx))
+	if (!valid_idx(args->mon_reg_read.mon_idx))
 		return ERR_INVALID_INDEX;
-	if (!valid_pid(args->mon_reg.pid))
+	if (!valid_pid(args->mon_reg_read.pid))
 		return ERR_INVALID_PID;
-	if (!valid_reg(args->mon_reg.reg))
+	if (!valid_reg(args->mon_reg_read.reg))
 		return ERR_INVALID_REGISTER;
 	return SUCCESS;
 }
 
 proc_t *handle_mon_reg_read(proc_t *const p, const sys_args_t *args)
 {
-	cte_t mon = ctable_get(p->pid, args->mon_reg.mon_idx);
+	cte_t mon = ctable_get(p->pid, args->mon_reg_read.mon_idx);
 	p->regs[REG_T0] = ERR_PREEMPTED;
 	if (!kernel_lock_acquire())
 		return NULL;
-	p->regs[REG_T0] = cap_monitor_reg_read(
-	    mon, args->mon_reg.pid, args->mon_reg.reg, &p->regs[REG_A0]);
+	p->regs[REG_T0] = cap_monitor_reg_read(mon, args->mon_reg_read.pid,
+					       args->mon_reg_read.reg,
+					       &p->regs[REG_A0]);
 	kernel_lock_release();
 	return p;
 }
 
 err_t validate_mon_reg_write(const sys_args_t *args)
 {
-	if (!valid_idx(args->mon_reg.mon_idx))
+	if (!valid_idx(args->mon_reg_write.mon_idx))
 		return ERR_INVALID_INDEX;
-	if (!valid_pid(args->mon_reg.pid))
+	if (!valid_pid(args->mon_reg_write.pid))
 		return ERR_INVALID_PID;
-	if (!valid_reg(args->mon_reg.reg))
+	if (!valid_reg(args->mon_reg_write.reg))
 		return ERR_INVALID_REGISTER;
 	return SUCCESS;
 }
 
 proc_t *handle_mon_reg_write(proc_t *const p, const sys_args_t *args)
 {
-	cte_t mon = ctable_get(p->pid, args->mon_reg.mon_idx);
+	cte_t mon = ctable_get(p->pid, args->mon_reg_write.mon_idx);
 	p->regs[REG_T0] = ERR_PREEMPTED;
 	if (!kernel_lock_acquire())
 		return NULL;
-	p->regs[REG_T0] = cap_monitor_reg_write(
-	    mon, args->mon_reg.pid, args->mon_reg.reg, args->mon_reg.val);
+	p->regs[REG_T0] = cap_monitor_reg_write(mon, args->mon_reg_write.pid,
+						args->mon_reg_write.reg,
+						args->mon_reg_write.val);
 	kernel_lock_release();
 	return p;
 }
 
 err_t validate_mon_cap_read(const sys_args_t *args)
 {
-	if (!valid_idx(args->mon_cap.mon_idx))
+	if (!valid_idx(args->mon_cap_read.mon_idx))
 		return ERR_INVALID_INDEX;
-	if (!valid_pid(args->mon_cap.pid))
+	if (!valid_pid(args->mon_cap_read.pid))
 		return ERR_INVALID_PID;
-	if (!valid_idx(args->mon_cap.idx))
+	if (!valid_idx(args->mon_cap_read.idx))
 		return ERR_INVALID_INDEX;
 	return SUCCESS;
 }
 
 proc_t *handle_mon_cap_read(proc_t *const p, const sys_args_t *args)
 {
-	cte_t mon = ctable_get(p->pid, args->mon_cap.mon_idx);
-	cte_t src = ctable_get(args->mon_cap.pid, args->mon_cap.idx);
+	cte_t mon = ctable_get(p->pid, args->mon_cap_read.mon_idx);
+	cte_t src = ctable_get(args->mon_cap_read.pid, args->mon_cap_read.idx);
 	p->regs[REG_T0] = ERR_PREEMPTED;
 	if (!kernel_lock_acquire())
 		return NULL;
@@ -501,24 +519,26 @@ proc_t *handle_mon_cap_read(proc_t *const p, const sys_args_t *args)
 
 err_t validate_mon_cap_move(const sys_args_t *args)
 {
-	if (!valid_idx(args->mon_cap.mon_idx))
+	if (!valid_idx(args->mon_cap_move.mon_idx))
 		return ERR_INVALID_INDEX;
-	if (!valid_pid(args->mon_cap.pid))
+	if (!valid_pid(args->mon_cap_move.src_pid))
 		return ERR_INVALID_PID;
-	if (!valid_idx(args->mon_cap.idx))
+	if (!valid_idx(args->mon_cap_move.src_idx))
 		return ERR_INVALID_INDEX;
-	if (!valid_pid(args->mon_cap.dst_pid))
+	if (!valid_pid(args->mon_cap_move.dst_pid))
 		return ERR_INVALID_PID;
-	if (!valid_idx(args->mon_cap.dst_idx))
+	if (!valid_idx(args->mon_cap_move.dst_idx))
 		return ERR_INVALID_INDEX;
 	return SUCCESS;
 }
 
 proc_t *handle_mon_cap_move(proc_t *const p, const sys_args_t *args)
 {
-	cte_t mon = ctable_get(p->pid, args->mon_cap.mon_idx);
-	cte_t src = ctable_get(args->mon_cap.pid, args->mon_cap.idx);
-	cte_t dst = ctable_get(args->mon_cap.dst_pid, args->mon_cap.dst_idx);
+	cte_t mon = ctable_get(p->pid, args->mon_cap_move.mon_idx);
+	cte_t src = ctable_get(args->mon_cap_move.src_pid,
+			       args->mon_cap_move.src_idx);
+	cte_t dst = ctable_get(args->mon_cap_move.dst_pid,
+			       args->mon_cap_move.dst_idx);
 	p->regs[REG_T0] = ERR_PREEMPTED;
 	if (!kernel_lock_acquire())
 		return NULL;
@@ -529,51 +549,46 @@ proc_t *handle_mon_cap_move(proc_t *const p, const sys_args_t *args)
 
 err_t validate_mon_pmp_load(const sys_args_t *args)
 {
-	if (!valid_idx(args->mon_pmp.mon_idx))
+	if (!valid_idx(args->mon_pmp_load.mon_idx))
 		return ERR_INVALID_INDEX;
-	if (!valid_pid(args->mon_pmp.pid))
+	if (!valid_pid(args->mon_pmp_load.pid))
 		return ERR_INVALID_PID;
-	if (!valid_idx(args->mon_pmp.pmp_idx))
+	if (!valid_idx(args->mon_pmp_load.idx))
 		return ERR_INVALID_INDEX;
-	if (!valid_pid(args->mon_pmp.pmp_slot))
+	if (!valid_pid(args->mon_pmp_load.slot))
 		return ERR_INVALID_PID;
-	if (!valid_idx(args->mon_cap.dst_idx))
-		return ERR_INVALID_INDEX;
 	return SUCCESS;
 }
 
 proc_t *handle_mon_pmp_load(proc_t *const p, const sys_args_t *args)
 {
-	cte_t mon = ctable_get(p->pid, args->mon_pmp.mon_idx);
-	cte_t pmp = ctable_get(args->mon_pmp.pid, args->mon_pmp.pmp_idx);
+	cte_t mon = ctable_get(p->pid, args->mon_pmp_load.mon_idx);
+	cte_t pmp = ctable_get(args->mon_pmp_load.pid, args->mon_pmp_load.idx);
 	p->regs[REG_T0] = ERR_PREEMPTED;
 	if (!kernel_lock_acquire())
 		return NULL;
 	p->regs[REG_T0]
-	    = cap_monitor_pmp_load(mon, pmp, args->mon_pmp.pmp_slot);
+	    = cap_monitor_pmp_load(mon, pmp, args->mon_pmp_load.slot);
 	kernel_lock_release();
 	return p;
 }
 
 err_t validate_mon_pmp_unload(const sys_args_t *args)
 {
-	if (!valid_idx(args->mon_pmp.mon_idx))
+	if (!valid_idx(args->mon_pmp_unload.mon_idx))
 		return ERR_INVALID_INDEX;
-	if (!valid_pid(args->mon_pmp.pid))
+	if (!valid_pid(args->mon_pmp_unload.pid))
 		return ERR_INVALID_PID;
-	if (!valid_idx(args->mon_pmp.pmp_idx))
-		return ERR_INVALID_INDEX;
-	if (!valid_pid(args->mon_pmp.pmp_slot))
-		return ERR_INVALID_PID;
-	if (!valid_idx(args->mon_cap.dst_idx))
+	if (!valid_idx(args->mon_pmp_unload.idx))
 		return ERR_INVALID_INDEX;
 	return SUCCESS;
 }
 
 proc_t *handle_mon_pmp_unload(proc_t *const p, const sys_args_t *args)
 {
-	cte_t mon = ctable_get(p->pid, args->mon_pmp.mon_idx);
-	cte_t pmp = ctable_get(args->mon_pmp.pid, args->mon_pmp.pmp_idx);
+	cte_t mon = ctable_get(p->pid, args->mon_pmp_unload.mon_idx);
+	cte_t pmp
+	    = ctable_get(args->mon_pmp_unload.pid, args->mon_pmp_unload.idx);
 	p->regs[REG_T0] = ERR_PREEMPTED;
 	if (!kernel_lock_acquire())
 		return NULL;

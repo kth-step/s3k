@@ -16,17 +16,17 @@ static uint64_t wcet;
 void kernel_init(void)
 {
 	alt_init();
-	alt_puts("> uart initialized");
+	kprintf(0, "> uart initialized\n");
 	mcslock_init(&lock);
-	alt_puts("> mcslock initialized");
+	kprintf(0, "> mcslock initialized\n");
 	ctable_init();
-	alt_puts("> ctable initialized");
+	kprintf(0, "> ctable initialized\n");
 	sched_init();
-	alt_puts("> scheduler initialized");
+	kprintf(0, "> scheduler initialized\n");
 	proc_init();
-	alt_puts("> processes initialized");
-	alt_puts("> kernel initialization complete");
-	alt_puts("> starting boot process");
+	kprintf(0, "> processes initialized\n");
+	kprintf(0, "> kernel initialization complete\n");
+	kprintf(0, "> starting boot process\n");
 }
 
 uint64_t kernel_wcet(void)
@@ -54,7 +54,7 @@ void kernel_lock_release(void)
 bool kernel_preempt(void)
 {
 #ifndef NPREEMPT
-	return csrr(mip) & csrr(mie);
+	return csrr(mip) & 0x80;
 #else
 	return false;
 #endif
