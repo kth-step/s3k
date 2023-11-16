@@ -3,7 +3,10 @@
 export ROOT=${abspath .}
 
 
-PROJECTS:=projects/hello projects/trapped projects/ping-pong
+PROJECTS:=projects/hello \
+	  projects/trapped \
+	  projects/ping-pong \
+	  projects/demonstrator
 PLATFORM?=qemu_virt
 
 include tools.mk
