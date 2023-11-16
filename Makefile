@@ -19,10 +19,7 @@ clean:
 		make -C $$i clean PLATFORM=${PLATFORM}; \
 	done
 
-docs:
-	doxygen
-
 format:
-	clang-format -i $(shell find -name '*.[hc]' -not -path '*/.*')
+	clang-format -i $(shell find * -type f -name '*.[hc]')
 
 .PHONY: all docs clean common ${PROJECTS}
