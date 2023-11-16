@@ -23,6 +23,6 @@ clean:
 	done
 
 format:
-	clang-format -i $(shell find * -type f -name '*.[hc]')
+	clang-format -i $$(find * -type f -name '*.[hc]')
 
 .PHONY: all docs clean common ${PROJECTS}
