@@ -5,13 +5,14 @@ export ROOT       :=${abspath ../..}
 export BUILD      :=${abspath build/${PLATFORM}}
 export S3K_CONF_H :=${abspath s3k_conf.h}
 
+include ${ROOT}/tools.mk
 include ${ROOT}/common/plat/${PLATFORM}.mk
 
 APPS=boot app0 app1 monitor crypto uartppp
 
 ELFS:=${patsubst %,${BUILD}/%.elf,kernel boot}
 
-all: kernel ${APPS}
+all: kernel ${APPS} size
 
 clean:
 	@${MAKE} -C ${ROOT}/common clean
@@ -30,6 +31,9 @@ boot: monitor crypto uartppp
 ${APPS}:
 	@${MAKE} -f build.mk PROGRAM=$@
 
+size:
+	${SIZE} ${BUILD}/*.elf
+
 qemu: kernel ${APPS}
 	@ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh -serial tcp:localhost:8888,server,nowait
 
@@ -44,4 +48,4 @@ gdb-openocd: kernel ${APPS}
 
 
 
-.PHONY: all clean qemu qemu-gdb gdb kernel common ${APPS}
+.PHONY: all clean size qemu qemu-gdb gdb kernel common ${APPS}
