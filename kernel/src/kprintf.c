@@ -5,21 +5,26 @@
 
 #define BUF_SIZE 128
 
-void kputstr(char *buf)
+#if defined(NDEBUG) || !defined(VERBOSITY)
+#undef VERBOSITY
+#define VERBOSITY 0
+#endif
+
+void kprintf(int verbosity, char *restrict fmt, ...)
 {
 	static int lock = 0;
-	while (__atomic_fetch_or(&lock, 1, __ATOMIC_ACQUIRE))
-		;
-	alt_putstr(buf);
-	__atomic_store_n(&lock, 0, __ATOMIC_RELEASE);
-}
 
-void kprintf(char *restrict fmt, ...)
-{
+	if (verbosity > VERBOSITY)
+		return;
+
 	char buf[BUF_SIZE];
 	va_list ap;
 	va_start(ap, fmt);
 	alt_vsnprintf(buf, BUF_SIZE, fmt, ap);
 	va_end(ap);
-	kputstr(buf);
+
+	while (__atomic_fetch_or(&lock, 1, __ATOMIC_ACQUIRE))
+		;
+	alt_putstr(buf);
+	__atomic_store_n(&lock, 0, __ATOMIC_RELEASE);
 }

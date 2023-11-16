@@ -17,7 +17,7 @@ void proc_init(void)
 	}
 	_processes[0].state = 0;
 	_processes[0].regs[REG_PC] = (uint64_t)_payload;
-	kprintf("> boot process pc=0x%X\n", _payload);
+	kprintf(0, "> boot process pc=0x%X\n", _payload);
 	KASSERT(cap_pmp_load(ctable_get(0, 0), 0) == SUCCESS);
 }
 
@@ -44,7 +44,7 @@ bool proc_acquire(proc_t *proc)
 	if (expected & (PSF_BUSY | PSF_SUSPENDED))
 		return false;
 
-	if ((expected == PSF_BLOCKED) && time_get() < proc->timeout)
+	if (time_get() < proc->timeout)
 		return false;
 
 	return __atomic_compare_exchange(&proc->state, &expected, &desired,
@@ -70,6 +70,8 @@ void proc_suspend(proc_t *proc)
 
 void proc_resume(proc_t *proc)
 {
+	if (proc->state == PSF_SUSPENDED)
+		proc->timeout = 0;
 	__atomic_fetch_and(&proc->state, ~PSF_SUSPENDED, __ATOMIC_RELAXED);
 }
 

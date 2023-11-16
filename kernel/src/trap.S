@@ -114,8 +114,9 @@ _exception_table:
 
 _machine_yield:
 	csrrw	a0,mscratch,a0
-_user_yield:
+	csrw	mstatus,0
 
+_user_yield:
 #ifdef NDEBUG
 	csrr	t0,mcause
 	li	t1,0x8000000000000007
@@ -131,8 +132,8 @@ _sched:
 	call	sched
 
 trap_exit_pmp:
-#ifndef NPREEMPT
-	csrw	mstatus,MSTATUS_MIE
+#ifndef PREEMPT
+	csrs	mstatus,MSTATUS_MIE
 #endif
 	ld	s0,PROC_PMPADDR0(a0)
 	ld	s1,PROC_PMPADDR1(a0)
@@ -154,15 +155,15 @@ trap_exit_pmp:
 	csrw	pmpcfg0,s8
 
 trap_exit:
-#ifndef NPREEMPT
-	csrw	mstatus,MSTATUS_MIE
+#ifndef PREEMPT
+	csrs	mstatus,MSTATUS_MIE
 #endif
 	ld	t0,PROC_PC(a0)
 	csrw	mepc,t0
 
 	ld	ra,PROC_RA(a0)
-	#ld	sp,PROC_A0(a0)
-	#ld	gp,PROC_A0(a0)
+	#ld	sp,PROC_SP(a0)
+	#ld	gp,PROC_GP(a0)
 	ld	tp,PROC_TP(a0)
 	ld	t0,PROC_T0(a0)
 	ld	t1,PROC_T1(a0)
@@ -191,6 +192,8 @@ trap_exit:
 	ld	t4,PROC_T4(a0)
 	ld	t5,PROC_T5(a0)
 	ld	t6,PROC_T6(a0)
+
+	csrc	mstatus,MSTATUS_MIE
 
 	# Save PCB pointer
 	csrw	mscratch,a0

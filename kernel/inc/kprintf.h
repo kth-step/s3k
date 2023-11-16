@@ -1,3 +1,4 @@
 #pragma once
-void kputstr(char *s);
-void kprintf(char *restrict fmt, ...);
+#include <stdbool.h>
+
+void kprintf(int verbosity, char *const restrict fmt, ...);

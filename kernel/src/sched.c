@@ -14,9 +14,9 @@
 
 typedef struct slot_info {
 	// Owner of time slot.
-	uint32_t pid;
+	uint8_t pid;
 	// Remaining length of corresponding slice.
-	uint32_t length;
+	uint8_t length;
 } slot_info_t;
 
 struct sched_decision {
@@ -24,7 +24,7 @@ struct sched_decision {
 	uint64_t end_time;
 };
 
-static slot_info_t slots[S3K_HART_CNT][S3K_SLOT_CNT];
+static uint64_t slots[S3K_SLOT_CNT];
 static semaphore_t sched_semaphore;
 
 void sched_init(void)
@@ -45,13 +45,14 @@ void sched_update(uint64_t pid, uint64_t end, uint64_t hart, uint64_t from,
 {
 	// Acquire all resources, blocking everyone else.
 	semaphore_acquire_n(&sched_semaphore, S3K_HART_CNT);
-#if !defined(NDEBUG) && VERBOSE > 0
-	kprintf("> sched_update(pid=%D,end=%D,hart=%D,from=%D,to=%D)\n", pid,
+	kprintf(1, "> sched_update(pid=%D,end=%D,hart=%D,from=%D,to=%D)\n", pid,
 		end, hart, from, to);
-#endif
+	hart -= S3K_MIN_HART;
+	int offset = hart * 16;
+	uint64_t mask = 0xFFFFull << offset;
 	for (uint64_t i = from; i < to; i++) {
-		slots[hart - S3K_MIN_HART][i].pid = pid & 0xFF;
-		slots[hart - S3K_MIN_HART][i].length = (end - i) & 0xFF;
+		slots[i] &= ~mask;
+		slots[i] |= ((pid << 8) | (end - from)) << offset;
 	}
 	// Release the resources.
 	semaphore_release_n(&sched_semaphore, S3K_HART_CNT);
@@ -60,20 +61,22 @@ void sched_update(uint64_t pid, uint64_t end, uint64_t hart, uint64_t from,
 void sched_delete(uint64_t hart, uint64_t from, uint64_t to)
 {
 	semaphore_acquire_n(&sched_semaphore, S3K_HART_CNT);
-#if !defined(NDEBUG) && VERBOSE > 0
-	kprintf("> sched_delete(hart=%D,from=%D,to=%D)\n", hart, from, to);
-#endif
-	for (uint64_t i = from; i < to; ++i) {
-		slots[hart - S3K_MIN_HART][i].pid = 0;
-		slots[hart - S3K_MIN_HART][i].length = 0;
-	}
+	kprintf(1, "> sched_delete(hart=%D,from=%D,to=%D)\n", hart, from, to);
+	hart -= S3K_MIN_HART;
+	int offset = hart * 16;
+	uint64_t mask = 0xFFFFull << offset;
+	for (uint64_t i = from; i < to; ++i)
+		slots[i] &= ~mask;
 	// Release the resources.
 	semaphore_release_n(&sched_semaphore, S3K_HART_CNT);
 }
 
 slot_info_t slot_info_get(uint64_t hartid, uint64_t slot)
 {
-	return slots[hartid - S3K_MIN_HART][slot % S3K_SLOT_CNT];
+	uint64_t x = slots[slot % S3K_SLOT_CNT];
+	x >>= (hartid - S3K_MIN_HART) * 16;
+	x &= 0xFFFF;
+	return (slot_info_t){.pid = (x >> 8) & 0xFF, .length = x & 0xFF};
 }
 
 static proc_t *sched_fetch(uint64_t hart, uint64_t slot)
@@ -107,32 +110,32 @@ static proc_t *sched_fetch(uint64_t hart, uint64_t slot)
 	// Try to acquire the process.
 	if (!proc_acquire(p))
 		return NULL;
-#if !defined(NDEBUG) && VERBOSE > 1
-	kprintf("> sched(hart=%d,pid=%d,slot=%D)\n", hart, si.pid,
+	kprintf(2, "> sched(hart=%d,pid=%d,slot=%D)\n", hart, si.pid,
 		slot % S3K_SLOT_CNT);
-#endif
 	p->timeout = (slot + si.length) * S3K_SLOT_LEN;
 	return p;
 }
 
 proc_t *sched(void)
 {
-	// Get hart ID
+	// Hart ID
 	uint64_t hart = csrr(mhartid);
-	// Get next time slot
+	// Time slot
 	uint64_t slot = (time_get() + S3K_SCHED_TIME) / S3K_SLOT_LEN;
 	// Process to run
-	proc_t *next = NULL;
-	while (!next) {
+	proc_t *next;
+
+	do {
 		while (time_get() < slot * S3K_SLOT_LEN)
 			;
 		// Try schedule process
 		semaphore_acquire(&sched_semaphore);
 		next = sched_fetch(hart, slot);
 		semaphore_release(&sched_semaphore);
-		// Increment time slot if necessary.
 		slot++;
-	}
+	} while (!next);
+
 	timeout_set(hart, next->timeout - S3K_SCHED_TIME);
+
 	return next;
 }

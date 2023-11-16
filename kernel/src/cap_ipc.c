@@ -61,8 +61,10 @@ static err_t do_send(cap_t cap, const ipc_msg_t *msg, proc_t **next)
 			cap_move(msg->cap_buf, cap_buf);
 
 		if (cap.sock.mode == IPC_YIELD) {
+			recv->timeout = (*next)->timeout;
 			*next = recv;
 		} else {
+			recv->timeout = 0;
 			proc_release(recv);
 		}
 		return SUCCESS;
