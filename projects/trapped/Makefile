@@ -5,21 +5,14 @@ export ROOT       :=${abspath ../..}
 export BUILD      :=${abspath build/${PLATFORM}}
 export S3K_CONF_H :=${abspath s3k_conf.h}
 
-include ${ROOT}/tools.mk
-include ${ROOT}/common/plat/${PLATFORM}.mk
-
 APPS=app0
 
-ELFS:=${patsubst %,${BUILD}/%.elf,kernel ${APPS}}
+ELFS:=${patsubst %, ${BUILD}/%.elf, kernel ${APPS}}
 
-all: kernel ${APPS} size
+all: kernel ${APPS}
 
 clean:
-	@${MAKE} -C ${ROOT}/common clean
-	@${MAKE} -C ${ROOT}/kernel clean
-	@for prog in ${APPS}; do \
-		${MAKE} -f build.mk PROGRAM=$$prog clean; \
-		done
+	rm -rf ${BUILD}
 
 common:
 	@${MAKE} -C ${ROOT}/common
@@ -27,8 +20,8 @@ common:
 kernel: common
 	@${MAKE} -C ${ROOT}/kernel
 
-size: kernel ${APPS}
-	${SIZE} ${BUILD}/*.elf
+${APPS}: common
+	@${MAKE} -f ../build.mk PROGRAM=$@
 
 qemu: kernel ${APPS}
 	@ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh
@@ -42,7 +35,4 @@ gdb: kernel ${APPS}
 gdb-openocd: kernel ${APPS}
 	@ELFS="${ELFS}" ${ROOT}/scripts/gdb-openocd.sh
 
-${APPS}: common
-	@${MAKE} -f build.mk PROGRAM=$@
-
-.PHONY: all clean size qemu qemu-gdb gdb kernel common ${APPS}
+.PHONY: all clean qemu qemu-gdb gdb kernel common ${APPS}

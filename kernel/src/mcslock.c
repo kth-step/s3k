@@ -22,8 +22,6 @@ static void _release(qnode_t *const node)
 
 static bool _acquire(mcslock_t *lock, qnode_t *const node, bool preemptive)
 {
-	if (preemptive && kernel_preempt())
-		return false;
 	node->next = &lock->tail;
 	node->prev
 	    = __atomic_exchange_n(&lock->tail.prev, node, __ATOMIC_ACQUIRE);

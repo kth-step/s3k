@@ -156,4 +156,4 @@ typedef union {
 
 _Static_assert(sizeof(sys_args_t) == 64, "sys_args_t has the wrong size");
 
-proc_t *handle_syscall(proc_t *);
+proc_t *handle_syscall(void);

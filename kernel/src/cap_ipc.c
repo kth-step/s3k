@@ -7,6 +7,7 @@
 #include "drivers/time.h"
 #include "error.h"
 #include "kassert.h"
+#include "kernel.h"
 #include "macro.h"
 #include "proc.h"
 
@@ -27,10 +28,11 @@ static err_t do_send(cap_t cap, const ipc_msg_t *msg, proc_t **next)
 	cte_t cap_buf = channels[cap.sock.chan].cap_buf;
 
 	uint64_t curr_time = time_get();
-	uint64_t timeout = (*next)->timeout;
+	uint64_t timeout = timeout_get(csrr(mhartid));
 
-	if (curr_time > timeout)
+	if (curr_time >= timeout) {
 		return ERR_PREEMPTED;
+	}
 
 	proc_t *recv;
 
@@ -63,9 +65,11 @@ static err_t do_send(cap_t cap, const ipc_msg_t *msg, proc_t **next)
 		if (cap.sock.mode == IPC_YIELD) {
 			recv->timeout = (*next)->timeout;
 			*next = recv;
-		} else {
+		} else if (cap.sock.mode == IPC_NOYIELD) {
 			recv->timeout = 0;
 			proc_release(recv);
+		} else {
+			KASSERT(0);
 		}
 		return SUCCESS;
 	}
@@ -115,6 +119,7 @@ static err_t replyrecv(cte_t sock, cap_t cap, const ipc_msg_t *msg,
 {
 	cte_t cap_buf = msg->cap_buf;
 	proc_t *server = *next;
+	KASSERT(server->state == PSF_BUSY);
 
 	// Can send capability?
 	if (msg->send_cap && !(cap.sock.perm & IPC_SCAP))
@@ -209,6 +214,7 @@ err_t cap_sock_sendrecv(cte_t sock, const ipc_msg_t *msg, proc_t **next)
 		*next = NULL;
 		return ERR_PREEMPTED;
 	}
+	KASSERT((*next)->state == PSF_BUSY);
 
 	if (cap.sock.tag == 0) {
 		return replyrecv(sock, cap, msg, next);
