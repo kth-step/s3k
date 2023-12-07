@@ -21,12 +21,15 @@ void ctable_init(void)
 {
 	const cap_t init_caps[] = INIT_CAPS;
 	cte_t prev = ctable;
-	kprintf(0, "> Initial capabilities:\n");
+	kprintf(0, "# Initial capabilities:\n");
 	for (unsigned int i = 0; i < ARRAY_SIZE(init_caps); ++i) {
+		if (init_caps[i].type == CAPTY_NONE)
+			continue;
+		cte_insert(&ctable[i], init_caps[i], prev);
+
 		char buf[128];
 		cap_snprint(buf, 128, init_caps[i]);
-		kprintf(0, "  %d: %s\n", i, buf);
-		cte_insert(&ctable[i], init_caps[i], prev);
+		kprintf(0, "#\t%d: %s\n", i, buf);
 	}
 }
 

@@ -81,13 +81,13 @@ int alt_vsnprintf(char *restrict str, size_t size, const char *restrict fmt,
 			s = write_hex(s, end, va_arg(ap, unsigned int));
 			break;
 		case 'X':
-			s = write_hex(s, end, va_arg(ap, unsigned long long));
+			s = write_hex(s, end, va_arg(ap, unsigned long));
 			break;
 		case 'd':
 			s = write_dec(s, end, va_arg(ap, unsigned int));
 			break;
 		case 'D':
-			s = write_dec(s, end, va_arg(ap, unsigned long long));
+			s = write_dec(s, end, va_arg(ap, unsigned long));
 			break;
 		case '\0':
 			break;

@@ -8,7 +8,7 @@
 
 // Min and max usable hart ID.
 #define S3K_MIN_HART 1
-#define S3K_MAX_HART 1
+#define S3K_MAX_HART 4
 
 // Total number of usable harts.
 #define S3K_HART_CNT (S3K_MAX_HART - S3K_MIN_HART + 1ul)
@@ -31,6 +31,9 @@
 		[2] = cap_mk_memory(0x10010000, 0x10011000, MEM_RW),  \
 		[3] = cap_mk_memory(0x200b000, 0x200c000, MEM_R),     \
 		[4] = cap_mk_time(1, 0, S3K_SLOT_CNT),                \
+		[5] = cap_mk_time(2, 0, S3K_SLOT_CNT),                \
+		[6] = cap_mk_time(3, 0, S3K_SLOT_CNT),                \
+		[7] = cap_mk_time(4, 0, S3K_SLOT_CNT),                \
 		[8] = cap_mk_monitor(0, S3K_PROC_CNT),                \
 		[9] = cap_mk_channel(0, S3K_CHAN_CNT),                \
 	}

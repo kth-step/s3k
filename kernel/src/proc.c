@@ -6,26 +6,25 @@
 #include "drivers/time.h"
 #include "kassert.h"
 
-static proc_t _processes[S3K_PROC_CNT];
+static proc_t procs[S3K_PROC_CNT];
 extern unsigned char _payload[];
 
 void proc_init(void)
 {
 	for (uint64_t i = 0; i < S3K_PROC_CNT; i++) {
-		_processes[i].pid = i;
-		_processes[i].state = PSF_SUSPENDED;
+		procs[i].pid = i;
+		procs[i].state = PSF_SUSPENDED;
 	}
-	_processes[0].state = 0;
-	_processes[0].regs[REG_PC] = (uint64_t)_payload;
-	kprintf(0, "> boot process pc=0x%X\n", _payload);
+	procs[0].state = 0;
+	procs[0].regs[REG_PC] = (uint64_t)_payload;
 	KASSERT(cap_pmp_load(ctable_get(0, 0), 0) == SUCCESS);
 }
 
 proc_t *proc_get(pid_t pid)
 {
 	KASSERT(pid < S3K_PROC_CNT);
-	KASSERT(_processes[pid].pid == pid);
-	return &_processes[pid];
+	KASSERT(procs[pid].pid == pid);
+	return &procs[pid];
 }
 
 proc_state_t proc_get_state(proc_t *proc)
@@ -46,16 +45,24 @@ bool proc_acquire(proc_t *proc)
 
 	if (time_get() < proc->timeout)
 		return false;
-
+#ifdef SMP
 	return __atomic_compare_exchange(&proc->state, &expected, &desired,
 					 false, __ATOMIC_ACQUIRE,
 					 __ATOMIC_RELAXED);
+#else
+	proc->state = desired;
+	return true;
+#endif
 }
 
 void proc_release(proc_t *proc)
 {
 	KASSERT(proc->state & PSF_BUSY);
+#ifdef SMP
 	__atomic_fetch_xor(&proc->state, PSF_BUSY, __ATOMIC_RELEASE);
+#else
+	proc->state = 0;
+#endif
 }
 
 void proc_suspend(proc_t *proc)
@@ -78,7 +85,7 @@ void proc_resume(proc_t *proc)
 void proc_ipc_wait(proc_t *proc, chan_t chan)
 {
 	KASSERT(proc->state == PSF_BUSY);
-	proc->state = PSF_BLOCKED | ((uint64_t)chan << 48);
+	proc->state = PSF_BLOCKED | ((uint64_t)chan << 48) | PSF_BUSY;
 }
 
 bool proc_ipc_acquire(proc_t *proc, chan_t chan)
@@ -90,9 +97,14 @@ bool proc_ipc_acquire(proc_t *proc, chan_t chan)
 		return false;
 	if (time_get() >= proc->timeout)
 		return false;
+#ifdef SMP
 	return __atomic_compare_exchange_n(&proc->state, &expected, desired,
 					   false, __ATOMIC_ACQUIRE,
 					   __ATOMIC_RELAXED);
+#else
+	proc->state = desired;
+	return true;
+#endif
 }
 
 bool proc_is_suspended(proc_t *proc)
