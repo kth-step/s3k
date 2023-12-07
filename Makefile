@@ -1,28 +1,24 @@
 .POSIX:
-
-export ROOT=${abspath .}
-
+.SECONDARY:
 
 PROJECTS:=projects/hello \
 	  projects/trapped \
 	  projects/ping-pong \
 	  projects/demonstrator
-PLATFORM?=qemu_virt
-
-include tools.mk
-include common/plat/${PLATFORM}.mk
 
 all: ${PROJECTS}
 
+${PROJECTS}: common
+
 common ${PROJECTS}:
-	make -C $@ all PLATFORM=${PLATFORM}
+	@${MAKE} -C $@ all
 
 clean:
-	for i in ${PROJECTS}; do \
-		make -C $$i clean PLATFORM=${PLATFORM}; \
+	@for i in common ${PROJECTS}; do \
+		${MAKE} -C $$i clean; \
 	done
 
 format:
 	clang-format -i $$(find * -type f -name '*.[hc]')
 
-.PHONY: all docs clean common ${PROJECTS}
+.PHONY: all clean format common ${PROJECTS}

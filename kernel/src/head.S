@@ -1,4 +1,4 @@
-# See LICENSE file for copyright and license details.
+// See LICENSE file for copyright and license details.
 #include "macro.inc"
 #include "offsets.h"
 #include "csr.h"
@@ -7,7 +7,7 @@
 .extern sched
 .extern trap_entry
 .extern trap_exit
-.extern trap_exit_pmp
+.extern trap_resume
 
 .section .text.init,"ax",@progbits
 
@@ -15,18 +15,18 @@
 .type _start, @function
 _start:
 head_entry:
-	/* Load global pointer */
+	// Load global pointer.
 	ld_gp
 	ld_sp	t1
 
-	/* If hartid != MIN_HARTID, then jump to wait. */
+	// If hartid != MIN_HARTID, then jump to wait.
 	csrr	t0,mhartid
 	li	t1,S3K_MIN_HART
 	li	t2,S3K_MAX_HART
 	bltu	t0,t1,__hang
 	bgtu	t0,t2,__hang
 
-	/* Set some CSRs to 0 */
+	// Set some CSRs to 0.
 	csrw	mstatus,0
 	csrw	medeleg,0
 	csrw	mideleg,0
@@ -34,7 +34,7 @@ head_entry:
 	csrw	mie,0
 	csrw	satp,0
 
-	/* Set trap entry. */
+	// Set trap entry.
 	la	t0,__hang
 	csrw	mtvec,t0
 
@@ -42,7 +42,8 @@ head_entry:
 	li	t1,S3K_MIN_HART
 	bne	t0,t1,wait
 
-zero_bss: /* write zeros to the bss section */
+zero_bss:
+	// Initialize the bss section.
 	la	t0,_bss
 	la 	t1,_end
 	j	2f
@@ -56,29 +57,31 @@ zero_bss: /* write zeros to the bss section */
 	li	t1,1
 	sw	t1,(t0)
 
-wait:   # Wait for initilization to finish.
+wait:   // Wait for initilization to finish.
 	la	t0,kernel_ready
 	lw	t0,(t0)
 	beqz	t0,wait
 
 head_exit:
-	# Enable timer interrupts
+	// Enable timer interrupts.
 	li	t0,MIE_MTIE
 	csrw	mie,t0
 
-#ifdef INSTRUMENT
-	csrw	mcounteren,0xF
-	csrw	scounteren,0xF
+#if defined(INSTRUMENT_CYCLE) || defined(INSTRUMENT_DISPATCH_LATENCY)
+	csrw	mcounteren,0x3
+	csrw	scounteren,0x3
 #endif
 
-	# Start user processes.
+	// Start user processes.
 	la	t0,trap_entry
 	csrw	mtvec,t0
 	csrw	mscratch,0
-	call	sched
-	j	trap_exit_pmp
+	la	ra,trap_exit
+	tail	sched
 
 __hang:
+	csrw	mie,0
+	wfi
 	j	__hang
 
 .section .data

@@ -484,7 +484,7 @@ s3k_err_t s3k_try_cap_derive(s3k_cidx_t src, s3k_cidx_t dst, s3k_cap_t ncap)
 {
 	sys_args_t args = {
 	    .cap_derive = {src, dst, ncap.raw}
-	  };
+	      };
 	return DO_ECALL(S3K_SYS_CAP_DERIVE, args, sizeof(args.cap_derive)).err;
 }
 

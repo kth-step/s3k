@@ -97,6 +97,8 @@ typedef struct {
 	uint64_t serv_time;
 } proc_t;
 
+register proc_t *current __asm__("tp");
+
 /**
  * Initializes all processes in the system.
  *

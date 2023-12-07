@@ -10,5 +10,5 @@
 
 #include <stdint.h>
 
-proc_t *handle_exception(proc_t *);
-proc_t *handle_illegal_instruction(proc_t *);
+proc_t *handle_exception(void);
+proc_t *handle_illegal_instruction(void);
