@@ -577,7 +577,7 @@ proc_t *handle_sock_send(proc_t *const p, const sys_args_t *args)
 	const ipc_msg_t msg = {
 	    .cap_buf = ctable_get(p->pid, args->sock.cap_idx),
 	    .send_cap = args->sock.send_cap,
-	    .data = {args->sock.data[0], args->sock.data[1], args->sock.data[1],
+	    .data = {args->sock.data[0], args->sock.data[1], args->sock.data[2],
 		     args->sock.data[3]},
 	};
 	proc_t *next = p;
@@ -618,7 +618,7 @@ proc_t *handle_sock_sendrecv(proc_t *const p, const sys_args_t *args)
 	const ipc_msg_t msg = {
 	    .cap_buf = ctable_get(p->pid, args->sock.cap_idx),
 	    .send_cap = args->sock.send_cap,
-	    .data = {args->sock.data[0], args->sock.data[1], args->sock.data[1],
+	    .data = {args->sock.data[0], args->sock.data[1], args->sock.data[2],
 		     args->sock.data[3]},
 	};
 	proc_t *next = p;
