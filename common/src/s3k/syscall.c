@@ -622,7 +622,7 @@ s3k_reply_t s3k_try_sock_recv(s3k_cidx_t sock_idx, s3k_cidx_t cap_idx)
 	sys_args_t args = {
 	    .sock = {.sock_idx = sock_idx, .cap_idx = cap_idx}
 	      };
-	register uint64_t t0 __asm__("t0") = S3K_SYS_SOCK_SENDRECV;
+	register uint64_t t0 __asm__("t0") = S3K_SYS_SOCK_RECV;
 	register uint64_t a0 __asm__("a0") = args.a0;
 	register uint64_t a1 __asm__("a1") = args.a1;
 	register uint64_t a2 __asm__("a2") = args.a2;
