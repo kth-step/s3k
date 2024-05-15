@@ -21,7 +21,7 @@ struct uart {
 	int div;    // Baud rate divisor
 };
 
-void uart_init(void *base)
+void uart_init(void *base, uint64_t freq, uint64_t baud)
 {
 	volatile struct uart *uart = base;
 	uart->txctrl = TXCTRL_TXEN; // Enable transmit data

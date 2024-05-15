@@ -1,0 +1,9 @@
+export ARCH=rv64imac_zicsr
+export ABI=lp64
+export CMODEL=medany
+export QEMU_MACHINE=none
+export QEMU_SMP=none
+export COMMON_INC:=${ROOT}/common/inc
+export COMMON_LIB:=${ROOT}/common/build/${PLATFORM}
+export STARTFILES:=${ROOT}/common/build/${PLATFORM}/start
+PLAT_SRCS=src/drivers/uart/cheshire.c src/drivers/time.c

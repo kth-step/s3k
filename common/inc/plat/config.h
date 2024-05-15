@@ -8,6 +8,8 @@
 #include "plat/sifive_unleashed.h"
 #elif defined(PLATFORM_sifive_unleashed4)
 #include "plat/sifive_unleashed4.h"
+#elif defined(PLATFORM_cheshire)
+#include "plat/cheshire.h"
 #else
 #error "Unsupported platform or platform not found"
 #endif

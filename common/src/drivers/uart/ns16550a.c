@@ -22,7 +22,7 @@ struct uart {
 	char lsr; // Line status register
 };
 
-void uart_init(void *base)
+void uart_init(void *base, uint64_t freq, uint64_t baud)
 {
 	volatile struct uart *uart = base;
 	uart->lcr = 0x3;

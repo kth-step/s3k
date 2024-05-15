@@ -16,11 +16,13 @@ uint64_t kernel_wcrt;
 void kernel_init(void)
 {
 	alt_init();
+	//alt_init(1000000, 115200);
 	kprintf(0, "# uart initialized\n");
 #ifdef SMP
 	cap_lock_init();
 	kprintf(0, "# capability lock initialized\n");
 #endif
+	mcslock_init(&lock);
 	ctable_init();
 	kprintf(0, "# ctable initialized\n");
 	sched_init();

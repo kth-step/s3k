@@ -1,6 +1,5 @@
 #pragma once
 
-#define PLATFORM_VIRT
 #include "plat/config.h"
 
 // Number of user processes
