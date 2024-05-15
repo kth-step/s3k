@@ -78,17 +78,8 @@ trap_exception:
 	csrc	mstatus,MSTATUS_MIE	
 #endif
 
-#ifdef INSTRUMENT_WCRT
-	csrw	mcycle,0
-#endif
 	// Call handler.
 	jalr	ra,%pcrel_lo(1b)(ra)	
-
-#ifdef INSTRUMENT_WCRT
-	csrr	t0,mcycle
-	la	t1,kernel_wcrt
-	amomax.d x0,t0,(t1)
-#endif
 
 	beq	a0,tp,trap_resume
 

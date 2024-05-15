@@ -32,7 +32,6 @@ void main(void)
 			ppp_send(s, 6);
 			continue;
 		}
-		alt_printf("{wcet:0x%X}", s3k_get_wcet(true));
 		ppp_send(buf, reply.data[0]);
 	}
 }

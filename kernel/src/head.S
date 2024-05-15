@@ -67,11 +67,6 @@ head_exit:
 	li	t0,MIE_MTIE
 	csrw	mie,t0
 
-#if defined(INSTRUMENT_CYCLE) || defined(INSTRUMENT_DISPATCH_LATENCY)
-	csrw	mcounteren,0x3
-	csrw	scounteren,0x3
-#endif
-
 	// Start user processes.
 	la	t0,trap_entry
 	csrw	mtvec,t0
