@@ -1,23 +1,31 @@
-s3k - Simple Secure Separation Kernel
+S3K - Simple Secure Separation Kernel
 =====================================
 
-s3k is a separation kernel targetting embedded RISC-V systems.
+S3K is a capability-based separation kernel targetting embedded RISC-V systems.
 
-- [Documentation Index](https://github.com/kth-step/s3k/wiki)
-- [S3K Design](https://github.com/kth-step/s3k/wiki/S3K-Design)
-- [S3K API](https://github.com/kth-step/s3k/wiki/S3K-API)
+Documentation
+-------------
+
+| Page | Description |
+| --- | --- |
+| [Home](https://github.com/kth-step/s3k/wiki)                  | Documentation Index |
+| [S3K Design](https://github.com/kth-step/s3k/wiki/S3K-Design) | High-level design of S3K |
+| [S3K Implementation](https://github.com/kth-step/s3k/wiki/S3K-Implementation) | Description of S3K implementation |
+| [S3K API](https://github.com/kth-step/s3k/wiki/S3K-API)       | User-level Kernel API |
+
+More documenation will be added.
 
 Configuration
 -------------
 
 Set your compiler toolchain in `tools.mk`. By default we have the following:
 ```
-CC=riscv64-unknown-elf-gcc
-AR=riscv64-unknown-elf-ar
-LD=riscv64-unknown-elf-ld
-SIZE=riscv64-unknown-elf-size
-OBJDUMP=riscv64-unknown-elf-objdump
-OBJCOPY=riscv64-unknown-elf-objcopy
+CC      =riscv64-unknown-elf-gcc
+AR      =riscv64-unknown-elf-ar
+LD      =riscv64-unknown-elf-ld
+SIZE    =riscv64-unknown-elf-size
+OBJDUMP =riscv64-unknown-elf-objdump
+OBJCOPY =riscv64-unknown-elf-objcopy
 ```
 
 Build and Run
@@ -73,7 +81,5 @@ Repository structure
   - hello - Hello, world example with two processes
   - ping-ping - IPC example
   - trapped - Trap handling example
-  - wcet - deprecated project (for now)
-- API.md - Kernel API
 - LICENSE - MIT License file
 - tools.mk - Set the compiler tools here

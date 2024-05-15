@@ -1,5 +1,6 @@
 # See LICENSE file for copyright and license details.
 .POSIX:
+.SECONDARY:
 
 # Kernel basename
 ROOT=..
@@ -12,15 +13,15 @@ include ${ROOT}/common/plat/${PLATFORM}.mk
 CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 	-DPLATFORM_${PLATFORM} \
 	-std=c11 \
-	-Os -g3 \
+	-O2 -g3 \
 	-Wall -Wextra -Werror \
 	-Wno-unused-parameter \
 	-Wshadow -fno-common \
 	-Wno-builtin-declaration-mismatch \
 	-fno-stack-protector \
-	-flto \
+	-flto -fwhole-program \
 	-include ${S3K_CONF_H} \
-	-Iinc -I${COMMON_INC}
+	-Iinc -I${COMMON_INC} \
 
 # LD flags
 LDFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
@@ -51,32 +52,38 @@ BIN:=${ELF:.elf=.bin}
 HEX:=${ELF:.elf=.hex}
 DA :=${ELF:.elf=.da}
 
-all: ${ELF} ${BIN} ${HEX}
+all: ${ELF} ${BIN} ${HEX} ${DA}
 
 clean:
 	rm -f ${ELF} ${OBJS} ${DEPS}
 
 ${BUILD}/${PROGRAM}/%.o: src/%.S
 	@mkdir -p ${@D}
-	${CC} -o $@ $< -c -MMD ${CFLAGS} 
+	@${CC} -o $@ $< -c -MMD ${CFLAGS}
+	@printf "CC\t$@\n"
 
 ${BUILD}/${PROGRAM}/%.o: src/%.c
 	@mkdir -p ${@D}
-	${CC} -o $@ $< -c -MMD ${CFLAGS}
+	@${CC} -o $@ $< -c -MMD ${CFLAGS}
+	@printf "CC\t$@\n"
 
 %.elf: ${OBJS}
 	@mkdir -p ${@D}
-	${CC} -o $@ ${OBJS} ${LDFLAGS}
+	@${CC} -o $@ ${OBJS} ${LDFLAGS}
+	@printf "CC\t$@\n"
 
 %.bin: %.elf
-	${OBJCOPY} -O binary $< $@
+	@${OBJCOPY} -O binary $< $@
+	@printf "OBJCOPY\t$@\n"
 
 %.hex: %.elf
-	${OBJCOPY} -O ihex $< $@
+	@${OBJCOPY} -O ihex $< $@
+	@printf "OBJCOPY\t$@\n"
 
 %.da: %.elf
-	${OBJDUMP} -D $< > $@
+	@${OBJDUMP} -D $< > $@
+	@printf "OBJDUMP\t$@\n"
 
-.PHONY: all common da format clean
+.PHONY: all da format clean
 
 -include ${DEPS}

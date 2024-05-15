@@ -12,7 +12,7 @@ size_t ppp_recv(char *buf);
 void main(void)
 {
 	s3k_cap_revoke(0x2);
-	alt_puts("uart started");
+	alt_puts("{uart started}");
 	s3k_msg_t msg;
 	s3k_reply_t reply;
 
@@ -20,6 +20,7 @@ void main(void)
 
 	while (1) {
 		size_t len = ppp_recv(buf);
+		alt_puts("{received message}");
 		msg.data[0] = len;
 		reply = s3k_sock_sendrecv(0x5, &msg);
 		if (reply.err != S3K_SUCCESS) {
@@ -31,7 +32,6 @@ void main(void)
 			ppp_send(s, 6);
 			continue;
 		}
-		alt_printf("{wcet:0x%X}", s3k_get_wcet(true));
 		ppp_send(buf, reply.data[0]);
 	}
 }

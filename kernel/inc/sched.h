@@ -29,7 +29,7 @@ void sched_init(void);
  * This function finds the next process to schedule based on the current
  * state of the system.
  */
-void sched(proc_t *) NORETURN;
+proc_t *sched(void);
 
 /// Let pid run on hartid, begin-end.
 void sched_update(uint64_t pid, uint64_t end, uint64_t hartid, uint64_t from,

@@ -21,8 +21,16 @@ void ctable_init(void)
 {
 	const cap_t init_caps[] = INIT_CAPS;
 	cte_t prev = ctable;
-	for (unsigned int i = 0; i < ARRAY_SIZE(init_caps); ++i)
+	kprintf(0, "# Initial capabilities:\n");
+	for (unsigned int i = 0; i < ARRAY_SIZE(init_caps); ++i) {
+		if (init_caps[i].type == CAPTY_NONE)
+			continue;
 		cte_insert(&ctable[i], init_caps[i], prev);
+
+		char buf[128];
+		cap_snprint(buf, 128, init_caps[i]);
+		kprintf(0, "#\t%d: %s\n", i, buf);
+	}
 }
 
 cte_t ctable_get(uint64_t pid, uint64_t index)
@@ -72,17 +80,16 @@ uint64_t cte_pid(cte_t c)
 	return offset(c) / S3K_CAP_CNT;
 }
 
-void cte_move(cte_t src, cte_t dst, cap_t *cap)
+void cte_move(cte_t src, cte_t dst)
 {
-	*cap = src->cap;
 	if (src == dst)
 		return;
+	cte_set_cap(dst, cte_cap(src));
 	cte_set_cap(src, (cap_t){0});
 	cte_set_prev(dst, cte_prev(src));
 	cte_set_next(dst, cte_next(src));
 	cte_prev(dst)->next = offset(dst);
 	cte_next(dst)->prev = offset(dst);
-	cte_set_cap(dst, *cap);
 }
 
 cap_t cte_delete(cte_t c)

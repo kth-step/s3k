@@ -2,7 +2,7 @@
 #include "mcslock.h"
 
 #include "kassert.h"
-#include "preempt.h"
+#include "kernel.h"
 
 #include <stddef.h>
 
@@ -22,8 +22,6 @@ static void _release(qnode_t *const node)
 
 static bool _acquire(mcslock_t *lock, qnode_t *const node, bool preemptive)
 {
-	if (preemptive && preempt())
-		return false;
 	node->next = &lock->tail;
 	node->prev
 	    = __atomic_exchange_n(&lock->tail.prev, node, __ATOMIC_ACQUIRE);
@@ -31,7 +29,7 @@ static bool _acquire(mcslock_t *lock, qnode_t *const node, bool preemptive)
 		return true;
 	node->prev->next = node;
 	while (__atomic_load_n(&node->prev, __ATOMIC_ACQUIRE)) {
-		if (preemptive && preempt()) {
+		if (preemptive && kernel_preempt()) {
 			_release(node);
 			return false;
 		}

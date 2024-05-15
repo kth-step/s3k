@@ -1,30 +1,27 @@
 .POSIX:
 
-export PLATFORM   ?=qemu_virt
+export PLATFORM   ?=qemu_virt4
 export ROOT       :=${abspath ../..}
 export BUILD      :=${abspath build/${PLATFORM}}
 export S3K_CONF_H :=${abspath s3k_conf.h}
 
-include ${ROOT}/common/plat/${PLATFORM}.mk
-
 APPS=app0 app1
 
-ELFS=${patsubst %, ${BUILD}/%.elf, kernel ${APPS}}
+ELFS:=${patsubst %, ${BUILD}/%.elf, kernel ${APPS}}
 
 all: kernel ${APPS}
 
 clean:
-	@${MAKE} -C ${ROOT}/common clean
-	@${MAKE} -C ${ROOT}/kernel clean
-	@for prog in ${APPS}; do \
-		${MAKE} -f build.mk PROGRAM=$$prog clean; \
-		done
+	rm -rf ${BUILD}
 
 common:
 	@${MAKE} -C ${ROOT}/common
 
 kernel: common
 	@${MAKE} -C ${ROOT}/kernel
+
+${APPS}: common
+	@${MAKE} -f ../build.mk PROGRAM=$@
 
 qemu: kernel ${APPS}
 	@ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh
@@ -37,8 +34,5 @@ gdb: kernel ${APPS}
 
 gdb-openocd: kernel ${APPS}
 	@ELFS="${ELFS}" ${ROOT}/scripts/gdb-openocd.sh
-
-${APPS}: common
-	@${MAKE} -f build.mk PROGRAM=$@
 
 .PHONY: all clean qemu qemu-gdb gdb kernel common ${APPS}
