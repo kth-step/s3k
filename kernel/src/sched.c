@@ -154,9 +154,6 @@ proc_t *sched(void)
 		slot = (time_get() + S3K_SCHED_TIME) / S3K_SLOT_LEN;
 		while (time_get() < slot * S3K_SLOT_LEN)
 			;
-#ifdef INSTRUMENT_DISPATCH_LATENCY
-		csrw(mcycle, 0);
-#endif
 		// Try schedule process
 		proc = sched_fetch(hart, slot);
 	} while (!proc);

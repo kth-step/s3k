@@ -186,12 +186,6 @@ proc_t *handle_get_info(proc_t *const p, const sys_args_t *args)
 	case 2:
 		p->regs[REG_A0] = timeout_get(csrr(mhartid));
 		break;
-	case 3:
-		p->regs[REG_A0] = kernel_wcet();
-		break;
-	case 4:
-		p->regs[REG_A0] = kernel_wcet_reset();
-		break;
 	default:
 		p->regs[REG_A0] = 0;
 	}
