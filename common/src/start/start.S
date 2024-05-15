@@ -1,6 +1,5 @@
 .globl _start
-.extern __global_pointer$
-.extern __stack_pointer
+#define STACK_SIZE 1024
 /* Defines program entry */
 .section .init,"ax",@progbits
 _start:
@@ -9,7 +8,7 @@ _start:
 .option norelax
 	la gp,__global_pointer$
 .option pop
-	la sp,__stack_pointer
+	la sp,__stack_top
 
 	la t0,_bss
 	la t1,_end
@@ -21,3 +20,9 @@ _start:
 	call main
 
 1:	j 1b
+
+/* Defines stack */
+.section .bss,"aw",@nobits
+.balign 8
+	.space STACK_SIZE
+__stack_top:
