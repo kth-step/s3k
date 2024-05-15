@@ -54,13 +54,17 @@ static err_t do_send(cap_t cap, const ipc_msg_t *msg, proc_t **next)
 	if (proc_ipc_acquire(recv, cap.sock.chan)) {
 		recv->regs[REG_T0] = SUCCESS;
 		recv->regs[REG_A0] = cap.sock.tag;
-		recv->regs[REG_A1] = msg->send_cap ? cte_cap(cap_buf).raw : 0;
 		recv->regs[REG_A2] = msg->data[0];
 		recv->regs[REG_A3] = msg->data[1];
 		recv->regs[REG_A4] = msg->data[2];
 		recv->regs[REG_A5] = msg->data[3];
-		if (msg->send_cap)
+
+		if (msg->send_cap) {
+			recv->regs[REG_A1] = cte_cap(msg->cap_buf).raw;
 			cap_move(msg->cap_buf, cap_buf);
+		} else {
+			recv->regs[REG_A1] = 0;
+		}
 
 		if (cap.sock.mode == IPC_YIELD) {
 			recv->timeout = (*next)->timeout;
