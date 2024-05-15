@@ -21,8 +21,7 @@ CMD_RUN = 0x4
 CMD_RESET = 0x5
 
 # Initializing serial connection
-#ser = serial.Serial("/dev/ttyUSB1", 115200)
-ser = serial.serial_for_url("socket://localhost:8888")
+ser = serial.Serial("/dev/ttyUSB1", 115200)
 
 # Function for sending data with PPP encoding
 def ppp_send(data, file=sys.stdout.buffer):
@@ -32,20 +31,16 @@ def ppp_send(data, file=sys.stdout.buffer):
     :param data: The data to be sent, as bytes.
     :param file: The file-like object where data will be written. Defaults to sys.stdout.buffer.
     """
-    i = 2
     file.write(PPP_BGN)
     for c in data:
         byte = c.to_bytes(1, byteorder="little")
         if byte in [PPP_ESC, PPP_BGN, PPP_END]:
             file.write(PPP_ESC)
             file.write((c ^ 0x20).to_bytes(1, byteorder="little"))
-            i += 2
         else:
             file.write(byte)
-            i += 1
     file.write(PPP_END)
     file.flush()
-    print(f"Sent {i} bytes")
 
 # Function for receiving data with PPP encoding
 def ppp_recv(file=sys.stdin.buffer):

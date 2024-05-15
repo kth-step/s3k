@@ -13,7 +13,7 @@
 #define S3K_CHAN_CNT 2
 
 // Number of slots per period
-#define S3K_SLOT_CNT 32ull
+#define S3K_SLOT_CNT 64ull
 
 // Length of slots in ticks.
 #define S3K_SLOT_LEN (S3K_RTC_HZ / S3K_SLOT_CNT / 100ull)
@@ -22,4 +22,4 @@
 #define S3K_SCHED_TIME (S3K_SLOT_LEN / 10)
 
 // If debugging, comment
-// #define NDEBUG
+#define NDEBUG

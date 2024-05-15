@@ -63,12 +63,13 @@ void setup_trap(void)
 
 void setup_uart(s3k_cidx_t uart_idx)
 {
-	uint64_t uart_addr = s3k_napot_encode(UART0_BASE_ADDR, 0x8);
+	uint64_t uart_addr = s3k_napot_encode(0x10000000, 0x8);
 	// Derive a PMP capability for accessing UART
 	s3k_cap_derive(UART_MEM, uart_idx, s3k_mk_pmp(uart_addr, S3K_MEM_RW));
 	// Load the derive PMP capability to PMP configuration
 	s3k_pmp_load(uart_idx, 1);
 	// Synchronize PMP unit (hardware) with PMP configuration
+	// false => not full synchronization.
 	s3k_sync_mem();
 }
 

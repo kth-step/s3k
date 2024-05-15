@@ -5,9 +5,8 @@
  * @copyright MIT License
  * @author Henrik Karlsson (henrik10@kth.se)
  */
-#include "macro.h"
-
 #include <stdint.h>
 
-void trap_entry(void) NORETURN;
-void trap_exit(void) NORETURN;
+void trap_entry(void) __attribute__((noreturn));
+void trap_exit(proc_t *) __attribute__((noreturn));
+void trap_resume(proc_t *) __attribute__((noreturn));

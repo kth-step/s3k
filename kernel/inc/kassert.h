@@ -1,5 +1,5 @@
 #pragma once
-#include "kprintf.h"
+#include "altc/altio.h"
 
 /**
  * @file kassert.h
@@ -17,24 +17,28 @@
  */
 #ifndef NDEBUG
 
+#define _X_(x) #x
 #define KASSERT_FAILURE(FILE, LINE) \
-	kprintf(0, "Kernel assertion failed at %s:%d.\n", FILE, LINE);
+	alt_puts("Kernel assertion failed at " FILE ":" _X_(LINE) ".");
 
-#define KASSERT(expr)                                \
-	do {                                         \
-		if (expr)                            \
-			break;                       \
-		KASSERT_FAILURE(__FILE__, __LINE__); \
-		while (1)                            \
-			;                            \
+#define KASSERT(EXPR)                                        \
+	do {                                                 \
+		if (!(EXPR)) {                               \
+			KASSERT_FAILURE(__FILE__, __LINE__); \
+			while (1)                            \
+				;                            \
+		}                                            \
 	} while (false)
 
 #else /* NDEBUG */
 
 #define KASSERT(expr)                            \
 	do {                                     \
-		if (!(expr))                     \
+		if (!(expr)) {                   \
 			__builtin_unreachable(); \
+			while (1)                \
+				;                \
+		}                                \
 	} while (false)
 
 #endif /* NDEBUG */

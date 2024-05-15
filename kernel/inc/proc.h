@@ -17,6 +17,11 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+/** Process state flags
+ * PSF_BUSY: Process has been acquired.
+ * PSF_BLOCKED: Waiting for IPC.
+ * PSF_SUSPENDED: Waiting for monitor
+ */
 typedef uint64_t proc_state_t;
 
 typedef enum {
@@ -75,8 +80,6 @@ typedef enum {
  * Contains all information needed manage a process except the capabilities.
  */
 typedef struct {
-	/** Process state. */
-	proc_state_t state;
 	/** The registers of the process (RISC-V registers and virtual
 	 * registers). */
 	uint64_t regs[REG_CNT];
@@ -86,8 +89,17 @@ typedef struct {
 	/** Instrumentation registers */
 	/** Process ID. */
 	pid_t pid;
+	/** Process state. */
+	proc_state_t state;
+	qnode_t qnode;
 
 	/** Scheduling information */
+
+	/***** IPC related things *****/
+	/**
+	 * Timeout of IPC yielding send.
+	 * Time before sender gives up.
+	 */
 	uint64_t timeout;
 	/**
 	 * Minimum remaining time required for receiving messages.
@@ -95,12 +107,16 @@ typedef struct {
 	 * it is not allowed to send the message.
 	 */
 	uint64_t serv_time;
+	/**
+	 * Source and destination pointer for transmitting capabilities.
+	 */
+	cte_t cap_buf;
 } proc_t;
-
-register proc_t *current __asm__("tp");
 
 /**
  * Initializes all processes in the system.
+ *
+ * @param payload A pointer to the boot loader's code.
  *
  * @note This function should be called only once during system startup.
  */
@@ -114,14 +130,48 @@ void proc_init(void);
  */
 proc_t *proc_get(pid_t pid);
 
-proc_state_t proc_get_state(proc_t *proc);
-
+/**
+ * @brief Attempt to acquire the lock for a process.
+ *
+ * The process's lock is embedded in its state. This function attempts to
+ * acquire the lock by atomically setting the LSB of the state to 1 if it
+ * currently has the value 'expected'. If the lock is already held by another
+ * process, this function will return false.
+ *
+ * @param proc Pointer to the process to acquire the lock for.
+ * @param expected The expected value of the process's state.
+ * @return True if the lock was successfully acquired, false otherwise.
+ */
 bool proc_acquire(proc_t *proc);
+
+/**
+ * @brief Release the lock on a process.
+ *
+ * The process's lock is embedded in its state. This function sets the LSB of
+ * the state to 0 to unlock the process.
+ *
+ * @param proc Pointer to the process to release the lock for.
+ */
 void proc_release(proc_t *proc);
+
+/**
+ * Set the process to a suspended state without locking it. The process may
+ * still be running, but it will not resume after its timeslice has ended.
+ *
+ * @param proc Pointer to process to suspend.
+ */
 void proc_suspend(proc_t *proc);
+
+/**
+ * Resumes a process from its suspend state without locking it.
+ *
+ * @param proc Pointer to process to be resumed.
+ */
 void proc_resume(proc_t *proc);
-void proc_ipc_wait(proc_t *proc, chan_t chan);
-bool proc_ipc_acquire(proc_t *proc, chan_t chan);
+
+void proc_ipc_wait(proc_t *proc, chan_t channel);
+bool proc_ipc_acquire(proc_t *proc, chan_t channel);
+
 bool proc_is_suspended(proc_t *proc);
 
 bool proc_pmp_avail(proc_t *proc, pmp_slot_t slot);

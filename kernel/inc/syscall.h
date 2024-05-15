@@ -1,7 +1,6 @@
 #pragma once
 
 #include "cap_types.h"
-#include "macro.h"
 #include "proc.h"
 
 #include <stdint.h>
@@ -12,7 +11,6 @@ typedef enum {
 	SYS_REG_READ,  // Set the value of a specific register
 	SYS_REG_WRITE, // Get the value of a specific register
 	SYS_SYNC,      // Synchronize with capabilities/scheduling
-	SYS_SLEEP,
 
 	// Capability Management
 	SYS_CAP_READ,	// Read the properties of a capability
@@ -49,111 +47,64 @@ typedef union {
 	};
 
 	struct {
-		uint64_t info;
+		int info;
 	} get_info;
 
 	struct {
-		uint64_t reg;
-	} reg_read;
-
-	struct {
-		uint64_t reg;
+		regnr_t reg;
 		uint64_t val;
-	} reg_write;
+	} reg;
 
 	struct {
-		uint64_t full;
+		bool full;
 	} sync;
 
 	struct {
-		uint64_t time;
-	} sleep;
+		cidx_t idx;
+		cidx_t dst_idx;
+		cap_t cap;
+	} cap;
 
 	struct {
-		uint64_t idx;
-	} cap_read;
+		cidx_t pmp_idx;
+		pmp_slot_t pmp_slot;
+	} pmp;
 
 	struct {
-		uint64_t src_idx;
-		uint64_t dst_idx;
-	} cap_move;
-
-	struct {
-		uint64_t idx;
-	} cap_delete;
-
-	struct {
-		uint64_t idx;
-	} cap_revoke;
-
-	struct {
-		uint64_t src_idx;
-		uint64_t dst_idx;
-		uint64_t cap_raw;
-	} cap_derive;
-
-	struct {
-		uint64_t idx;
-		uint64_t slot;
-	} pmp_load;
-
-	struct {
-		uint64_t idx;
-	} pmp_unload;
-
-	struct {
-		uint64_t mon_idx;
-		uint64_t pid;
+		cidx_t mon_idx;
+		pid_t pid;
 	} mon_state;
 
 	struct {
-		uint64_t mon_idx;
-		uint64_t pid;
-		uint64_t reg;
-	} mon_reg_read;
-
-	struct {
-		uint64_t mon_idx;
-		uint64_t pid;
-		uint64_t reg;
+		cidx_t mon_idx;
+		pid_t pid;
+		regnr_t reg;
 		uint64_t val;
-	} mon_reg_write;
+	} mon_reg;
 
 	struct {
-		uint64_t mon_idx;
-		uint64_t pid;
-		uint64_t idx;
-	} mon_cap_read;
+		cidx_t mon_idx;
+		pid_t pid;
+		cidx_t idx;
+		pid_t dst_pid;
+		cidx_t dst_idx;
+	} mon_cap;
 
 	struct {
-		uint64_t mon_idx;
-		uint64_t src_pid;
-		uint64_t src_idx;
-		uint64_t dst_pid;
-		uint64_t dst_idx;
-	} mon_cap_move;
+		cidx_t mon_idx;
+		pid_t pid;
+		cidx_t pmp_idx;
+		pmp_slot_t pmp_slot;
+	} mon_pmp;
 
 	struct {
-		uint64_t mon_idx;
-		uint64_t pid;
-		uint64_t idx;
-		uint64_t slot;
-	} mon_pmp_load;
-
-	struct {
-		uint64_t mon_idx;
-		uint64_t pid;
-		uint64_t idx;
-	} mon_pmp_unload;
-
-	struct {
-		uint64_t sock_idx;
-		uint64_t cap_idx;
-		uint64_t send_cap;
+		cidx_t sock_idx;
+		cidx_t cap_idx;
+		bool send_cap;
 		uint64_t data[4];
 	} sock;
 } sys_args_t;
 
 _Static_assert(sizeof(sys_args_t) == 64, "sys_args_t has the wrong size");
 
-proc_t *handle_syscall(void);
+void handle_syscall(proc_t *p) __attribute__((noreturn));

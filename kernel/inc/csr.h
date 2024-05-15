@@ -15,24 +15,32 @@
 #define MSTATUS_MIE 0x8
 
 #ifndef __ASSEMBLER__
-#define csrr(__reg)                                                \
-	({                                                         \
-		unsigned long __ret;                               \
-		__asm__ volatile("csrr %0," #__reg : "=r"(__ret)); \
-		__ret;                                             \
-	})
-#define csrw(__reg, __val) \
-	({ __asm__ volatile("csrw " #__reg ", %0" ::"r"(__val)); })
-#define csrrw(__reg, __val)                               \
-	({                                                \
-		unsigned long __ret;                      \
-		__asm__ volatile("csrrw %0," #__reg ",%1" \
-				 : "=r"(__ret)            \
-				 : "r"(__val));           \
-		__ret;                                    \
-	})
-#define csrs(__reg, __val) \
-	({ __asm__ volatile("csrs " #__reg ", %0" ::"r"(__val)); })
-#define csrc(__reg, __val) \
-	({ __asm__ volatile("csrc " #__reg ", %0" ::"r"(__val)); })
+#include <stdint.h>
+uint64_t csrr_mhartid(void);
+uint64_t csrr_mip(void);
+uint64_t csrr_mcycle(void);
+uint64_t csrr_mhpmcounter3(void);
+void csrw_mcycle(uint64_t val);
+void csrw_mhpmcounter3(uint64_t val);
+void csrw_mstatus(uint64_t val);
+void csrs_mstatus(uint64_t val);
+void csrc_mstatus(uint64_t val);
+uint64_t csrr_pmpcfg0(void);
+uint64_t csrr_pmpaddr0(void);
+uint64_t csrr_pmpaddr1(void);
+uint64_t csrr_pmpaddr2(void);
+uint64_t csrr_pmpaddr3(void);
+uint64_t csrr_pmpaddr4(void);
+uint64_t csrr_pmpaddr5(void);
+uint64_t csrr_pmpaddr6(void);
+uint64_t csrr_pmpaddr7(void);
+void csrw_pmpcfg0(uint64_t val);
+void csrw_pmpaddr0(uint64_t val);
+void csrw_pmpaddr1(uint64_t val);
+void csrw_pmpaddr2(uint64_t val);
+void csrw_pmpaddr3(uint64_t val);
+void csrw_pmpaddr4(uint64_t val);
+void csrw_pmpaddr5(uint64_t val);
+void csrw_pmpaddr6(uint64_t val);
+void csrw_pmpaddr7(uint64_t val);
 #endif

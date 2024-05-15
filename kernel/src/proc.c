@@ -6,105 +6,108 @@
 #include "drivers/time.h"
 #include "kassert.h"
 
-static proc_t procs[S3K_PROC_CNT];
+static proc_t _processes[S3K_PROC_CNT];
 extern unsigned char _payload[];
 
 void proc_init(void)
 {
 	for (uint64_t i = 0; i < S3K_PROC_CNT; i++) {
-		procs[i].pid = i;
-		procs[i].state = PSF_SUSPENDED;
+		_processes[i].pid = i;
+		_processes[i].state = PSF_SUSPENDED;
 	}
-	procs[0].state = 0;
-	procs[0].regs[REG_PC] = (uint64_t)_payload;
+	_processes[0].state = 0;
+	_processes[0].regs[REG_PC] = (uint64_t)_payload;
 	KASSERT(cap_pmp_load(ctable_get(0, 0), 0) == SUCCESS);
 }
 
 proc_t *proc_get(pid_t pid)
 {
 	KASSERT(pid < S3K_PROC_CNT);
-	KASSERT(procs[pid].pid == pid);
-	return &procs[pid];
-}
-
-proc_state_t proc_get_state(proc_t *proc)
-{
-	proc_state_t state = proc->state;
-	if ((state == PSF_BLOCKED) && time_get() >= proc->timeout)
-		return 0;
-	return state;
+	KASSERT(_processes[pid].pid == pid);
+	return &_processes[pid];
 }
 
 bool proc_acquire(proc_t *proc)
 {
-	proc_state_t expected = proc->state;
-	proc_state_t desired = PSF_BUSY;
+	// Set the busy flag if expected state
+	uint64_t expected = proc->state;
+	uint64_t desired = PSF_BUSY;
+	uint64_t curr_time = time_get();
 
-	if (expected & (PSF_BUSY | PSF_SUSPENDED))
+	// If state == 0, then process is ready.
+	bool is_ready = (expected == 0);
+	// If state is blocked, then process logically ready on timeout.
+	bool is_timeout
+	    = ((expected & PSF_BLOCKED) && curr_time >= proc->timeout);
+
+	if (!is_ready && !is_timeout)
 		return false;
 
-	if (time_get() < proc->timeout)
-		return false;
-#ifdef SMP
-	return __atomic_compare_exchange(&proc->state, &expected, &desired,
-					 false, __ATOMIC_ACQUIRE,
-					 __ATOMIC_RELAXED);
-#else
-	proc->state = desired;
-	return true;
-#endif
+	bool succ = __atomic_compare_exchange(&proc->state, &expected, &desired,
+					      false /* not weak */,
+					      __ATOMIC_ACQUIRE /* succ */,
+					      __ATOMIC_RELAXED /* fail */);
+	if (is_timeout && succ)
+		proc->regs[REG_T0] = ERR_TIMEOUT;
+	return succ;
 }
 
 void proc_release(proc_t *proc)
 {
+	// Unset the busy flag.
 	KASSERT(proc->state & PSF_BUSY);
-#ifdef SMP
-	__atomic_fetch_xor(&proc->state, PSF_BUSY, __ATOMIC_RELEASE);
-#else
-	proc->state = 0;
-#endif
+	__atomic_fetch_and(&proc->state, (uint64_t)~PSF_BUSY, __ATOMIC_RELEASE);
 }
 
 void proc_suspend(proc_t *proc)
 {
-	proc_state_t prev
-	    = __atomic_fetch_or(&proc->state, PSF_SUSPENDED, __ATOMIC_RELAXED);
-	if (prev & PSF_BLOCKED) {
-		proc->state = PSF_SUSPENDED;
+	// Set the suspend flag
+	uint64_t prev_state
+	    = __atomic_fetch_or(&proc->state, PSF_SUSPENDED, __ATOMIC_ACQUIRE);
+
+	// If the process was waiting, we also unset the waiting flag.
+	if ((prev_state & 0xFF) == PSF_BLOCKED) {
 		proc->regs[REG_T0] = ERR_SUSPENDED;
+		proc->state = PSF_SUSPENDED;
+		__atomic_thread_fence(__ATOMIC_ACQUIRE);
 	}
 }
 
 void proc_resume(proc_t *proc)
 {
-	if (proc->state == PSF_SUSPENDED)
-		proc->timeout = 0;
-	__atomic_fetch_and(&proc->state, ~PSF_SUSPENDED, __ATOMIC_RELAXED);
+	// Unset the suspend flag
+	__atomic_fetch_and(&proc->state, (uint64_t)~PSF_SUSPENDED,
+			   __ATOMIC_RELEASE);
 }
 
-void proc_ipc_wait(proc_t *proc, chan_t chan)
+void proc_ipc_wait(proc_t *proc, chan_t channel)
 {
 	KASSERT(proc->state == PSF_BUSY);
-	proc->state = PSF_BLOCKED | ((uint64_t)chan << 48) | PSF_BUSY;
+	proc->state = PSF_BLOCKED | PSF_BUSY | ((uint64_t)channel << 32);
 }
 
-bool proc_ipc_acquire(proc_t *proc, chan_t chan)
+bool proc_ipc_acquire(proc_t *proc, chan_t channel)
 {
-	proc_state_t expected = PSF_BLOCKED | ((uint64_t)chan << 48);
-	proc_state_t desired = PSF_BUSY;
+	uint64_t curr_time = time_get();
+	uint64_t timeout = timeout_get(csrr_mhartid());
 
-	if (proc->state != expected)
+	if (proc->serv_time > 0) {
+		// proc is a server for a YIELDING channel with minimum server
+		// time.
+		if (proc->serv_time + curr_time >= timeout)
+			return false; // not enough time
+	}
+
+	// Check if the process has timed out
+	if (curr_time >= proc->timeout)
 		return false;
-	if (time_get() >= proc->timeout)
-		return false;
-#ifdef SMP
-	return __atomic_compare_exchange_n(&proc->state, &expected, desired,
-					   false, __ATOMIC_ACQUIRE,
-					   __ATOMIC_RELAXED);
-#else
-	proc->state = desired;
-	return true;
-#endif
+
+	// Try to acquire the process
+	uint64_t expected = PSF_BLOCKED | ((uint64_t)channel << 32);
+	uint64_t desired = PSF_BUSY;
+	return __atomic_compare_exchange(&proc->state, &expected, &desired,
+					 false, __ATOMIC_ACQUIRE,
+					 __ATOMIC_RELAXED);
 }
 
 bool proc_is_suspended(proc_t *proc)
@@ -126,17 +129,4 @@ void proc_pmp_load(proc_t *proc, pmp_slot_t slot, pmp_slot_t rwx, napot_t addr)
 void proc_pmp_unload(proc_t *proc, pmp_slot_t slot)
 {
 	proc->pmpcfg[slot] = 0;
-}
-
-void proc_pmp_sync(proc_t *proc)
-{
-	csrw(pmpaddr0, proc->pmpaddr[0]);
-	csrw(pmpaddr1, proc->pmpaddr[1]);
-	csrw(pmpaddr2, proc->pmpaddr[2]);
-	csrw(pmpaddr3, proc->pmpaddr[3]);
-	csrw(pmpaddr4, proc->pmpaddr[4]);
-	csrw(pmpaddr5, proc->pmpaddr[5]);
-	csrw(pmpaddr6, proc->pmpaddr[6]);
-	csrw(pmpaddr7, proc->pmpaddr[7]);
-	csrw(pmpcfg0, *(uint64_t *)proc->pmpcfg);
 }

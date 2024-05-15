@@ -27,7 +27,7 @@ SECTIONS {
 		_end = .;
 	} > RAM
 
-	.stack : ALIGN(8) {
+	.stach : ALIGN(8) {
 		. += __stack_size;
 		__stack_pointer = .;
 		_end = .;

@@ -1,24 +1,27 @@
 .POSIX:
-.SECONDARY:
+export ROOT=${abspath .}
 
-PROJECTS:=projects/hello \
-	  projects/trapped \
-	  projects/ping-pong \
-	  projects/demonstrator
+
+PROJECTS:=projects/hello projects/trapped projects/ping-pong
+PLATFORM?=qemu_virt
+
+include tools.mk
+include common/plat/${PLATFORM}.mk
 
 all: ${PROJECTS}
 
-${PROJECTS}: common
-
 common ${PROJECTS}:
-	@${MAKE} -C $@ all
+	make -C $@ all PLATFORM=${PLATFORM}
 
 clean:
-	@for i in common ${PROJECTS}; do \
-		${MAKE} -C $$i clean; \
+	for i in ${PROJECTS}; do \
+		make -C $$i clean PLATFORM=${PLATFORM}; \
 	done
 
-format:
-	clang-format -i $$(find * -type f -name '*.[hc]')
+docs:
+	doxygen
 
-.PHONY: all clean format common ${PROJECTS}
+format:
+	clang-format -i $(shell find -name '*.[hc]' -not -path '*/.*')
+
+.PHONY: all docs clean common ${PROJECTS}

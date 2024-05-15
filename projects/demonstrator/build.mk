@@ -1,5 +1,4 @@
 .POSIX:
-.SECONDARY:
 
 BUILD   ?=build
 PROGRAM ?=a
@@ -39,30 +38,24 @@ clean:
 
 ${BUILD}/${PROGRAM}/%.o: ${PROGRAM}/%.S
 	@mkdir -p ${@D}
-	@${CC} -o $@ $< ${CFLAGS} ${INC} -MMD -c
-	@printf "CC\t$@\n"
+	${CC} -o $@ $< ${CFLAGS} ${INC} -MMD -c
 
 ${BUILD}/${PROGRAM}/%.o: ${PROGRAM}/%.c
 	@mkdir -p ${@D}
-	@${CC} -o $@ $< ${CFLAGS} ${INC} -MMD -c
-	@printf "CC\t$@\n"
+	${CC} -o $@ $< ${CFLAGS} ${INC} -MMD -c
 
 %.elf: ${OBJS}
 	@mkdir -p ${@D}
-	@${CC} -o $@ ${OBJS} ${LDFLAGS} ${INC}
-	@printf "CC\t$@\n"
+	${CC} -o $@ ${OBJS} ${LDFLAGS} ${INC}
 
 %.bin: %.elf
-	@${OBJCOPY} -O binary $< $@
-	@printf "OBJCOPY\t$@\n"
+	${OBJCOPY} -O binary $< $@
 
 %.hex: %.elf
-	@${OBJCOPY} -O ihex $< $@
-	@printf "OBJCOPY\t$@\n"
+	${OBJCOPY} -O ihex $< $@
 
 %.da: %.elf
-	@${OBJDUMP} -D $< > $@
-	@printf "OBJDUMP\t$@\n"
+	${OBJDUMP} -D $< > $@
 
 .PHONY: all clean
 

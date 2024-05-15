@@ -17,3 +17,12 @@
 	la	gp, __global_pointer$
 .option pop
 .endm
+
+.macro	instr_init
+#ifdef INSTRUMENT
+	csrw	mcounteren,0xF
+	csrw	scounteren,0xF
+	csrw	mcountinhibit,0x8
+	csrw	mhpmcounter3,0
+#endif
+.endm

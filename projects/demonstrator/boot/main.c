@@ -1,7 +1,7 @@
 #include "../config.h"
 #include "altc/altio.h"
-#include "altc/string.h"
 #include "s3k/s3k.h"
+#include "string.h"
 
 #include <stddef.h>
 
@@ -164,18 +164,18 @@ void start_proc(void)
 	s3k_mon_resume(MONITOR_CIDX, CRYPTO_PID);
 	while (s3k_mon_yield(MONITOR_CIDX, CRYPTO_PID))
 		;
-	alt_puts("{crypto started}");
+	alt_puts("crypto started");
 
 	s3k_mon_resume(MONITOR_CIDX, MONITOR_PID);
 	while (s3k_mon_yield(MONITOR_CIDX, MONITOR_PID))
 		;
-	alt_puts("{monitor started}");
+	alt_puts("monitor started");
 
 	s3k_mon_resume(MONITOR_CIDX, UART_PID);
 	while (s3k_mon_yield(MONITOR_CIDX, UART_PID))
 		;
 	// UART outputs "uart started"
-	alt_puts("{error}");
+	alt_puts("error");
 	while (1)
 		;
 }
@@ -197,7 +197,7 @@ void main(void)
 	s3k_pmp_load(5, 1);
 	s3k_sync_mem();
 
-	alt_puts("{setting up memory ...}");
+	alt_puts("setting up memory ...");
 	/* Copy binary of monitor process, setup PMP and program counter. */
 	setup_bin(MONITOR_PID, MONITOR_MEM, MONITOR_MEM_LEN, monitor_bin,
 		  monitor_bin_len);
@@ -213,15 +213,15 @@ void main(void)
 	/* Give monitor access to application memory */
 	setup_app_mem();
 
-	alt_puts("{setting up ipc}");
+	alt_puts("setting up ipc");
 	setup_uart_ipc(0, S3K_IPC_NOYIELD, S3K_IPC_CDATA | S3K_IPC_SDATA);
 	setup_crypto_ipc(1, S3K_IPC_NOYIELD, S3K_IPC_CDATA | S3K_IPC_SDATA);
 	setup_app_channels();
 	setup_app_monitoring();
 
-	alt_puts("{setting up time}");
+	alt_puts("setting up time");
 	setup_time();
 
-	alt_puts("{starting processes}");
+	alt_puts("starting processes");
 	start_proc();
 }
