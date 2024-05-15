@@ -16,7 +16,6 @@ DEPS  :=${OBJS:.o=.d}
 CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 	-DPLATFORM_${PLATFORM} \
 	-nostdlib \
-	-DSTACK_SIZE=1024 \
 	-Os -g3 -flto \
 	-I${COMMON_INC} -include ${S3K_CONF_H}
 
