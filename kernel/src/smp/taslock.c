@@ -1,6 +1,8 @@
 #include "smp/taslock.h"
-#include <stdbool.h>
+
 #include "kernel.h"
+
+#include <stdbool.h>
 
 void taslock_init(taslock_t *l)
 {
