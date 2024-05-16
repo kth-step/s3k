@@ -9,5 +9,6 @@
 
 #include <stdint.h>
 
+void trap_handle(void);
 void trap_entry(void) NORETURN;
 void trap_exit(void) NORETURN;

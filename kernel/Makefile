@@ -40,8 +40,8 @@ S_SRCS:=${wildcard src/*.S}
 C_SRCS:=${wildcard src/*.c}
 
 # Object files
-OBJS:=${patsubst src/%.S, ${BUILD}/${PROGRAM}/%.o, ${S_SRCS}} \
-      ${patsubst src/%.c, ${BUILD}/${PROGRAM}/%.o, ${C_SRCS}}
+OBJS:=${patsubst src/%.S, ${BUILD}/${PROGRAM}/%.S.o, ${S_SRCS}} \
+      ${patsubst src/%.c, ${BUILD}/${PROGRAM}/%.c.o, ${C_SRCS}}
 
 # Dependency files
 DEPS:=${OBJS:.o=.d}
@@ -57,12 +57,12 @@ all: ${ELF} ${BIN} ${HEX} ${DA}
 clean:
 	rm -f ${ELF} ${OBJS} ${DEPS}
 
-${BUILD}/${PROGRAM}/%.o: src/%.S
+${BUILD}/${PROGRAM}/%.S.o: src/%.S
 	@mkdir -p ${@D}
 	@${CC} -o $@ $< -c -MMD ${CFLAGS}
 	@printf "CC\t$@\n"
 
-${BUILD}/${PROGRAM}/%.o: src/%.c
+${BUILD}/${PROGRAM}/%.c.o: src/%.c
 	@mkdir -p ${@D}
 	@${CC} -o $@ $< -c -MMD ${CFLAGS}
 	@printf "CC\t$@\n"

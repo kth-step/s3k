@@ -1,6 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 #include "exception.h"
 
+#include "altc/altio.h"
 #include "csr.h"
 #include "kernel.h"
 #include "proc.h"
@@ -12,44 +13,32 @@
 #define SRET 0x10200073
 #define URET 0x00200073
 
-proc_t *handle_exception(void)
+
+static proc_t *_exception_delegate(proc_t *proc, uint64_t mcause, uint64_t mtval)
 {
-	kprintf(1, "> handle_exception(pid=%X,mcause=%X,mtval=%X,mepc=%X)\n",
-		current->pid, csrr(mcause), csrr(mtval), csrr(mepc));
-	/* Check if it is a return from exception */
-	current->regs[REG_ECAUSE] = csrr(mcause);
-	current->regs[REG_EVAL] = csrr(mtval);
-	current->regs[REG_EPC] = current->regs[REG_PC];
-	current->regs[REG_ESP] = current->regs[REG_SP];
-	current->regs[REG_PC] = current->regs[REG_TPC];
-	current->regs[REG_SP] = current->regs[REG_TSP];
-	if (!current->regs[REG_PC]) {
-		proc_suspend(current);
-		return NULL;
-	}
-	return current;
+	proc->regs[REG_ECAUSE] = mcause;
+	proc->regs[REG_EVAL] = mtval;
+	proc->regs[REG_EPC] = proc->regs[REG_PC];
+	proc->regs[REG_ESP] = proc->regs[REG_SP];
+	proc->regs[REG_PC] = proc->regs[REG_TPC];
+	proc->regs[REG_SP] = proc->regs[REG_TSP];
+	return proc;
 }
 
-static proc_t *handle_trap_return(void)
+static proc_t *_exception_trap_return(proc_t *proc)
 {
-	kprintf(1, "> handle_trap_return(pid=%X)\n", current->pid);
-	current->regs[REG_PC] = current->regs[REG_EPC];
-	current->regs[REG_SP] = current->regs[REG_ESP];
-	current->regs[REG_ECAUSE] = 0;
-	current->regs[REG_EVAL] = 0;
-	current->regs[REG_EPC] = 0;
-	current->regs[REG_ESP] = 0;
-	return current;
+	proc->regs[REG_PC] = proc->regs[REG_EPC];
+	proc->regs[REG_SP] = proc->regs[REG_ESP];
+	proc->regs[REG_ECAUSE] = 0;
+	proc->regs[REG_EVAL] = 0;
+	proc->regs[REG_EPC] = 0;
+	proc->regs[REG_ESP] = 0;
+	return proc;
 }
 
-proc_t *handle_illegal_instruction(void)
+proc_t *exception_handler(proc_t * proc, uint64_t mcause, uint64_t mtval)
 {
-	switch (csrr(mtval)) {
-	case MRET:
-	case SRET:
-	case URET:
-		return handle_trap_return();
-	default:
-		return handle_exception();
-	}
+	if (mcause == ILLEGAL_INSTRUCTION && (mtval == MRET || mtval == SRET || mtval == URET))
+		return _exception_trap_return(proc);
+	return _exception_delegate(proc, mcause, mtval);
 }

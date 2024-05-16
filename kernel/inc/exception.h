@@ -10,5 +10,4 @@
 
 #include <stdint.h>
 
-proc_t *handle_exception(void);
-proc_t *handle_illegal_instruction(void);
+proc_t *exception_handler(proc_t *proc, uint64_t mcause, uint64_t mtval);

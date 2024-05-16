@@ -61,7 +61,7 @@ void proc_release(proc_t *proc)
 #ifdef SMP
 	__atomic_fetch_xor(&proc->state, PSF_BUSY, __ATOMIC_RELEASE);
 #else
-	proc->state = 0;
+	proc->state &= ~PSF_BUSY;
 #endif
 }
 

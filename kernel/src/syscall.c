@@ -99,10 +99,9 @@ validator_t validators[] = {
     validate_sock_sendrecv,
 };
 
-proc_t *handle_syscall(void)
+proc_t *syscall_handler(proc_t *proc)
 {
 	// System call arguments.
-	proc_t *proc = current;
 	const sys_args_t *args = (sys_args_t *)&proc->regs[REG_A0];
 	uint64_t call = proc->regs[REG_T0];
 
