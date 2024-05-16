@@ -8,7 +8,7 @@
 #include "kernel.h"
 #include "kprintf.h"
 #include "proc.h"
-#include "semaphore.h"
+#include "smp/semaphore.h"
 #include "trap.h"
 #include "wfi.h"
 

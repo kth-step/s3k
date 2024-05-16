@@ -37,7 +37,7 @@ LDFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 
 # Source files
 S_SRCS:=${wildcard src/*.S}
-C_SRCS:=${wildcard src/*.c}
+C_SRCS:=${wildcard src/*.c} ${wildcard src/*/*.c}
 
 # Object files
 OBJS:=${patsubst src/%.S, ${BUILD}/${PROGRAM}/%.S.o, ${S_SRCS}} \

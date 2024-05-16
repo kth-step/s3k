@@ -12,7 +12,6 @@
 
 #include "cap_table.h"
 #include "cap_types.h"
-#include "mcslock.h"
 
 #include <stdbool.h>
 #include <stdint.h>

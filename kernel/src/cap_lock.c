@@ -1,7 +1,7 @@
 #include "cap_lock.h"
 
 #include "csr.h"
-#include "mcslock.h"
+#include "smp/mcslock.h"
 
 #ifdef SMP
 static mcslock_t lock;

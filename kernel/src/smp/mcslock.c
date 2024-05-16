@@ -1,5 +1,5 @@
 // TODO: Replace with proper MCS Lock
-#include "mcslock.h"
+#include "smp/mcslock.h"
 
 #include "kassert.h"
 #include "kernel.h"
