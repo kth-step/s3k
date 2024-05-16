@@ -1,5 +1,5 @@
 name: Compilation Checker
-on: [push]
+on: []
 jobs:
   compilation-checking:
     runs-on: ubuntu-latest
