@@ -13,8 +13,8 @@
 #define SRET 0x10200073
 #define URET 0x00200073
 
-
-static proc_t *_exception_delegate(proc_t *proc, uint64_t mcause, uint64_t mtval)
+static proc_t *_exception_delegate(proc_t *proc, uint64_t mcause,
+				   uint64_t mtval)
 {
 	proc->regs[REG_ECAUSE] = mcause;
 	proc->regs[REG_EVAL] = mtval;
@@ -36,9 +36,10 @@ static proc_t *_exception_trap_return(proc_t *proc)
 	return proc;
 }
 
-proc_t *exception_handler(proc_t * proc, uint64_t mcause, uint64_t mtval)
+proc_t *exception_handler(proc_t *proc, uint64_t mcause, uint64_t mtval)
 {
-	if (mcause == ILLEGAL_INSTRUCTION && (mtval == MRET || mtval == SRET || mtval == URET))
+	if (mcause == ILLEGAL_INSTRUCTION
+	    && (mtval == MRET || mtval == SRET || mtval == URET))
 		return _exception_trap_return(proc);
 	return _exception_delegate(proc, mcause, mtval);
 }
