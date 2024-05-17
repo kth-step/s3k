@@ -5,6 +5,8 @@ export ROOT       :=${abspath ../..}
 export BUILD      :=${abspath build/${PLATFORM}}
 export S3K_CONF_H :=${abspath s3k_conf.h}
 
+include ${ROOT}/tools.mk
+
 APPS=app0 app1
 
 ELFS:=${patsubst %, ${BUILD}/%.elf, kernel ${APPS}}
@@ -35,4 +37,7 @@ gdb: kernel ${APPS}
 gdb-openocd: kernel ${APPS}
 	@ELFS="${ELFS}" ${ROOT}/scripts/gdb-openocd.sh
 
-.PHONY: all clean qemu qemu-gdb gdb kernel common ${APPS}
+size: ${ELFS}
+	${SIZE} ${ELFS}
+
+.PHONY: all clean size qemu qemu-gdb gdb kernel common ${APPS}

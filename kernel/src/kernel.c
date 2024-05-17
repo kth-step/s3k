@@ -29,9 +29,5 @@ void kernel_init(void)
 
 bool kernel_preempt(void)
 {
-#ifndef NPREEMPT
 	return csrr(mip) & 0x80;
-#else  /* NPREEMPT */
-	return false;
-#endif /* NPREEMPT */
 }
