@@ -1,11 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 #include "exception.h"
 
-#include "altc/altio.h"
-#include "csr.h"
-#include "kernel.h"
 #include "proc.h"
-#include "trap.h"
 
 #define ILLEGAL_INSTRUCTION 0x2
 

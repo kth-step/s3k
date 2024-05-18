@@ -20,4 +20,5 @@ typedef enum {
 	ERR_PREEMPTED,
 	ERR_TIMEOUT,
 	ERR_SUSPENDED,
+	CONTINUE = -1, // Special for revocation
 } err_t;

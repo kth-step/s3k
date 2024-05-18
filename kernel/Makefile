@@ -5,6 +5,9 @@
 # Kernel basename
 ROOT=..
 PROGRAM?=kernel
+PLATFORM?=qemu_virt4
+BUILD?=build/${PLATFORM}
+S3K_CONF_H?=s3k_conf.h
 
 include ${ROOT}/tools.mk
 include ${ROOT}/common/plat/${PLATFORM}.mk
@@ -17,9 +20,8 @@ CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 	-Wall -Wextra -Werror \
 	-Wno-unused-parameter \
 	-Wshadow -fno-common \
-	-Wno-builtin-declaration-mismatch \
 	-fno-stack-protector \
-	-flto -fwhole-program \
+	-flto \
 	-include ${S3K_CONF_H} \
 	-Iinc -I${COMMON_INC} \
 
@@ -27,7 +29,7 @@ CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 LDFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 	 -Tlinker.ld \
 	 -nostartfiles -ffreestanding \
-	 -flto -fwhole-program \
+	 -flto \
 	 -Wl,--no-warn-rwx-segment \
 	 -Wl,--gc-sections \
 	 --specs=nosys.specs \

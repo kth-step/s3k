@@ -9,3 +9,5 @@ docs
 *.bin
 *.hex
 *.res
+compile_commands.json
+.cache

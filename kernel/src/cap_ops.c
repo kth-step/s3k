@@ -160,7 +160,7 @@ err_t cap_revoke_time(cte_t parent, cap_t pcap)
 		// Update parent.
 		pcap.time.mrk = ccap.time.mrk;
 		cte_set_cap(parent, pcap);
-		return pcap.time.mrk == pcap.time.bgn ? SUCCESS : -1;
+		return pcap.time.mrk == pcap.time.bgn ? SUCCESS : CONTINUE;
 	}
 
 	// Update schedule.
@@ -214,7 +214,7 @@ err_t cap_revoke_memory(cte_t parent, cap_t pcap)
 
 		return (pcap.mem.mrk == pcap.mem.bgn && !pcap.mem.lck) ?
 			   SUCCESS :
-			   -1;
+			   CONTINUE;
 	}
 
 	uint64_t base, size;
@@ -231,7 +231,7 @@ err_t cap_revoke_memory(cte_t parent, cap_t pcap)
 					ccap.pmp.slot);
 		}
 
-		return -1;
+		return CONTINUE;
 	}
 
 	pcap.mem.mrk = pcap.mem.bgn;
@@ -309,7 +309,7 @@ err_t cap_revoke_monitor(cte_t parent, cap_t pcap)
 		pcap.mon.mrk = ccap.mon.mrk;
 		cte_set_cap(parent, pcap);
 
-		return (pcap.mon.mrk == pcap.mon.bgn) ? SUCCESS : -1;
+		return (pcap.mon.mrk == pcap.mon.bgn) ? SUCCESS : CONTINUE;
 	}
 
 	pcap.mon.mrk = pcap.mon.bgn;
@@ -348,7 +348,7 @@ err_t cap_revoke_channel(cte_t parent, cap_t pcap)
 		pcap.chan.mrk = ccap.chan.mrk;
 		cte_set_cap(parent, pcap);
 
-		return (pcap.chan.mrk == pcap.chan.bgn) ? SUCCESS : -1;
+		return (pcap.chan.mrk == pcap.chan.bgn) ? SUCCESS : CONTINUE;
 	}
 
 	if (ccap.type == CAPTY_SOCKET && pcap.chan.bgn <= ccap.sock.chan) {
@@ -358,7 +358,7 @@ err_t cap_revoke_channel(cte_t parent, cap_t pcap)
 		// Clear socket
 		cap_sock_clear(ccap, proc_get(cte_pid(child)));
 
-		return -1;
+		return CONTINUE;
 	}
 
 	pcap.chan.mrk = pcap.chan.bgn;
@@ -407,7 +407,7 @@ err_t cap_revoke_socket(cte_t parent, cap_t pcap)
 		// Clear socket
 		cap_sock_clear(ccap, proc_get(cte_pid(child)));
 
-		return -1;
+		return CONTINUE;
 	}
 
 	return SUCCESS;

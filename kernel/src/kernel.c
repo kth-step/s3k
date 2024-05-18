@@ -1,6 +1,5 @@
 #include "kernel.h"
 
-#include "altc/altio.h"
 #include "altc/init.h"
 #include "cap_lock.h"
 #include "cap_table.h"
