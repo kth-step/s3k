@@ -1,0 +1,15 @@
+#pragma once
+
+typedef enum {
+	SUCCESS = 0,
+	ERR_EMPTY,
+	ERR_INVARG,
+	ERR_INVDRV,
+	ERR_SRC_EMPTY,
+	ERR_DST_OCCUPIED,
+	ERR_NO_RECEIVER,
+	ERR_PREEMPTED,
+	ERR_TIMEOUT,
+	ERR_SUSPENDED,
+	CONTINUE = -1, // Special for revocation
+} err_t;
