@@ -1,24 +1,5 @@
-.POSIX:
-.SECONDARY:
-
-PROJECTS:=projects/hello \
-	  projects/trapped \
-	  projects/ping-pong \
-	  projects/demonstrator
-
-all: ${PROJECTS}
-
-${PROJECTS}: common
-
-common ${PROJECTS}:
-	@${MAKE} -C $@ all
+all:
+	$(MAKE) -C projects/hello all
 
 clean:
-	@for i in common ${PROJECTS}; do \
-		${MAKE} -C $$i clean; \
-	done
-
-format:
-	clang-format -i $$(find * -type f -name '*.[hc]')
-
-.PHONY: all clean format common ${PROJECTS}
+	$(MAKE) -C projects/hello clean

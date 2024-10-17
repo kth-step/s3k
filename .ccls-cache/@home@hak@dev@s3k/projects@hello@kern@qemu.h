@@ -1,0 +1,9 @@
+#define S3K_MIN_HART 0
+#define S3K_MAX_HART 0
+#define S3K_PMP_CNT 8
+#define S3K_CHAN_CNT 8
+#define S3K_PROC_CNT 8
+#define S3K_CAP_CNT 16
+#define S3K_SLOT_CNT 32
+#define S3K_SLOT_LEN 1000
+#define S3K_LOG_STACK_SIZE 8

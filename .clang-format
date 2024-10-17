@@ -4,7 +4,7 @@ UseTab: Always
 TabWidth: 8
 IndentWidth: 8
 ContinuationIndentWidth: 4
-ColumnLimit: 80
+ColumnLimit: 120
 SortIncludes: true
 MaxEmptyLinesToKeep: 1
 ReflowComments: false

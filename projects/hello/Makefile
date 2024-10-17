@@ -1,43 +1,22 @@
 .POSIX:
 
-export PLATFORM   ?=qemu_virt4
-export ROOT       :=${abspath ../..}
-export BUILD      :=${abspath build/${PLATFORM}}
-export S3K_CONF_H :=${abspath s3k_conf.h}
+export S3K_ROOT:=${abspath ../..}
 
-include ${ROOT}/tools.mk
+include ${S3K_ROOT}/tools/tools.mk
 
-APPS=app0 app1
+PROGRAMS=kern
+#app0 app1
 
 ELFS:=${patsubst %, ${BUILD}/%.elf, kernel ${APPS}}
 
-all: kernel ${APPS}
+all: ${PROGRAMS}
 
 clean:
-	rm -rf ${BUILD}
+	for i in $(PROGRAMS); do \
+		${MAKE} -C $$i clean; \
+	done
 
-common:
-	@${MAKE} -C ${ROOT}/common
+${PROGRAMS}:
+	@${MAKE} -C $@ all
 
-kernel: common
-	@${MAKE} -C ${ROOT}/kernel
-
-${APPS}: common
-	@${MAKE} -f ../build.mk PROGRAM=$@
-
-qemu: kernel ${APPS}
-	@ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh
-
-qemu-gdb: kernel ${APPS}
-	@ELFS="${ELFS}" ${ROOT}/scripts/qemu.sh -gdb tcp::3333 -S
-
-gdb: kernel ${APPS}
-	@ELFS="${ELFS}" ${ROOT}/scripts/gdb.sh
-
-gdb-openocd: kernel ${APPS}
-	@ELFS="${ELFS}" ${ROOT}/scripts/gdb-openocd.sh
-
-size: ${ELFS}
-	${SIZE} ${ELFS}
-
-.PHONY: all clean size qemu qemu-gdb gdb kernel common ${APPS}
+.PHONY: all clean ${PROGRAMS}
