@@ -11,4 +11,5 @@
 
 void trap_handle(void);
 void trap_entry(void) NORETURN;
-void trap_exit(void) NORETURN;
+void trap_resume(proc_t *proc) NORETURN;
+void trap_return(proc_t *proc) NORETURN;

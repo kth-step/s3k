@@ -4,7 +4,8 @@
 #include "csr.h"
 
 .globl trap_entry
-.globl trap_exit
+.globl trap_resume
+.globl trap_return
 
 .type trap_entry, @function
 .type trap_exit, @function
@@ -63,7 +64,7 @@ trap_entry:
 	csrr	a2,mtval
 	call	trap_handler
 
-trap_exit:
+trap_resume:
 	ld	s0,PROC_PMPADDR0(a0)
 	ld	s1,PROC_PMPADDR1(a0)
 	ld	s2,PROC_PMPADDR2(a0)
@@ -72,7 +73,6 @@ trap_exit:
 	ld	s5,PROC_PMPADDR5(a0)
 	ld	s6,PROC_PMPADDR6(a0)
 	ld	s7,PROC_PMPADDR7(a0)
-	fence
 	ld	s8,PROC_PMPCFG0(a0)
 	csrw	pmpaddr0,s0
 	csrw	pmpaddr1,s1
@@ -84,6 +84,7 @@ trap_exit:
 	csrw	pmpaddr7,s7
 	csrw	pmpcfg0,s8
 
+trap_return:
 	ld	t0,PROC_PC(a0)
 	ld	t1,PROC_A0(a0)
 	csrw	mepc,t0

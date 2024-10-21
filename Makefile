@@ -3,8 +3,7 @@
 
 PROJECTS:=projects/hello \
 	  projects/trapped \
-	  projects/ping-pong \
-	  projects/demonstrator
+	  projects/ping-pong
 
 all: ${PROJECTS}
 
