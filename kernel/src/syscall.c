@@ -230,6 +230,7 @@ proc_t *handle_sync(proc_t *const p, const sys_args_t *args)
 	// Full sync invokes scheduler,
 	// otherwise only update memory.
 	if (args->sync.full) {
+		p->timeout = 0;
 		proc_release(p);
 		return NULL;
 	}
