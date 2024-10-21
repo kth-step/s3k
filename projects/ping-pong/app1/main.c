@@ -13,8 +13,10 @@ int main(void)
 	while (1) {
 		do {
 			reply = s3k_sock_sendrecv(3, &msg);
-			if (reply.err == S3K_ERR_TIMEOUT)
+			while (reply.err == S3K_ERR_TIMEOUT) {
 				alt_puts("timeout");
+				reply = s3k_sock_recv(3, msg.cap_idx);
+			}
 		} while (reply.err);
 		alt_puts((char *)reply.data);
 	}
