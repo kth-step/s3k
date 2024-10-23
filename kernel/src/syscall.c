@@ -231,7 +231,6 @@ proc_t *handle_sync(proc_t *const p, const sys_args_t *args)
 	// otherwise only update memory.
 	if (args->sync.full) {
 		p->timeout = 0;
-		proc_release(p);
 		return NULL;
 	}
 	proc_pmp_sync(p);
