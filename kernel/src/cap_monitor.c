@@ -62,8 +62,6 @@ err_t cap_monitor_yield(cte_t mon, pid_t pid, proc_t **next)
 		proc_t *proc = proc_get(pid);
 		if (proc_acquire(proc)) {
 			*next = proc;
-			proc_release(monitor);
-			return SUCCESS;
 		}
 		return ERR_INVALID_STATE;
 	}
