@@ -1,7 +1,7 @@
 #include "altc/altio.h"
 #include "s3k/s3k.h"
 
-#define APP_1_TIME 2
+#include "../../tutorial-commons/utils.h"
 
 int main(void)
 {
