@@ -50,6 +50,18 @@ void setup_uart()
 	s3k_sync_mem();
 }
 
+void setup_uart_and_virtio()
+{
+	uint64_t uart_addr = s3k_napot_encode(UART0_BASE_ADDR, 0x2000);
+	// Derive a PMP capability for accessing UART
+	s3k_cap_derive(UART_MEM, UART_CAP, s3k_mk_pmp(uart_addr, S3K_MEM_RW));
+	// Load the derive PMP capability to PMP configuration
+	s3k_pmp_load(UART_CAP, UART_PMP);
+	// Synchronize PMP unit (hardware) with PMP configuration
+	// false => not full synchronization.
+	s3k_sync_mem();
+}
+
 void default_trap_handler(void) __attribute__((interrupt("machine")));
 void default_trap_handler(void) {
     	// We enter here on illegal instructions, for example writing to
