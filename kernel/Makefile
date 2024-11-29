@@ -17,11 +17,11 @@ CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 	-DPLATFORM_${PLATFORM} \
 	-std=c11 \
 	-O2 -g3 \
+	-flto -ffat-lto-objects \
 	-Wall -Wextra -Werror \
 	-Wno-unused-parameter \
 	-Wshadow -fno-common \
 	-fno-stack-protector \
-	-flto \
 	-include ${S3K_CONF_H} \
 	-Iinc -I${COMMON_INC} \
 
@@ -29,9 +29,9 @@ CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 LDFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 	 -Tlinker.ld \
 	 -nostartfiles -ffreestanding \
-	 -flto \
 	 -Wl,--no-warn-rwx-segment \
 	 -Wl,--gc-sections \
+	 -flto \
 	 --specs=nosys.specs \
 	 -ffunction-sections -fdata-sections \
 	 -L${COMMON_LIB} \
@@ -52,7 +52,8 @@ DEPS:=${OBJS:.o=.d}
 ELF:=${BUILD}/${PROGRAM}.elf
 BIN:=${ELF:.elf=.bin}
 HEX:=${ELF:.elf=.hex}
-DA :=${ELF:.elf=.da}
+DA :=${ELF:.elf=.da} ${patsubst %.o, %.da, ${OBJS}}
+
 
 all: ${ELF} ${BIN} ${HEX} ${DA}
 
@@ -82,8 +83,16 @@ ${BUILD}/${PROGRAM}/%.c.o: src/%.c
 	@${OBJCOPY} -O ihex $< $@
 	@printf "OBJCOPY\t$@\n"
 
+%.c.da: %.c.o
+	@${OBJDUMP} -d $< > $@
+	@printf "OBJDUMP\t$@\n"
+
+%.S.da: %.S.o
+	@${OBJDUMP} -d $< > $@
+	@printf "OBJDUMP\t$@\n"
+
 %.da: %.elf
-	@${OBJDUMP} -D $< > $@
+	@${OBJDUMP} -d $< > $@
 	@printf "OBJDUMP\t$@\n"
 
 .PHONY: all da format clean
