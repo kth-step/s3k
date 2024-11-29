@@ -58,7 +58,6 @@ err_t cap_monitor_yield(cte_t mon, pid_t pid, proc_t **next)
 {
 	err_t err = check_monitor(mon, pid, false);
 	if (!err) {
-		proc_t *monitor = *next;
 		proc_t *proc = proc_get(pid);
 		if (proc_acquire(proc)) {
 			*next = proc;
