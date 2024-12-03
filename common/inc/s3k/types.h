@@ -12,6 +12,8 @@
 typedef uint64_t s3k_napot_t;
 typedef uint64_t s3k_addr_t;
 typedef uint64_t s3k_state_t;
+typedef uint64_t s3k_val_t;
+typedef uint64_t s3k_time_t;
 typedef uint16_t s3k_block_t;
 typedef uint16_t s3k_chan_t;
 typedef uint16_t s3k_time_slot_t;
@@ -193,12 +195,12 @@ typedef enum {
 typedef struct {
 	s3k_cidx_t cap_idx;
 	bool send_cap;
-	uint64_t data[4];
+	uint8_t data[32];
 } s3k_msg_t;
 
 typedef struct {
 	s3k_err_t err;
 	uint32_t tag;
 	s3k_cap_t cap;
-	uint64_t data[4];
+	uint8_t data[32];
 } s3k_reply_t;

@@ -1,25 +1,25 @@
 #include "drivers/time.h"
 
 #include "plat/config.h"
-static volatile uint64_t *const MTIME = (uint64_t *)MTIME_BASE_ADDR;
-static volatile uint64_t *const MTIMECMP = (uint64_t *)MTIMECMP_BASE_ADDR;
+static volatile s3k_addr_t *const MTIME = (s3k_addr_t *)MTIME_BASE_ADDR;
+static volatile s3k_addr_t *const MTIMECMP = (s3k_addr_t *)MTIMECMP_BASE_ADDR;
 
-uint64_t time_get(void)
+s3k_time_t time_get(void)
 {
 	return MTIME[0];
 }
 
-void time_set(uint64_t time)
+void time_set(s3k_time_t time)
 {
 	MTIME[0] = time;
 }
 
-uint64_t timeout_get(uint64_t hartid)
+s3k_time_t timeout_get(s3k_hart_t hartid)
 {
 	return MTIMECMP[hartid];
 }
 
-void timeout_set(uint64_t hartid, uint64_t timeout)
+void timeout_set(s3k_hart_t hartid, s3k_time_t timeout)
 {
 	MTIMECMP[hartid] = timeout;
 }

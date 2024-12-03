@@ -2,7 +2,7 @@
 
 typedef union {
 	struct {
-		uint64_t a0, a1, a2, a3, a4, a5, a6, a7;
+		s3k_val_t a0, a1, a2, a3, a4, a5, a6, a7;
 	};
 
 	struct {
@@ -11,7 +11,7 @@ typedef union {
 
 	struct {
 		s3k_reg_t reg;
-		uint64_t val;
+		s3k_val_t val;
 	} reg;
 
 	struct {
@@ -38,7 +38,7 @@ typedef union {
 		s3k_cidx_t mon_idx;
 		s3k_pid_t pid;
 		s3k_reg_t reg;
-		uint64_t val;
+		s3k_val_t val;
 	} mon_reg;
 
 	struct {
@@ -60,13 +60,13 @@ typedef union {
 		s3k_cidx_t sock_idx;
 		s3k_cidx_t cap_idx;
 		bool send_cap;
-		uint64_t data[4];
+		uint8_t data[32];
 	} sock;
 } sys_args_t;
 
 typedef struct {
 	s3k_err_t err;
-	uint64_t val;
+	s3k_val_t val;
 } s3k_ret_t;
 
 _Static_assert(sizeof(sys_args_t) == 64, "sys_args_t has the wrong size");
@@ -156,7 +156,7 @@ s3k_cap_t s3k_mk_socket(s3k_chan_t chan, s3k_ipc_mode_t mode,
 	     };
 }
 
-void s3k_napot_decode(s3k_napot_t addr, uint64_t *base, size_t *size)
+void s3k_napot_decode(s3k_napot_t addr, s3k_addr_t *base, size_t *size)
 {
 	*base = ((addr + 1) & addr) << 2;
 	*size = (((addr + 1) ^ addr) + 1) << 2;
@@ -167,27 +167,27 @@ s3k_napot_t s3k_napot_encode(s3k_addr_t base, size_t size)
 	return (base | (size / 2 - 1)) >> 2;
 }
 
-static inline bool is_range_subset(uint64_t a_bgn, uint64_t a_end,
-				   uint64_t b_bgn, uint64_t b_end)
+static inline bool is_range_subset(s3k_addr_t a_bgn, s3k_addr_t a_end,
+				   s3k_addr_t b_bgn, s3k_addr_t b_end)
 {
 	return a_bgn <= b_bgn && b_end <= a_end;
 }
 
-static inline bool is_range_prefix(uint64_t a_bgn, uint64_t a_end,
-				   uint64_t b_bgn, uint64_t b_end)
+static inline bool is_range_prefix(s3k_addr_t a_bgn, s3k_addr_t a_end,
+				   s3k_addr_t b_bgn, s3k_addr_t b_end)
 {
 	return a_bgn == b_bgn && b_end <= a_end;
 }
 
-static inline bool is_bit_subset(uint64_t a, uint64_t b)
+static inline bool is_bit_subset(s3k_addr_t a, s3k_addr_t b)
 {
 	return (a & b) == a;
 }
 
 s3k_addr_t s3k_tag_block_to_addr(s3k_tag_t tag, s3k_block_t block)
 {
-	return ((uint64_t)tag << S3K_MAX_BLOCK_SIZE)
-	       + ((uint64_t)block << S3K_MIN_BLOCK_SIZE);
+	return ((s3k_addr_t)tag << S3K_MAX_BLOCK_SIZE)
+	       + ((s3k_addr_t)block << S3K_MIN_BLOCK_SIZE);
 }
 
 static bool s3k_cap_time_revokable(s3k_cap_t p, s3k_cap_t c)
@@ -200,7 +200,7 @@ static bool s3k_cap_time_revokable(s3k_cap_t p, s3k_cap_t c)
 static bool s3k_cap_mem_revokable(s3k_cap_t p, s3k_cap_t c)
 {
 	if (c.type == S3K_CAPTY_PMP) {
-		uint64_t p_bgn, p_end, c_bgn, c_end;
+		s3k_addr_t p_bgn, p_end, c_bgn, c_end;
 		p_bgn = s3k_tag_block_to_addr(p.mem.tag, p.mem.bgn);
 		p_end = s3k_tag_block_to_addr(p.mem.tag, p.mem.end);
 		s3k_napot_decode(c.pmp.addr, &c_bgn, &c_end);
@@ -285,7 +285,7 @@ static bool s3k_cap_time_derivable(s3k_cap_t p, s3k_cap_t c)
 static bool s3k_cap_mem_derivable(s3k_cap_t p, s3k_cap_t c)
 {
 	if (c.type == S3K_CAPTY_PMP) {
-		uint64_t p_mrk, p_end, c_bgn, c_end;
+		s3k_addr_t p_mrk, p_end, c_bgn, c_end;
 		p_mrk = s3k_tag_block_to_addr(p.mem.tag, p.mem.mrk);
 		p_end = s3k_tag_block_to_addr(p.mem.tag, p.mem.end);
 		s3k_napot_decode(c.pmp.addr, &c_bgn, &c_end);
