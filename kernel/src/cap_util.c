@@ -22,7 +22,7 @@ cap_t cap_mk_time(hart_t hart, time_slot_t bgn, time_slot_t end)
 
 cap_t cap_mk_memory(addr_t bgn, addr_t end, rwx_t rwx)
 {
-	uint64_t tag = bgn >> MAX_BLOCK_SIZE;
+	addr_t tag = bgn >> MAX_BLOCK_SIZE;
 	KASSERT(bgn < end);
 	KASSERT(end <= (tag + 1) << MAX_BLOCK_SIZE);
 	cap_t cap;
@@ -94,15 +94,15 @@ void cap_snprint(char *restrict buf, size_t size, cap_t cap)
 			     cap.time.mrk);
 		break;
 	case CAPTY_MEMORY: {
-		uint64_t bgn = tag_block_to_addr(cap.mem.tag, cap.mem.bgn);
-		uint64_t end = tag_block_to_addr(cap.mem.tag, cap.mem.end);
-		uint64_t mrk = tag_block_to_addr(cap.mem.tag, cap.mem.mrk);
+		addr_t bgn = tag_block_to_addr(cap.mem.tag, cap.mem.bgn);
+		addr_t end = tag_block_to_addr(cap.mem.tag, cap.mem.end);
+		addr_t mrk = tag_block_to_addr(cap.mem.tag, cap.mem.mrk);
 		alt_snprintf(buf, size,
 			     "MEMORY{bgn=0x%X,end=0x%X,mrk=0x%X,rwx=%d,lck=%x}",
 			     bgn, end, mrk, cap.mem.rwx, cap.mem.lck);
 	} break;
 	case CAPTY_PMP: {
-		uint64_t base, _size;
+		addr_t base, _size;
 		pmp_napot_decode(cap.pmp.addr, &base, &_size);
 		alt_snprintf(buf, size,
 			     "PMP{bgn=0x%X,end=0x%X,rwx=%d,used=%d,slot=%d}",

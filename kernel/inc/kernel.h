@@ -6,8 +6,8 @@
 #include <stdint.h>
 
 void kernel_init(void);
-uint64_t kernel_wcet(void);
-uint64_t kernel_wcet_reset(void);
+time_t kernel_wcet(void);
+time_t kernel_wcet_reset(void);
 
 void kernel_syscall_entry(void);
 void kernel_syscall_exit(void);

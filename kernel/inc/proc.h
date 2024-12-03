@@ -16,7 +16,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-typedef uint64_t proc_state_t;
+typedef val_t proc_state_t;
 
 typedef enum {
 	PSF_BUSY = 1,
@@ -78,22 +78,22 @@ typedef struct {
 	proc_state_t state;
 	/** The registers of the process (RISC-V registers and virtual
 	 * registers). */
-	uint64_t regs[REG_CNT];
+	val_t regs[REG_CNT];
 	/** PMP registers */
 	uint8_t pmpcfg[S3K_PMP_CNT];
-	uint64_t pmpaddr[S3K_PMP_CNT];
+	val_t pmpaddr[S3K_PMP_CNT];
 	/** Instrumentation registers */
 	/** Process ID. */
 	pid_t pid;
 
 	/** Scheduling information */
-	uint64_t timeout;
+	time_t timeout;
 	/**
 	 * Minimum remaining time required for receiving messages.
 	 * If a client does not have sufficient execution time,
 	 * it is not allowed to send the message.
 	 */
-	uint64_t serv_time;
+	time_t serv_time;
 } proc_t;
 
 /**

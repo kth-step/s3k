@@ -23,4 +23,4 @@
  *
  * @param payload A pointer to the boot process's code.
  */
-void init_kernel(uint64_t payload);
+void init_kernel(addr_t payload);

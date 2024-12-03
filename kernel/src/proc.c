@@ -11,12 +11,12 @@ extern unsigned char _payload[];
 
 void proc_init(void)
 {
-	for (uint64_t i = 0; i < S3K_PROC_CNT; i++) {
+	for (pid_t i = 0; i < S3K_PROC_CNT; i++) {
 		procs[i].pid = i;
 		procs[i].state = PSF_SUSPENDED;
 	}
 	procs[0].state = 0;
-	procs[0].regs[REG_PC] = (uint64_t)_payload;
+	procs[0].regs[REG_PC] = (addr_t)_payload;
 	KASSERT(cap_pmp_load(ctable_get(0, 0), 0) == SUCCESS);
 }
 
@@ -85,12 +85,12 @@ void proc_resume(proc_t *proc)
 void proc_ipc_wait(proc_t *proc, chan_t chan)
 {
 	KASSERT(proc->state == PSF_BUSY);
-	proc->state = PSF_BLOCKED | ((uint64_t)chan << 48) | PSF_BUSY;
+	proc->state = PSF_BLOCKED | ((val_t)chan << 48) | PSF_BUSY;
 }
 
 bool proc_ipc_acquire(proc_t *proc, chan_t chan)
 {
-	proc_state_t expected = PSF_BLOCKED | ((uint64_t)chan << 48);
+	proc_state_t expected = PSF_BLOCKED | ((val_t)chan << 48);
 	proc_state_t desired = PSF_BUSY;
 
 	if (proc->state != expected)
@@ -138,5 +138,5 @@ void proc_pmp_sync(proc_t *proc)
 	csrw(pmpaddr5, proc->pmpaddr[5]);
 	csrw(pmpaddr6, proc->pmpaddr[6]);
 	csrw(pmpaddr7, proc->pmpaddr[7]);
-	csrw(pmpcfg0, *(uint64_t *)proc->pmpcfg);
+	csrw(pmpcfg0, *(val_t *)proc->pmpcfg);
 }

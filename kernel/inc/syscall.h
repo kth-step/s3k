@@ -45,112 +45,112 @@ typedef enum {
 
 typedef union {
 	struct {
-		uint64_t a0, a1, a2, a3, a4, a5, a6, a7;
+		val_t a0, a1, a2, a3, a4, a5, a6, a7;
 	};
 
 	struct {
-		uint64_t info;
+		val_t info;
 	} get_info;
 
 	struct {
-		uint64_t reg;
+		val_t reg;
 	} reg_read;
 
 	struct {
-		uint64_t reg;
-		uint64_t val;
+		val_t reg;
+		val_t val;
 	} reg_write;
 
 	struct {
-		uint64_t full;
+		val_t full;
 	} sync;
 
 	struct {
-		uint64_t time;
+		val_t time;
 	} sleep;
 
 	struct {
-		uint64_t idx;
+		val_t idx;
 	} cap_read;
 
 	struct {
-		uint64_t src_idx;
-		uint64_t dst_idx;
+		val_t src_idx;
+		val_t dst_idx;
 	} cap_move;
 
 	struct {
-		uint64_t idx;
+		val_t idx;
 	} cap_delete;
 
 	struct {
-		uint64_t idx;
+		val_t idx;
 	} cap_revoke;
 
 	struct {
-		uint64_t src_idx;
-		uint64_t dst_idx;
-		uint64_t cap_raw;
+		val_t src_idx;
+		val_t dst_idx;
+		val_t cap_raw;
 	} cap_derive;
 
 	struct {
-		uint64_t idx;
-		uint64_t slot;
+		val_t idx;
+		val_t slot;
 	} pmp_load;
 
 	struct {
-		uint64_t idx;
+		val_t idx;
 	} pmp_unload;
 
 	struct {
-		uint64_t mon_idx;
-		uint64_t pid;
+		val_t mon_idx;
+		val_t pid;
 	} mon_state;
 
 	struct {
-		uint64_t mon_idx;
-		uint64_t pid;
-		uint64_t reg;
+		val_t mon_idx;
+		val_t pid;
+		val_t reg;
 	} mon_reg_read;
 
 	struct {
-		uint64_t mon_idx;
-		uint64_t pid;
-		uint64_t reg;
-		uint64_t val;
+		val_t mon_idx;
+		val_t pid;
+		val_t reg;
+		val_t val;
 	} mon_reg_write;
 
 	struct {
-		uint64_t mon_idx;
-		uint64_t pid;
-		uint64_t idx;
+		val_t mon_idx;
+		val_t pid;
+		val_t idx;
 	} mon_cap_read;
 
 	struct {
-		uint64_t mon_idx;
-		uint64_t src_pid;
-		uint64_t src_idx;
-		uint64_t dst_pid;
-		uint64_t dst_idx;
+		val_t mon_idx;
+		val_t src_pid;
+		val_t src_idx;
+		val_t dst_pid;
+		val_t dst_idx;
 	} mon_cap_move;
 
 	struct {
-		uint64_t mon_idx;
-		uint64_t pid;
-		uint64_t idx;
-		uint64_t slot;
+		val_t mon_idx;
+		val_t pid;
+		val_t idx;
+		val_t slot;
 	} mon_pmp_load;
 
 	struct {
-		uint64_t mon_idx;
-		uint64_t pid;
-		uint64_t idx;
+		val_t mon_idx;
+		val_t pid;
+		val_t idx;
 	} mon_pmp_unload;
 
 	struct {
-		uint64_t sock_idx;
-		uint64_t cap_idx;
-		uint64_t send_cap;
-		uint64_t data[4];
+		val_t sock_idx;
+		val_t cap_idx;
+		val_t send_cap;
+		val_t data[4];
 	} sock;
 } sys_args_t;
 

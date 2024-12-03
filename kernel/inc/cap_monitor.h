@@ -102,7 +102,7 @@ err_t cap_monitor_state_get(cte_t mon, pid_t pid, proc_state_t *state);
  *         ERR_INVALID_MONITOR if unauthorized or wrong capability type.
  *         ERR_INVALID_STATE if the process is not suspended.
  */
-err_t cap_monitor_reg_read(cte_t mon, pid_t pid, reg_t reg, uint64_t *val);
+err_t cap_monitor_reg_read(cte_t mon, pid_t pid, reg_t reg, val_t *val);
 
 /**
  * Writes a value to a specified register of a suspended process.
@@ -116,7 +116,7 @@ err_t cap_monitor_reg_read(cte_t mon, pid_t pid, reg_t reg, uint64_t *val);
  *         ERR_INVALID_MONITOR if unauthorized or wrong capability type.
  *         ERR_INVALID_STATE if the process is not suspended.
  */
-err_t cap_monitor_reg_write(cte_t mon, pid_t pid, reg_t reg, uint64_t val);
+err_t cap_monitor_reg_write(cte_t mon, pid_t pid, reg_t reg, val_t val);
 
 /**
  * Reads a capability from a specified source CTE of a suspended process.

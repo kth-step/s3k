@@ -3,7 +3,7 @@
  */
 #include "smp/semaphore.h"
 
-void semaphore_init(semaphore_t *sem, uint64_t tickets)
+void semaphore_init(semaphore_t *sem, val_t tickets)
 {
 	// Initial number of served tickets.
 	sem->released = tickets;
@@ -11,9 +11,9 @@ void semaphore_init(semaphore_t *sem, uint64_t tickets)
 	sem->acquired = 0;
 }
 
-void semaphore_acquire_n(semaphore_t *sem, uint64_t n)
+void semaphore_acquire_n(semaphore_t *sem, val_t n)
 {
-	uint64_t my_ticket;
+	val_t my_ticket;
 	// Acquire n tickets.
 	my_ticket = __atomic_add_fetch(&sem->acquired, n, __ATOMIC_RELAXED);
 	// Wait until the tickets are released.
@@ -21,7 +21,7 @@ void semaphore_acquire_n(semaphore_t *sem, uint64_t n)
 		;
 }
 
-void semaphore_release_n(semaphore_t *sem, uint64_t n)
+void semaphore_release_n(semaphore_t *sem, val_t n)
 {
 	// Release n tickets.
 	__atomic_fetch_add(&sem->released, n, __ATOMIC_RELEASE);

@@ -32,8 +32,8 @@ void sched_init(void);
 proc_t *sched(void);
 
 /// Let pid run on hartid, begin-end.
-void sched_update(uint64_t pid, uint64_t end, uint64_t hartid, uint64_t from,
-		  uint64_t to);
+void sched_update(pid_t pid, time_t end, hart_t hartid, time_t from,
+		  time_t to);
 
 /// Delete scheduling at hartid, begin-end.
-void sched_delete(uint64_t hartid, uint64_t from, uint64_t to);
+void sched_delete(hart_t hartid, time_t from, time_t to);

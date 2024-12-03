@@ -4,25 +4,27 @@
 #pragma once
 #include <stdint.h>
 
+#include "cap_types.h"
+
 typedef struct semaphore {
-	uint64_t released;
-	uint64_t acquired;
+	val_t released;
+	val_t acquired;
 } semaphore_t;
 
 /**
  * Initialize the semaphore with n tickets.
  */
-void semaphore_init(semaphore_t *sem, uint64_t tickets);
+void semaphore_init(semaphore_t *sem, val_t tickets);
 
 /**
  * Acquire n tickets and wait for release.
  */
-void semaphore_acquire_n(semaphore_t *sem, uint64_t n);
+void semaphore_acquire_n(semaphore_t *sem, val_t n);
 
 /**
  * Release n tickets.
  */
-void semaphore_release_n(semaphore_t *sem, uint64_t n);
+void semaphore_release_n(semaphore_t *sem, val_t n);
 
 /**
  * Acquire 1 ticket and wait for release.

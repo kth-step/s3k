@@ -150,11 +150,11 @@ err_t cap_revoke_time(cte_t parent, cap_t pcap)
 		cte_delete(child);
 
 		// Update schedule.
-		uint64_t pid = cte_pid(parent);
-		uint64_t end = pcap.time.end;
-		uint64_t hartid = pcap.time.hart;
-		uint64_t from = ccap.time.mrk;
-		uint64_t to = pcap.time.mrk;
+		pid_t pid = cte_pid(parent);
+		time_t end = pcap.time.end;
+		hart_t hartid = pcap.time.hart;
+		time_t from = ccap.time.mrk;
+		time_t to = pcap.time.mrk;
 		sched_update(pid, end, hartid, from, to);
 
 		// Update parent.
@@ -164,11 +164,11 @@ err_t cap_revoke_time(cte_t parent, cap_t pcap)
 	}
 
 	// Update schedule.
-	uint64_t pid = cte_pid(parent);
-	uint64_t end = pcap.time.end;
-	uint64_t hartid = pcap.time.hart;
-	uint64_t from = pcap.time.bgn;
-	uint64_t to = pcap.time.mrk;
+	pid_t pid = cte_pid(parent);
+	time_t end = pcap.time.end;
+	hart_t hartid = pcap.time.hart;
+	time_t from = pcap.time.bgn;
+	time_t to = pcap.time.mrk;
 	sched_update(pid, end, hartid, from, to);
 
 	// Update parent.
@@ -217,7 +217,7 @@ err_t cap_revoke_memory(cte_t parent, cap_t pcap)
 			   CONTINUE;
 	}
 
-	uint64_t base, size;
+	addr_t base, size;
 	pmp_napot_decode(ccap.pmp.addr, &base, &size);
 
 	if (ccap.type == CAPTY_PMP
@@ -254,8 +254,8 @@ err_t cap_derive_memory(cte_t src, cap_t cap, cte_t dst, cap_t new_cap)
 		return SUCCESS;
 	}
 
-	uint64_t pmp_begin, pmp_end;
-	uint64_t mem_mrk, mem_end;
+	addr_t pmp_begin, pmp_end;
+	addr_t mem_mrk, mem_end;
 	pmp_napot_decode(new_cap.pmp.addr, &pmp_begin, &pmp_end);
 	pmp_end += pmp_begin;
 	mem_mrk = tag_block_to_addr(cap.mem.tag, cap.mem.mrk);

@@ -13,18 +13,18 @@ cap_t cap_mk_socket(chan_t chan, ipc_mode_t mode, ipc_perm_t perm,
 
 static inline addr_t tag_block_to_addr(tag_t tag, block_t block)
 {
-	return ((uint64_t)tag << MAX_BLOCK_SIZE)
-	       + ((uint64_t)block << MIN_BLOCK_SIZE);
+	return ((addr_t)tag << MAX_BLOCK_SIZE)
+	       + ((addr_t)block << MIN_BLOCK_SIZE);
 }
 
-static inline void pmp_napot_decode(uint64_t addr, uint64_t *base,
-				    uint64_t *size)
+static inline void pmp_napot_decode(napot_t addr, addr_t *base,
+				    addr_t *size)
 {
 	*base = ((addr + 1) & addr) << 2;
 	*size = (((addr + 1) ^ addr) + 1) << 2;
 }
 
-static inline uint64_t pmp_napot_encode(uint64_t base, uint64_t size)
+static inline napot_t pmp_napot_encode(addr_t base, addr_t size)
 {
 	return (base | (size / 2 - 1)) >> 2;
 }

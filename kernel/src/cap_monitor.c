@@ -17,9 +17,9 @@ static err_t check_monitor(cte_t mon, pid_t pid, bool check_suspended)
 
 static err_t check_monitor_move(cte_t mon, cte_t src, cte_t dst)
 {
-	uint64_t mon_pid = cte_pid(mon);
-	uint64_t src_pid = cte_pid(src);
-	uint64_t dst_pid = cte_pid(dst);
+	pid_t mon_pid = cte_pid(mon);
+	pid_t src_pid = cte_pid(src);
+	pid_t dst_pid = cte_pid(dst);
 	err_t err;
 	if (mon_pid != src_pid && (err = check_monitor(mon, src_pid, true)))
 		return err;
@@ -68,7 +68,7 @@ err_t cap_monitor_yield(cte_t mon, pid_t pid, proc_t **next)
 	return err;
 }
 
-err_t cap_monitor_reg_read(cte_t mon, pid_t pid, reg_t reg, uint64_t *val)
+err_t cap_monitor_reg_read(cte_t mon, pid_t pid, reg_t reg, val_t *val)
 {
 	err_t err = check_monitor(mon, pid, true);
 	if (!err)
@@ -76,7 +76,7 @@ err_t cap_monitor_reg_read(cte_t mon, pid_t pid, reg_t reg, uint64_t *val)
 	return err;
 }
 
-err_t cap_monitor_reg_write(cte_t mon, pid_t pid, reg_t reg, uint64_t val)
+err_t cap_monitor_reg_write(cte_t mon, pid_t pid, reg_t reg, val_t val)
 {
 	err_t err = check_monitor(mon, pid, true);
 	if (!err)

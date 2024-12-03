@@ -4,7 +4,7 @@
 #include <syscall.h>
 #include <trap.h>
 
-proc_t *trap_handler(proc_t *proc, uint64_t mcause, uint64_t mtval)
+proc_t *trap_handler(proc_t *proc, val_t mcause, val_t mtval)
 {
 	if (mcause == 8) {
 		proc_t *next = syscall_handler(proc);

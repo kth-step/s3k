@@ -9,7 +9,7 @@
 typedef struct ipc_msg {
 	cte_t cap_buf;
 	bool send_cap;
-	uint64_t data[4];
+	uint8_t data[32];
 } ipc_msg_t;
 
 err_t cap_sock_send(cte_t sock, const ipc_msg_t *msg, proc_t **next);

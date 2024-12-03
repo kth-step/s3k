@@ -33,7 +33,7 @@ void ctable_init(void)
 	}
 }
 
-cte_t ctable_get(uint64_t pid, uint64_t index)
+cte_t ctable_get(pid_t pid, cidx_t index)
 {
 	KASSERT(pid < S3K_PROC_CNT);
 	KASSERT(index < S3K_CAP_CNT);
@@ -75,7 +75,7 @@ cap_t cte_cap(cte_t c)
 	return c->cap;
 }
 
-uint64_t cte_pid(cte_t c)
+pid_t cte_pid(cte_t c)
 {
 	return offset(c) / S3K_CAP_CNT;
 }

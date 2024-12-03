@@ -11,6 +11,8 @@
 
 typedef uint64_t napot_t;
 typedef uint64_t addr_t;
+typedef uint64_t val_t;
+typedef uint64_t time_t;
 typedef uint16_t block_t;
 typedef uint16_t chan_t;
 typedef uint16_t time_slot_t;
