@@ -153,7 +153,7 @@ typedef struct {
 	s3k_val_t val;
 } s3k_ret_t;
 
-_Static_assert(sizeof(sys_args_t) == 64, "sys_args_t has the wrong size");
+_Static_assert(sizeof(sys_args_t) == 32, "sys_args_t has the wrong size");
 
 #define DO_ECALL(call, args, width)                                            \
 	({                                                                     \

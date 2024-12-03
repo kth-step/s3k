@@ -9,11 +9,11 @@
 // Max logarithmic size of a memory slice
 #define S3K_MAX_BLOCK_SIZE 27
 
-typedef uint64_t s3k_napot_t;
-typedef uint64_t s3k_addr_t;
-typedef uint64_t s3k_state_t;
-typedef uint64_t s3k_val_t;
-typedef uint64_t s3k_time_t;
+typedef uint32_t s3k_napot_t;
+typedef uint32_t s3k_addr_t;
+typedef uint32_t s3k_state_t;
+typedef uint32_t s3k_val_t;
+typedef uint32_t s3k_time_t;
 typedef uint16_t s3k_block_t;
 typedef uint16_t s3k_chan_t;
 typedef uint16_t s3k_time_slot_t;
@@ -118,7 +118,7 @@ typedef union s3k_cap {
 		s3k_rwx_t rwx : 3;
 		bool used : 1;
 		s3k_pmp_slot_t slot;
-		s3k_napot_t addr : 48;
+		s3k_napot_t addr : 32;
 	} pmp;
 
 	struct {

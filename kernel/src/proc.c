@@ -16,7 +16,7 @@ void proc_init(void)
 		procs[i].state = PSF_SUSPENDED;
 	}
 	procs[0].state = 0;
-	procs[0].regs[REG_PC] = (addr_t)_payload;
+	procs[0].regs[REG_PC] = (val_t)_payload;
 	KASSERT(cap_pmp_load(ctable_get(0, 0), 0) == SUCCESS);
 }
 
@@ -85,12 +85,12 @@ void proc_resume(proc_t *proc)
 void proc_ipc_wait(proc_t *proc, chan_t chan)
 {
 	KASSERT(proc->state == PSF_BUSY);
-	proc->state = PSF_BLOCKED | ((val_t)chan << 48) | PSF_BUSY;
+	proc->state = PSF_BLOCKED | ((val_t)chan << 16) | PSF_BUSY;
 }
 
 bool proc_ipc_acquire(proc_t *proc, chan_t chan)
 {
-	proc_state_t expected = PSF_BLOCKED | ((val_t)chan << 48);
+	proc_state_t expected = PSF_BLOCKED | ((val_t)chan << 16);
 	proc_state_t desired = PSF_BUSY;
 
 	if (proc->state != expected)

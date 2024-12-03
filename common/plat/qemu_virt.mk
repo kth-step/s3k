@@ -1,5 +1,5 @@
-export ARCH=rv64imac_zicsr_zifencei
-export ABI=lp64
+export ARCH=rv32imac_zicsr_zifencei
+export ABI=ilp32
 export CMODEL=medany
 export COMMON_INC:=${ROOT}/common/inc
 export COMMON_LIB:=${ROOT}/common/build/${PLATFORM}

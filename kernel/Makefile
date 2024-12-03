@@ -5,7 +5,7 @@
 # Kernel basename
 ROOT=..
 PROGRAM?=kernel
-PLATFORM?=qemu_virt4
+PLATFORM?=qemu_virt
 BUILD?=build/${PLATFORM}
 S3K_CONF_H?=s3k_conf.h
 
@@ -35,7 +35,8 @@ LDFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 	 --specs=nosys.specs \
 	 -ffunction-sections -fdata-sections \
 	 -L${COMMON_LIB} \
-	 -laltc -lplat
+	 -laltc -lplat \
+	 -L/opt/homebrew/Cellar/riscv-gnu-toolchain/main/lib/gcc/riscv64-unknown-elf/12.2.0/rv32imac/ilp32
 
 # Source files
 S_SRCS:=${wildcard src/*.S}

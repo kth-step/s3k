@@ -97,9 +97,9 @@ void default_trap_handler(void) {
 void setup_trap(void (*trap_handler)(void), void * trap_stack_base, uint64_t trap_stack_size)
 {
 	// Sets the trap handler
-	s3k_reg_write(S3K_REG_TPC, (uint64_t)trap_handler);
+	s3k_reg_write(S3K_REG_TPC, (s3k_addr_t)trap_handler);
 	// Set the trap stack
-	s3k_reg_write(S3K_REG_TSP, ((uint64_t)trap_stack_base) + trap_stack_size);
+	s3k_reg_write(S3K_REG_TSP, ((s3k_addr_t)trap_stack_base) + trap_stack_size);
 }
 
 

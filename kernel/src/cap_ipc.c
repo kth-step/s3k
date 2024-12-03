@@ -85,13 +85,13 @@ static void do_recv(cap_t cap, cte_t cap_buf, proc_t *recv)
 	if (is_server) {
 		channels[cap.sock.chan].server = recv;
 		channels[cap.sock.chan].cap_buf = cap_buf;
-		recv->timeout = UINT64_MAX;
+		recv->timeout = UINT32_MAX;
 		proc_ipc_wait(recv, cap.sock.chan);
 	} else {
 		channels[cap.sock.chan].client = recv;
 		channels[cap.sock.chan].cap_buf = cap_buf;
 		if (cap.sock.mode == IPC_NOYIELD)
-			recv->timeout = UINT64_MAX;
+			recv->timeout = UINT32_MAX;
 		proc_ipc_wait(recv, cap.sock.chan);
 	}
 }

@@ -154,6 +154,6 @@ typedef union {
 	} sock;
 } sys_args_t;
 
-_Static_assert(sizeof(sys_args_t) == 64, "sys_args_t has the wrong size");
+_Static_assert(sizeof(sys_args_t) == 32, "sys_args_t has the wrong size");
 
 proc_t *syscall_handler(proc_t *proc);

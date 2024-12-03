@@ -9,10 +9,10 @@
 // Max logarithmic size of a memory slice
 #define MAX_BLOCK_SIZE 27
 
-typedef uint64_t napot_t;
-typedef uint64_t addr_t;
-typedef uint64_t val_t;
-typedef uint64_t time_t;
+typedef uint32_t napot_t;
+typedef uint32_t addr_t;
+typedef uint32_t val_t;
+typedef uint32_t time_t;
 typedef uint16_t block_t;
 typedef uint16_t chan_t;
 typedef uint16_t time_slot_t;
@@ -91,7 +91,7 @@ typedef union cap {
 		rwx_t rwx : 3;
 		bool used : 1;
 		pmp_slot_t slot;
-		napot_t addr : 48;
+		napot_t addr : 32;
 	} pmp;
 
 	struct {

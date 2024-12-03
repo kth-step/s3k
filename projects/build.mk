@@ -25,7 +25,9 @@ LDFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 	 -flto \
 	 -T${PROGRAM}.ld -Tdefault.ld \
 	 -Wl,--no-warn-rwx-segments \
-	 -L${COMMON_LIB} -ls3k -laltc -lplat \
+	 -L${COMMON_LIB} \
+	 -L/opt/homebrew/Cellar/riscv-gnu-toolchain/main/lib/gcc/riscv64-unknown-elf/12.2.0/rv32imac/ilp32 \
+	 -ls3k -laltc -lplat -lgcc \
 
 ELF:=${BUILD}/${PROGRAM}.elf
 BIN:=${ELF:.elf=.bin}

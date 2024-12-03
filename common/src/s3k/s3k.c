@@ -60,7 +60,7 @@ typedef union {
 		s3k_cidx_t sock_idx;
 		s3k_cidx_t cap_idx;
 		bool send_cap;
-		uint8_t data[32];
+		uint8_t data[16];
 	} sock;
 } sys_args_t;
 
@@ -69,7 +69,7 @@ typedef struct {
 	s3k_val_t val;
 } s3k_ret_t;
 
-_Static_assert(sizeof(sys_args_t) == 64, "sys_args_t has the wrong size");
+_Static_assert(sizeof(sys_args_t) == 32, "sys_args_t has the wrong size");
 
 s3k_cap_t s3k_mk_time(s3k_hart_t hart, s3k_time_slot_t bgn, s3k_time_slot_t end)
 {
@@ -156,13 +156,13 @@ s3k_cap_t s3k_mk_socket(s3k_chan_t chan, s3k_ipc_mode_t mode,
 	     };
 }
 
-void s3k_napot_decode(s3k_napot_t addr, s3k_addr_t *base, size_t *size)
+void s3k_napot_decode(s3k_napot_t addr, s3k_addr_t *base, s3k_addr_t *size)
 {
 	*base = ((addr + 1) & addr) << 2;
 	*size = (((addr + 1) ^ addr) + 1) << 2;
 }
 
-s3k_napot_t s3k_napot_encode(s3k_addr_t base, size_t size)
+s3k_napot_t s3k_napot_encode(s3k_addr_t base, s3k_addr_t size)
 {
 	return (base | (size / 2 - 1)) >> 2;
 }

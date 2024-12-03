@@ -30,7 +30,7 @@ static inline bool s3k_is_busy(s3k_state_t state)
 
 static inline bool s3k_is_blocked(s3k_state_t state, s3k_chan_t *chan)
 {
-	*chan = state >> 32;
+	*chan = state >> 16;
 	return state & S3K_PSF_BLOCKED;
 }
 

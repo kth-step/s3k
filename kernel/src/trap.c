@@ -14,7 +14,7 @@ proc_t *trap_handler(proc_t *proc, val_t mcause, val_t mtval)
 		if (next)
 			return next;
 		return sched();
-	} else if ((int64_t)mcause < 0) {
+	} else if ((int32_t)mcause < 0) {
 		return interrupt_handler(proc, mcause, mtval);
 	} else {
 		trap_return(exception_handler(proc, mcause, mtval));

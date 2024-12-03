@@ -54,7 +54,7 @@ for elf in $ELFS; do
 	LOADER+="-device loader,file=$elf "
 done
 
-qemu-system-riscv64 \
+qemu-system-riscv32 \
 	-M $QEMU_MACHINE \
 	-smp $QEMU_SMP \
 	-m 128M -nographic \
