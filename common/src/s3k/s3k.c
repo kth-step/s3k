@@ -110,7 +110,7 @@ s3k_cap_t s3k_mk_pmp(s3k_napot_t addr, s3k_rwx_t rwx)
 	return (s3k_cap_t){
 	    .pmp = {
 		    .type = S3K_CAPTY_PMP,
-		    .addr = addr & 0xFFFFFFFFFF,
+		    .addr = addr & 0xFFFFFFFF,
 		    .rwx = rwx & 0x7,
 		    .used = 0,
 		    .slot = 0,

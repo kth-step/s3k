@@ -83,7 +83,7 @@ typedef union {
 	struct {
 		s3k_val_t src_idx;
 		s3k_val_t dst_idx;
-		s3k_val_t cap_raw;
+		uint64_t cap_raw;
 	} cap_derive;
 
 	struct {
@@ -208,7 +208,7 @@ _Static_assert(sizeof(sys_args_t) == 32, "sys_args_t has the wrong size");
 			break;                                                 \
 		case 8:                                                        \
 			__asm__ volatile("ecall"                               \
-					 : "=r"(t0), "+r"(a0)                  \
+					 : "+r"(t0), "+r"(a0)                  \
 					 : "r"(a1), "r"(a2), "r"(a3), "r"(a4), \
 					   "r"(a5), "r"(a6), "r"(a7));         \
 			break;                                                 \
@@ -268,10 +268,12 @@ void s3k_sleep(s3k_val_t time)
 
 s3k_err_t s3k_cap_read(s3k_cidx_t idx, s3k_cap_t *cap)
 {
-	sys_args_t args = {.cap_read = {idx}};
-	s3k_ret_t ret = DO_ECALL(S3K_SYS_CAP_READ, args, sizeof(args.cap_read));
-	cap->raw = ret.val;
-	return ret.err;
+	register s3k_val_t t0 __asm__("t0") = S3K_SYS_CAP_READ;                     
+	register s3k_val_t a0 __asm__("a0") = idx;                  
+	register s3k_val_t a1 __asm__("a1");                 
+	__asm__ volatile("ecall" : "+r"(t0), "+r"(a0), "=r"(a1));
+	cap->raw = (uint64_t)a0 << 32 | (uint64_t)a1;
+	return t0;
 }
 
 s3k_err_t s3k_cap_move(s3k_cidx_t src, s3k_cidx_t dst)
@@ -563,9 +565,14 @@ s3k_err_t s3k_try_mon_cap_read(s3k_cidx_t mon_idx, s3k_pid_t pid,
 	       };
 	s3k_ret_t ret
 	    = DO_ECALL(S3K_SYS_MON_CAP_READ, args, sizeof(args.mon_cap_read));
-	if (!ret.err)
-		cap->raw = ret.val;
-	return ret.err;
+	register s3k_val_t t0 __asm__("t0") = S3K_SYS_CAP_READ;                     
+	register s3k_val_t a0 __asm__("a0") = mon_idx;                  
+	register s3k_val_t a1 __asm__("a1") = pid;                  
+	register s3k_val_t a2 __asm__("a2") = idx;                  
+	__asm__ volatile("ecall" : "+r"(t0), "+r"(a0), "+r"(a1) : "r"(a2));
+	if (!t0)
+	    cap->raw = (uint64_t)a0 << 32 | (uint64_t)a1;
+	return t0;
 }
 
 s3k_err_t s3k_try_mon_cap_move(s3k_cidx_t mon_idx, s3k_pid_t src_pid,

@@ -89,7 +89,7 @@ typedef union {
 	struct {
 		val_t src_idx;
 		val_t dst_idx;
-		val_t cap_raw;
+		uint64_t cap_raw;
 	} cap_derive;
 
 	struct {
