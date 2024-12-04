@@ -15,6 +15,7 @@
 trap_entry:
 	// Save user a0 to scratch, load PCB pointer
 	csrrw	a0,mscratch,a0
+    beqz    a0,__hang
 
 	sw	ra,PROC_RA(a0)
 	sw	sp,PROC_SP(a0)
@@ -50,7 +51,7 @@ trap_entry:
 	
 	// Save the 
 	csrr	t1,mepc
-	csrr	t2,mscratch
+	csrrw	t2,mscratch,zero
 	sw	t1,PROC_PC(a0)
 	sw	t2,PROC_A0(a0)
 
@@ -74,6 +75,9 @@ trap_resume:
 	lw	s6,PROC_PMPADDR6(a0)
 	lw	s7,PROC_PMPADDR7(a0)
 	lw	s8,PROC_PMPCFG0(a0)
+#if __riscv_xlen == 32
+	lw	s9,PROC_PMPCFG1(a0)
+#endif
 	csrw	pmpaddr0,s0
 	csrw	pmpaddr1,s1
 	csrw	pmpaddr2,s2
@@ -83,6 +87,9 @@ trap_resume:
 	csrw	pmpaddr6,s6
 	csrw	pmpaddr7,s7
 	csrw	pmpcfg0,s8
+#if __riscv_xlen == 32
+	csrw	pmpcfg1,s9
+#endif
 
 trap_return:
 	lw	t0,PROC_PC(a0)
@@ -126,3 +133,7 @@ trap_return:
 	csrrw	a0,mscratch,a0
 
 	mret
+
+__hang:
+    ebreak
+    j   __hang

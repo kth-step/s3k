@@ -1,6 +1,10 @@
 #pragma once
 
+#if __riscv_xlen == 32
+#define _OFFSET(x) (x * 4)
+#else
 #define _OFFSET(x) (x * 8)
+#endif
 
 #define PROC_STATE _OFFSET(0)
 
@@ -44,6 +48,19 @@
 #define PROC_ECAUSE _OFFSET(37)
 #define PROC_EVAL _OFFSET(38)
 #define PROC_SERVTIME _OFFSET(39)
+
+#if __riscv_xlen == 32
+#define PROC_PMPCFG0 _OFFSET(40)
+#define PROC_PMPCFG1 _OFFSET(41)
+#define PROC_PMPADDR0 _OFFSET(42)
+#define PROC_PMPADDR1 _OFFSET(43)
+#define PROC_PMPADDR2 _OFFSET(44)
+#define PROC_PMPADDR3 _OFFSET(45)
+#define PROC_PMPADDR4 _OFFSET(46)
+#define PROC_PMPADDR5 _OFFSET(47)
+#define PROC_PMPADDR6 _OFFSET(48)
+#define PROC_PMPADDR7 _OFFSET(49)
+#else
 #define PROC_PMPCFG0 _OFFSET(40)
 #define PROC_PMPADDR0 _OFFSET(41)
 #define PROC_PMPADDR1 _OFFSET(42)
@@ -53,3 +70,5 @@
 #define PROC_PMPADDR5 _OFFSET(46)
 #define PROC_PMPADDR6 _OFFSET(47)
 #define PROC_PMPADDR7 _OFFSET(48)
+
+#endif
