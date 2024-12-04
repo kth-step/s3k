@@ -166,7 +166,7 @@ _Static_assert(sizeof(sys_args_t) == 32, "sys_args_t has the wrong size");
 		register s3k_val_t a5 __asm__("a5") = args.a5;                  \
 		register s3k_val_t a6 __asm__("a6") = args.a6;                  \
 		register s3k_val_t a7 __asm__("a7") = args.a7;                  \
-		switch ((width + 7) / 8) {                                     \
+		switch ((width + 3) / 4) {                                     \
 		case 0:                                                        \
 			__asm__ volatile("ecall" : "+r"(t0));                  \
 			break;                                                 \
