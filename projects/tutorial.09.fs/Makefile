@@ -36,6 +36,18 @@ gdb: kernel ${APPS}
 
 gdb-openocd: kernel ${APPS}
 	@ELFS="${ELFS}" ${ROOT}/scripts/gdb-openocd.sh
+disk-image:
+	qemu-img create fs.img 10M
+	mformat -i fs.img ::
+	echo "hello" > tmp.txt
+	mcopy -i fs.img tmp.txt ::/test.txt
+	rm tmp.txt
+
+disk-read:
+	mdir -i fs.img
+	mcopy -i fs.img ::/NEWFILE.TXT extracted.txt
+	cat < extracted.txt
+	rm extracted.txt
 
 size: ${ELFS}
 	${SIZE} ${ELFS}
