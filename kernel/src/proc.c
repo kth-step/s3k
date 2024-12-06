@@ -67,8 +67,12 @@ void proc_release(proc_t *proc)
 
 void proc_suspend(proc_t *proc)
 {
-	proc_state_t prev
-	    = __atomic_fetch_or(&proc->state, PSF_SUSPENDED, __ATOMIC_RELAXED);
+#ifdef SMP
+	proc_state_t prev = __atomic_fetch_or(&proc->state, PSF_SUSPENDED, __ATOMIC_RELAXED);
+#else
+    proc_state_t prev = proc->state;
+    proc->state |= PSF_SUSPENDED;
+#endif
 	if (prev & PSF_BLOCKED) {
 		proc->state = PSF_SUSPENDED;
 		proc->regs[REG_T0] = ERR_SUSPENDED;
@@ -79,7 +83,11 @@ void proc_resume(proc_t *proc)
 {
 	if (proc->state == PSF_SUSPENDED)
 		proc->timeout = 0;
+#ifdef SMP
 	__atomic_fetch_and(&proc->state, ~PSF_SUSPENDED, __ATOMIC_RELAXED);
+#else
+    proc->state &= ~PSF_SUSPENDED;
+#endif
 }
 
 void proc_ipc_wait(proc_t *proc, chan_t chan)
