@@ -18,6 +18,12 @@ case ${PLATFORM} in
 		QEMU_OPTIONS="-icount 3 $@"
 		warning "Platform qemu_virt uses hart 0 only. If you want multiple cores, use qemu_virt4."
 		;;
+	qemu_virt_norvc)
+		QEMU_MACHINE=virt
+		QEMU_SMP=1
+		QEMU_OPTIONS="-icount 3 $@"
+		warning "Platform qemu_virt_norvc uses hart 0 only. If you want multiple cores, use qemu_virt4."
+		;;
 	qemu_virt4)
 		QEMU_MACHINE=virt
 		QEMU_SMP=4
