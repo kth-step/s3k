@@ -1,6 +1,6 @@
 .POSIX:
 
-export PLATFORM   ?=qemu_virt4
+export PLATFORM   ?=qemu_virt
 export ROOT       :=${abspath ../..}
 export BUILD      :=${abspath build/${PLATFORM}}
 export S3K_CONF_H :=${abspath s3k_conf.h}
@@ -36,6 +36,20 @@ gdb: kernel ${APPS}
 
 gdb-openocd: kernel ${APPS}
 	@ELFS="${ELFS}" ${ROOT}/scripts/gdb-openocd.sh
+
+disk-image:
+	qemu-img create fs.img 10M
+	mformat -i fs.img ::
+	echo "hello" > tmp.txt
+	mcopy -i fs.img tmp.txt ::/test.txt
+	mcopy -i fs.img build/qemu_virt/app2.bin ::/app2.bin
+	rm tmp.txt
+
+disk-read:
+	mdir -i fs.img
+	mcopy -i fs.img ::/NEWFILE.TXT extracted.txt
+	cat < extracted.txt
+	rm extracted.txt
 
 size: ${ELFS}
 	${SIZE} ${ELFS}

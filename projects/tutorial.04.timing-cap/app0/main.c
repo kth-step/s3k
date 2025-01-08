@@ -17,7 +17,7 @@ int main(void)
 	alt_printf("hello, world from app0\n");
 
 	// Setup scehduling
-	setup_scheduling(PARALLEL);
+	setup_scheduling(ROUND_ROBIN);
 
 	// Start app1
 	log_sys("10", s3k_mon_resume(MONITOR, APP1_PID)); 
