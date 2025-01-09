@@ -1,6 +1,6 @@
 .POSIX:
 
-export PLATFORM   ?=qemu_virt
+export PLATFORM   ?=qemu_esp32c3
 export ROOT       :=${abspath ../..}
 export BUILD      :=${abspath build/${PLATFORM}}
 export S3K_CONF_H :=${abspath s3k_conf.h}
@@ -36,6 +36,15 @@ gdb: kernel ${APPS}
 
 gdb-openocd: kernel ${APPS}
 	@ELFS="${ELFS}" ${ROOT}/scripts/gdb-openocd.sh
+
+qemu_flash.bin: kernel
+	esptool.py --chip=esp32c3 merge_bin --output=${BUILD}/qemu_flash.bin \
+	--fill-flash-size=2MB --flash_mode dio --flash_freq 80m \
+	--flash_size 2MB 0x0 ${BUILD}/kernel.bin
+
+debug: qemu_flash.bin
+	qemu-system-riscv32 -M esp32c3 \
+	-drive file=${BUILD}/qemu_flash.bin,if=mtd,format=raw -nographic -s -S
 
 size: ${ELFS}
 	${SIZE} ${ELFS}

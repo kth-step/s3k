@@ -16,7 +16,7 @@ include ${ROOT}/common/plat/${PLATFORM}.mk
 CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 	-DPLATFORM_${PLATFORM} \
 	-std=c11 \
-	-O2 -g3 \
+	-O0 -g3 \
 	-Wall -Wextra -Werror \
 	-Wno-unused-parameter \
 	-Wshadow -fno-common \
@@ -26,14 +26,14 @@ CFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
 	-Iinc -I${COMMON_INC} \
 
 # LD flags
+
 LDFLAGS:=-march=${ARCH} -mabi=${ABI} -mcmodel=${CMODEL} \
+	 -W -Wall -Wextra -Werror -Wundef -Wshadow -pedantic \
+	 -Wdouble-promotion -fno-common -Wconversion \
+	 -O0 -ffunction-sections -fdata-sections \
 	 -Tlinker.ld \
 	 -nostartfiles -ffreestanding \
-	 -flto \
-	 -Wl,--no-warn-rwx-segment \
-	 -Wl,--gc-sections \
 	 --specs=nosys.specs \
-	 -ffunction-sections -fdata-sections \
 	 -L${COMMON_LIB} \
 	 -laltc -lplat \
 	 -L/opt/homebrew/Cellar/riscv-gnu-toolchain/main/lib/gcc/riscv64-unknown-elf/12.2.0/rv32imac/ilp32

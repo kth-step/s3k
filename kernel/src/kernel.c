@@ -8,6 +8,8 @@
 #include "proc.h"
 #include "sched.h"
 
+__attribute__((section(".header"))) const unsigned long header_data[2] = {0xaedb041d, 0xaedb041d};
+
 void kernel_init(void)
 {
 	alt_init();

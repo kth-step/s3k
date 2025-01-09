@@ -4,6 +4,8 @@
 #include "plat/qemu_virt.h"
 #elif defined(PLATFORM_qemu_virt4)
 #include "plat/qemu_virt4.h"
+#elif defined(PLATFORM_qemu_esp32c3)
+#include "plat/qemu_esp32c3.h"
 #elif defined(PLATFORM_sifive_unleashed)
 #include "plat/sifive_unleashed.h"
 #elif defined(PLATFORM_sifive_unleashed4)
