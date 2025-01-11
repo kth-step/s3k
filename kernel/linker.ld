@@ -1,10 +1,10 @@
 ENTRY(_start)
 
-_payload = ORIGIN(ram) + LENGTH(ram);
+_payload = ORIGIN(irom) + LENGTH(irom);
 
 MEMORY
 {
-    irom (x): org = 0x42000000, len = 0x400000
+    irom (x): org = 0x42000000, len = 64K
     drom (r): org = 0x3C000000, len = 0x400000
     ram (rw): org = 0x3FC80000, len = 0x50000
     rtc_ram (rx): org = 0x50000000, len = 0x2000

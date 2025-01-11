@@ -8,7 +8,7 @@ SECTIONS {
 	.text : {
 		*( .init )
 		*( .text .text.* )
-	} > RAM
+	} > IRAM
 
 	.data : {
 		_data = . ;
@@ -31,5 +31,5 @@ SECTIONS {
 		. += __stack_size;
 		__stack_pointer = .;
 		_end = .;
-	}
+	} > RAM
 }

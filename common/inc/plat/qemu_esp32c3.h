@@ -24,8 +24,9 @@
 
 #define INIT_CAPS                                                     \
 	{                                                             \
-		[0] = cap_mk_pmp(pmp_napot_encode(0x3c000000, 0x08000000), MEM_RWX),                \
-		[4] = cap_mk_time(0, 0, S3K_SLOT_CNT),                \
+		[0] = cap_mk_pmp(pmp_napot_encode(0x42000000 + 0x10000, 0x10000), MEM_RWX),                \
+		[1] = cap_mk_pmp(pmp_napot_encode(0x3FC80000 + 0x10000, 0x10000), MEM_RWX),                \
+		[4] = cap_mk_time(0, 0, S3K_SLOT_CNT),							\
 		[8] = cap_mk_monitor(0, S3K_PROC_CNT),                \
 		[9] = cap_mk_channel(0, S3K_CHAN_CNT),                \
 	}

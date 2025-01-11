@@ -37,14 +37,21 @@ gdb: kernel ${APPS}
 gdb-openocd: kernel ${APPS}
 	@ELFS="${ELFS}" ${ROOT}/scripts/gdb-openocd.sh
 
-qemu_flash.bin: kernel
+image: kernel ${APPS}
+	./merge.sh
+
+qemu_flash.bin: image
 	esptool.py --chip=esp32c3 merge_bin --output=${BUILD}/qemu_flash.bin \
 	--fill-flash-size=2MB --flash_mode dio --flash_freq 80m \
-	--flash_size 2MB 0x0 ${BUILD}/kernel.bin
+	--flash_size 2MB 0x0 ${BUILD}/merged.bin
 
 debug: qemu_flash.bin
 	qemu-system-riscv32 -M esp32c3 \
 	-drive file=${BUILD}/qemu_flash.bin,if=mtd,format=raw -nographic -s -S
+
+run: qemu_flash.bin
+	qemu-system-riscv32 -M esp32c3 \
+	-drive file=${BUILD}/qemu_flash.bin,if=mtd,format=raw -nographic
 
 size: ${ELFS}
 	${SIZE} ${ELFS}
