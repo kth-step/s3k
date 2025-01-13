@@ -6,7 +6,7 @@
 int main(void)
 {
 	// Setup UART access
-	setup_uart();
+	/* setup_uart(); */
 
 	// Write hello world.
 	alt_printf("Hello, world\n");

@@ -19,6 +19,7 @@ void proc_init(void)
 	procs[0].regs[REG_PC] = (val_t)_payload;
 	KASSERT(cap_pmp_load(ctable_get(0, 0), 0) == SUCCESS);
 	KASSERT(cap_pmp_load(ctable_get(0, 1), 1) == SUCCESS);
+	KASSERT(cap_pmp_load(ctable_get(0, 2), 2) == SUCCESS);
 }
 
 proc_t *proc_get(pid_t pid)
