@@ -10,7 +10,7 @@
 #include "cap_types.h"
 #include "cap_util.h"
 #include "csr.h"
-#include "drivers/time.h"
+#include "altc/time.h"
 #include "error.h"
 #include "kernel.h"
 #include "sched.h"
@@ -150,17 +150,17 @@ proc_t *syscall_handler(proc_t *proc)
 
 static bool valid_idx(cidx_t idx)
 {
-	return idx < S3K_CAP_CNT;
+	return idx < NCAP;
 }
 
 static bool valid_slot(pmp_slot_t slot)
 {
-	return slot < S3K_PMP_CNT;
+	return slot < NPMP;
 }
 
 static bool valid_pid(pid_t pid)
 {
-	return pid < S3K_PROC_CNT;
+	return pid < NPROC;
 }
 
 static bool valid_reg(reg_t reg)

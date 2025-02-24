@@ -80,8 +80,8 @@ typedef struct {
 	 * registers). */
 	uint64_t regs[REG_CNT];
 	/** PMP registers */
-	uint8_t pmpcfg[S3K_PMP_CNT];
-	uint64_t pmpaddr[S3K_PMP_CNT];
+	uint8_t pmpcfg[NPMP];
+	uint64_t pmpaddr[NPMP];
 	/** Instrumentation registers */
 	/** Process ID. */
 	pid_t pid;

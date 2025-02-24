@@ -3,15 +3,15 @@
 
 #include "cap_pmp.h"
 #include "csr.h"
-#include "drivers/time.h"
+#include "altc/time.h"
 #include "kassert.h"
 
-static proc_t procs[S3K_PROC_CNT];
+static proc_t procs[NPROC];
 extern unsigned char _payload[];
 
 void proc_init(void)
 {
-	for (uint64_t i = 0; i < S3K_PROC_CNT; i++) {
+	for (uint64_t i = 0; i < NPROC; i++) {
 		procs[i].pid = i;
 		procs[i].state = PSF_SUSPENDED;
 	}
@@ -22,7 +22,7 @@ void proc_init(void)
 
 proc_t *proc_get(pid_t pid)
 {
-	KASSERT(pid < S3K_PROC_CNT);
+	KASSERT(pid < NPROC);
 	KASSERT(procs[pid].pid == pid);
 	return &procs[pid];
 }
@@ -45,7 +45,7 @@ bool proc_acquire(proc_t *proc)
 
 	if (time_get() < proc->timeout)
 		return false;
-#ifdef SMP
+#if NHART > 1
 	return __atomic_compare_exchange(&proc->state, &expected, &desired,
 					 false, __ATOMIC_ACQUIRE,
 					 __ATOMIC_RELAXED);
@@ -58,7 +58,7 @@ bool proc_acquire(proc_t *proc)
 void proc_release(proc_t *proc)
 {
 	KASSERT(proc->state & PSF_BUSY);
-#ifdef SMP
+#if NHART > 1
 	__atomic_fetch_xor(&proc->state, PSF_BUSY, __ATOMIC_RELEASE);
 #else
 	proc->state &= ~PSF_BUSY;
@@ -67,7 +67,7 @@ void proc_release(proc_t *proc)
 
 void proc_suspend(proc_t *proc)
 {
-#ifdef SMP
+#if NHART > 1
 	proc_state_t prev = __atomic_fetch_or(&proc->state, PSF_SUSPENDED, __ATOMIC_RELAXED);
 #else
     proc_state_t prev = proc->state;
@@ -83,7 +83,7 @@ void proc_resume(proc_t *proc)
 {
 	if (proc->state == PSF_SUSPENDED)
 		proc->timeout = 0;
-#ifdef SMP
+#if NHART > 1
 	__atomic_fetch_and(&proc->state, ~PSF_SUSPENDED, __ATOMIC_RELAXED);
 #else
     proc->state &= ~PSF_SUSPENDED;
@@ -105,7 +105,7 @@ bool proc_ipc_acquire(proc_t *proc, chan_t chan)
 		return false;
 	if (time_get() >= proc->timeout)
 		return false;
-#ifdef SMP
+#if NHART > 1
 	return __atomic_compare_exchange_n(&proc->state, &expected, desired,
 					   false, __ATOMIC_ACQUIRE,
 					   __ATOMIC_RELAXED);

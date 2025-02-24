@@ -4,10 +4,7 @@
 .macro ld_sp tmp
 	la	sp,_sp
 	csrr	\tmp,mhartid
-#if S3K_MIN_HART != 0
-	addi	\tmp,\tmp,-S3K_MIN_HART
-#endif
-	slli	\tmp,\tmp,S3K_LOG_STACK_SIZE
+	slli	\tmp,\tmp,8
 	sub	sp,sp,\tmp
 .endm
 

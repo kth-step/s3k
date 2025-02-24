@@ -10,9 +10,8 @@
 
 void kernel_init(void)
 {
-	alt_init();
 	kprintf(0, "# uart initialized\n");
-#ifdef SMP
+#if NHART > 1
 	cap_lock_init();
 	kprintf(0, "# capability lock initialized\n");
 #endif
