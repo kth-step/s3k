@@ -4,7 +4,7 @@
 #include "cap_ops.h"
 #include "cap_table.h"
 #include "csr.h"
-#include "drivers/time.h"
+#include "altc/time.h"
 #include "error.h"
 #include "kassert.h"
 #include "kernel.h"
@@ -20,7 +20,7 @@ struct {
 	proc_t *server;
 	proc_t *client;
 	cte_t cap_buf;
-} channels[S3K_CHAN_CNT];
+} channels[NCHAN];
 
 static err_t do_send(cap_t cap, const ipc_msg_t *msg, proc_t **next)
 {

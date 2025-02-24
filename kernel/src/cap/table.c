@@ -5,12 +5,23 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
+#define INIT_CAPS                                                     \
+	{                                                             \
+		[0] = cap_mk_pmp(0x20005fff, MEM_RWX),                \
+		[1] = cap_mk_memory(0x80020000, 0x88000000, MEM_RWX), \
+		[2] = cap_mk_memory(0x10000000, 0x10001000, MEM_RW),  \
+		[3] = cap_mk_memory(0x200b000, 0x200c000, MEM_R),     \
+		[4] = cap_mk_time(0, 0, NSLOT),                \
+		[8] = cap_mk_monitor(0, NPROC),                \
+		[9] = cap_mk_channel(0, NCHAN),                \
+	}
+
 struct cte {
 	uint32_t prev, next;
 	cap_t cap;
 };
 
-static struct cte ctable[S3K_PROC_CNT * S3K_CAP_CNT];
+static struct cte ctable[NPROC * NCAP];
 
 static uint32_t offset(cte_t c)
 {
@@ -35,9 +46,9 @@ void ctable_init(void)
 
 cte_t ctable_get(uint64_t pid, uint64_t index)
 {
-	KASSERT(pid < S3K_PROC_CNT);
-	KASSERT(index < S3K_CAP_CNT);
-	return &ctable[pid * S3K_CAP_CNT + index];
+	KASSERT(pid < NPROC);
+	KASSERT(index < NCAP);
+	return &ctable[pid * NCAP + index];
 }
 
 bool cte_is_empty(cte_t c)
@@ -77,7 +88,7 @@ cap_t cte_cap(cte_t c)
 
 uint64_t cte_pid(cte_t c)
 {
-	return offset(c) / S3K_CAP_CNT;
+	return offset(c) / NCAP;
 }
 
 void cte_move(cte_t src, cte_t dst)

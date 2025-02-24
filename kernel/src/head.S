@@ -21,10 +21,8 @@ head_entry:
 
 	// If hartid != MIN_HARTID, then jump to wait.
 	csrr	t0,mhartid
-	li	t1,S3K_MIN_HART
-	li	t2,S3K_MAX_HART
-	bltu	t0,t1,__hang
-	bgtu	t0,t2,__hang
+	li	t1,NHART
+	bgtu	t0,t1,__hang
 
 	// Set some CSRs to 0.
 	csrw	mstatus,0
@@ -39,8 +37,7 @@ head_entry:
 	csrw	mtvec,t0
 
 	csrr	t0,mhartid
-	li	t1,S3K_MIN_HART
-	bne	t0,t1,wait
+	bnez	t0,wait
 
 zero_bss:
 	// Initialize the bss section.

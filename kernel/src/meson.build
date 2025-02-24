@@ -1,0 +1,23 @@
+sources = files(
+  'head.S',
+  'stack.S',
+  'trap.S',
+  'altio.c',
+  'exception.c',
+  'interrupt.c',
+  'kernel.c',
+  'kprintf.c',
+  'proc.c',
+  'sched.c',
+  'syscall.c',
+  'trap.c',
+  'cap/ipc.c',
+  'cap/lock.c',
+  'cap/monitor.c',
+  'cap/ops.c',
+  'cap/pmp.c',
+  'cap/table.c',
+  'cap/util.c',
+  'smp/semaphore.c',
+  'smp/taslock.c'
+)
