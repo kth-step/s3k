@@ -2,7 +2,6 @@ sources = files(
   'head.S',
   'stack.S',
   'trap.S',
-  'altio.c',
   'exception.c',
   'interrupt.c',
   'kernel.c',
