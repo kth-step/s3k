@@ -27,9 +27,8 @@ s3k_err_t s3k_mon_reg_write(s3k_cidx_t mon_idx, s3k_pid_t pid, s3k_reg_t reg,
 			    uint64_t val);
 s3k_err_t s3k_mon_cap_read(s3k_cidx_t mon_idx, s3k_pid_t pid, s3k_cidx_t idx,
 			   s3k_cap_t *cap);
-s3k_err_t s3k_mon_cap_move(s3k_cidx_t mon_idx, s3k_pid_t src_pid,
-			   s3k_cidx_t src_idx, s3k_pid_t dst_pid,
-			   s3k_cidx_t dst_idx);
+s3k_err_t s3k_mon_cap_send(s3k_cidx_t mon_idx, s3k_cidx_t src_idx,
+			   s3k_pid_t dst_pid, s3k_cidx_t dst_idx);
 s3k_err_t s3k_mon_pmp_load(s3k_cidx_t mon_idx, s3k_pid_t pid,
 			   s3k_cidx_t pmp_idx, s3k_pmp_slot_t pmp_slot);
 s3k_err_t s3k_mon_pmp_unload(s3k_cidx_t mon_idx, s3k_pid_t pid,
@@ -55,9 +54,8 @@ s3k_err_t s3k_try_mon_reg_write(s3k_cidx_t mon_idx, s3k_pid_t pid,
 				s3k_reg_t reg, uint64_t val);
 s3k_err_t s3k_try_mon_cap_read(s3k_cidx_t mon_idx, s3k_pid_t pid,
 			       s3k_cidx_t idx, s3k_cap_t *cap);
-s3k_err_t s3k_try_mon_cap_move(s3k_cidx_t mon_idx, s3k_pid_t src_pid,
-			       s3k_cidx_t src_idx, s3k_pid_t dst_pid,
-			       s3k_cidx_t dst_idx);
+s3k_err_t s3k_try_mon_cap_send(s3k_cidx_t mon_idx, s3k_cidx_t src_idx,
+			       s3k_pid_t dst_pid, s3k_cidx_t dst_idx);
 s3k_err_t s3k_try_mon_pmp_load(s3k_cidx_t mon_idx, s3k_pid_t pid,
 			       s3k_cidx_t pmp_idx, s3k_pmp_slot_t pmp_slot);
 s3k_err_t s3k_try_mon_pmp_unload(s3k_cidx_t mon_idx, s3k_pid_t pid,
