@@ -1,0 +1,2 @@
+option('nproc', type : 'integer', value : 4)
+option('nhart', type : 'integer', value : 1)

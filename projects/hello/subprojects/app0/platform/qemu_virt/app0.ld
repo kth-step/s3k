@@ -2,15 +2,21 @@
 OUTPUT_ARCH(riscv)
 ENTRY(_start)
 
+_payload = ORIGIN(RAM) + LENGTH(RAM);
+
 __global_pointer$ = MIN(_sdata + 0x800, MAX(_data + 0x800, _end - 0x800));
+
+MEMORY {
+	RAM (rwx) : ORIGIN = 0x80010000, LENGTH = 64K
+}
 
 SECTIONS {
 	.text : {
-		*( .init )
+		*( .text.init )
 		*( .text .text.* )
 	} > RAM
 
-	.data : {
+	.data : ALIGN(4K) {
 		_data = . ;
 		*( .data )
 		*( .data.* )
@@ -19,17 +25,11 @@ SECTIONS {
 		*( .sdata.* )
 	} > RAM
 
-	.bss : {
+	.bss : ALIGN(4K) {
 		_bss = .;
 		_sbss = .;
 		*(.sbss .sbss.*)
 		*(.bss .bss.*)
-		_end = .;
+		_end = ALIGN(8);
 	} > RAM
-
-	.stack : ALIGN(8) {
-		. += __stack_size;
-		__stack_pointer = .;
-		_end = .;
-	}
 }
