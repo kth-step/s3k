@@ -1,5 +1,5 @@
-#include "cap_table.h"
-#include "cap_types.h"
+#include "cap/table.h"
+#include "cap/types.h"
 #include "error.h"
 #include "kernel.h"
 

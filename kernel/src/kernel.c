@@ -1,8 +1,8 @@
 #include "kernel.h"
 
 #include "altc/init.h"
-#include "cap_lock.h"
-#include "cap_table.h"
+#include "cap/lock.h"
+#include "cap/table.h"
 #include "csr.h"
 #include "kassert.h"
 #include "proc.h"

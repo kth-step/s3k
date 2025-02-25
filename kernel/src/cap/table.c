@@ -1,6 +1,6 @@
-#include "cap_table.h"
+#include "cap/table.h"
 
-#include "cap_util.h"
+#include "cap/util.h"
 #include "kassert.h"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))

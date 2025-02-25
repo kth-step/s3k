@@ -1,7 +1,7 @@
-#include "cap_ops.h"
+#include "cap/ops.h"
 
-#include "cap_ipc.h"
-#include "cap_util.h"
+#include "cap/ipc.h"
+#include "cap/util.h"
 #include "kernel.h"
 #include "sched.h"
 

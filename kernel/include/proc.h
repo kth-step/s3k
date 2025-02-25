@@ -10,8 +10,8 @@
  * @copyright MIT License
  */
 
-#include "cap_table.h"
-#include "cap_types.h"
+#include "cap/table.h"
+#include "cap/types.h"
 
 #include <stdbool.h>
 #include <stdint.h>

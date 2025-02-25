@@ -1,4 +1,4 @@
-#include "cap_lock.h"
+#include "cap/lock.h"
 
 #include "csr.h"
 #include "smp/taslock.h"

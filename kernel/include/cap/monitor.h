@@ -37,7 +37,7 @@
  */
 
 #pragma once
-#include "cap_table.h"
+#include "cap/table.h"
 #include "error.h"
 #include "proc.h"
 
