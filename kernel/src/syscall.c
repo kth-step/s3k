@@ -1,6 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 #include "syscall.h"
 
+#include "altc/time.h"
 #include "cap/ipc.h"
 #include "cap/lock.h"
 #include "cap/monitor.h"
@@ -10,7 +11,6 @@
 #include "cap/types.h"
 #include "cap/util.h"
 #include "csr.h"
-#include "altc/time.h"
 #include "error.h"
 #include "kernel.h"
 #include "sched.h"

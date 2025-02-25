@@ -23,14 +23,16 @@ struct uart_sifive_regs {
 
 void uart_sifive_init(ALTFILE *f)
 {
-	volatile struct uart_sifive_regs *uart = ((struct uart_sifive*)f)->base;
+	volatile struct uart_sifive_regs *uart
+	    = ((struct uart_sifive *)f)->base;
 	uart->txctrl = TXCTRL_TXEN; // Enable transmit data
 	uart->rxctrl = RXCTRL_RXEN; // Enable receive data
 }
 
 int uart_sifive_fputchar(int c, ALTFILE *f)
 {
-	volatile struct uart_sifive_regs *uart = ((struct uart_sifive*)f)->base;
+	volatile struct uart_sifive_regs *uart
+	    = ((struct uart_sifive *)f)->base;
 	while (uart->txdata & TXDATA_FULL) {
 	}
 	uart->txdata = (unsigned char)c;
@@ -39,7 +41,8 @@ int uart_sifive_fputchar(int c, ALTFILE *f)
 
 int uart_sifive_fgetchar(ALTFILE *f)
 {
-	volatile struct uart_sifive_regs *uart = ((struct uart_sifive*)f)->base;
+	volatile struct uart_sifive_regs *uart
+	    = ((struct uart_sifive *)f)->base;
 	int c;
 	do {
 		c = uart->rxdata;
