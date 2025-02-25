@@ -6,6 +6,7 @@ int alt_fputstr(const char *s, ALTFILE *f)
 		f->fputchar(*s, f);
 		s++;
 	}
+	f->fputchar('\0', f);
 	return 0;
 }
 

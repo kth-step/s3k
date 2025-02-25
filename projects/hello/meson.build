@@ -1,4 +1,9 @@
-project('hello_world', 'c', version : '0.1')
+project('hello_world', 'c', 
+  version : '0.1',
+  default_options : [
+    'warning_level=2', 
+    'c_std=gnu11', 
+    'optimization=s'])
 
 kernel = subproject('kernel')
 app0 = subproject('app0')

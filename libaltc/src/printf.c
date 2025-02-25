@@ -84,8 +84,63 @@ int alt_fprintf(ALTFILE *f, const char *fmt, ...)
 	return length;
 }
 
+void _print_hex(ALTFILE *f, unsigned long long x)
+{
+	if (!x) {
+		alt_fputchar('0', f);
+		return;
+	}
+
+	char hex[16];
+	int i = 0;
+	while (x) {
+		unsigned int h = x % 16;
+		if (h < 10)
+			hex[i++] = '0' + h;
+		else
+			hex[i++] = 'A' + h - 10;
+		x >>= 4;
+	}
+	while (i) {
+		alt_fputchar(hex[--i], f);
+	}
+}
+
 int alt_vfprintf(ALTFILE *f, const char *fmt, va_list ap)
 {
 	/* TODO */
+
+	while (*fmt != '\0') {
+		if (*fmt != '%') {
+			alt_fputchar(*fmt, f);
+			fmt++;
+			continue;
+		}
+		fmt++;
+		if (*fmt == '\0')
+			break;
+		switch (*fmt) {
+		case 'x': {
+			unsigned int x = va_arg(ap, unsigned int);
+			_print_hex(f, x);
+		} break;
+		case 'X': {
+			unsigned long long x = va_arg(ap, unsigned long long);
+			_print_hex(f, x);
+		} break;
+		case 'c': {
+			char c = va_arg(ap, int);
+			alt_fputchar(c, f);
+		} break;
+		case 's': {
+			char *s = va_arg(ap, char *);
+			alt_fputstr(s, f);
+		} break;
+		default:
+			alt_fputchar(*fmt, f);
+		}
+		fmt++;
+	}
+	alt_fputchar('\0', f);
 	return 0;
 }
