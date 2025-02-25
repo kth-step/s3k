@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cap_types.h"
+#include "cap/types.h"
 #include "macro.h"
 #include "proc.h"
 

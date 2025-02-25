@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cap_table.h"
+#include "cap/table.h"
 #include "error.h"
 
 err_t cap_read(cte_t cte, cap_t *cap);

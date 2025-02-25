@@ -1,5 +1,5 @@
 #pragma once
-#include "cap_types.h"
+#include "cap/types.h"
 
 #include <stddef.h>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "cap_types.h"
+#include "cap/types.h"
 #include "kassert.h"
 
 #include <stdbool.h>

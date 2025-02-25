@@ -1,7 +1,7 @@
-#include "cap_monitor.h"
+#include "cap/monitor.h"
 
-#include "cap_ops.h"
-#include "cap_pmp.h"
+#include "cap/ops.h"
+#include "cap/pmp.h"
 #include "proc.h"
 
 static err_t check_monitor(cte_t mon, pid_t pid, bool check_suspended)

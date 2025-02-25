@@ -1,4 +1,4 @@
-#include "cap_util.h"
+#include "cap/util.h"
 
 #include "altc/altio.h"
 #include "kassert.h"

@@ -1,8 +1,8 @@
-#include "cap_ipc.h"
+#include "cap/ipc.h"
 
 #include "altc/string.h"
-#include "cap_ops.h"
-#include "cap_table.h"
+#include "cap/ops.h"
+#include "cap/table.h"
 #include "csr.h"
 #include "altc/time.h"
 #include "error.h"

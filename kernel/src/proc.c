@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 #include "proc.h"
 
-#include "cap_pmp.h"
+#include "cap/pmp.h"
 #include "csr.h"
 #include "altc/time.h"
 #include "kassert.h"
