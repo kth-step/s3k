@@ -397,19 +397,6 @@ err_t cap_delete_socket(cte_t c, cap_t cap)
 
 err_t cap_revoke_socket(cte_t parent, cap_t pcap)
 {
-	cte_t child = cte_next(parent);
-	cap_t ccap = cte_cap(child);
-	if (ccap.type == CAPTY_SOCKET && pcap.sock.chan == ccap.sock.chan
-	    && pcap.sock.tag == 0) {
-		// delete the child
-		cte_delete(child);
-
-		// Clear socket
-		cap_sock_clear(ccap, proc_get(cte_pid(child)));
-
-		return CONTINUE;
-	}
-
 	return SUCCESS;
 }
 
