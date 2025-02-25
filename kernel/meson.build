@@ -11,7 +11,8 @@ altc_dep = altc.get_variable('altc_dep')
 
 subdir('src')
 incdir = include_directories('include')
-linker_script = meson.current_source_dir() / 'kernel.ld'
+
+subdir('platform' / get_option('platform'))
 
 cross_c_args = get_option('c_args')
 c_args = [
