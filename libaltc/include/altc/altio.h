@@ -31,9 +31,8 @@ int alt_read(char *s, int size);
 int alt_printf(const char *format, ...);
 int alt_vprintf(const char *format, va_list ap);
 int alt_sprintf(char *s, const char *format, ...);
-int alt_vsprintf(char *s, const char *format, va_list ap); 
+int alt_vsprintf(char *s, const char *format, va_list ap);
 int alt_snprintf(char *s, size_t n, const char *format, ...);
 int alt_vsnprintf(char *s, size_t n, const char *format, va_list ap);
 int alt_fprintf(ALTFILE *f, const char *format, ...);
 int alt_vfprintf(ALTFILE *f, const char *format, va_list ap);
-

@@ -1,11 +1,11 @@
 #include "altc/altio.h"
 
-#define UART_NS16550A(_base) \
-(struct uart_ns16550a) { \
-	.fputchar = uart_ns16550a_fputchar, \
-	.fgetchar = uart_ns16550a_fgetchar, \
-	.base = (void*)_base, \
-}
+#define UART_NS16550A(_base)                                               \
+	(struct uart_ns16550a)                                             \
+	{                                                                  \
+		.fputchar = uart_ns16550a_fputchar,                        \
+		.fgetchar = uart_ns16550a_fgetchar, .base = (void *)_base, \
+	}
 
 struct uart_ns16550a {
 	int (*fputchar)(int c, ALTFILE *);

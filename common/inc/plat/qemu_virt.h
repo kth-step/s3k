@@ -25,13 +25,13 @@
 /// Stack size of 1024 KiB
 #define S3K_LOG_STACK_SIZE 10
 
-#define INIT_CAPS                                                     \
-	{                                                             \
-		[0] = cap_mk_pmp(0x20005fff, MEM_RWX),                \
-		[1] = cap_mk_memory(0x80020000, 0x88000000, MEM_RWX), \
-		[2] = cap_mk_memory(0x10000000, 0x10001000, MEM_RW),  \
-		[3] = cap_mk_memory(0x200b000, 0x200c000, MEM_R),     \
-		[4] = cap_mk_time(0, 0, S3K_SLOT_CNT),                \
-		[8] = cap_mk_monitor(0, S3K_PROC_CNT),                \
-		[9] = cap_mk_channel(0, S3K_CHAN_CNT),                \
+#define INIT_CAPS                                                 \
+	{                                                         \
+	    [0] = cap_mk_pmp(0x20005fff, MEM_RWX),                \
+	    [1] = cap_mk_memory(0x80020000, 0x88000000, MEM_RWX), \
+	    [2] = cap_mk_memory(0x10000000, 0x10001000, MEM_RW),  \
+	    [3] = cap_mk_memory(0x200b000, 0x200c000, MEM_R),     \
+	    [4] = cap_mk_time(0, 0, S3K_SLOT_CNT),                \
+	    [8] = cap_mk_monitor(0, S3K_PROC_CNT),                \
+	    [9] = cap_mk_channel(0, S3K_CHAN_CNT),                \
 	}

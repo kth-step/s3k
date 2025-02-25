@@ -1,9 +1,9 @@
 /* See LICENSE file for copyright and license details. */
 #include "proc.h"
 
+#include "altc/time.h"
 #include "cap/pmp.h"
 #include "csr.h"
-#include "altc/time.h"
 #include "kassert.h"
 
 static proc_t procs[NPROC];
@@ -68,10 +68,11 @@ void proc_release(proc_t *proc)
 void proc_suspend(proc_t *proc)
 {
 #if NHART > 1
-	proc_state_t prev = __atomic_fetch_or(&proc->state, PSF_SUSPENDED, __ATOMIC_RELAXED);
+	proc_state_t prev
+	    = __atomic_fetch_or(&proc->state, PSF_SUSPENDED, __ATOMIC_RELAXED);
 #else
-    proc_state_t prev = proc->state;
-    proc->state |= PSF_SUSPENDED;
+	proc_state_t prev = proc->state;
+	proc->state |= PSF_SUSPENDED;
 #endif
 	if (prev & PSF_BLOCKED) {
 		proc->state = PSF_SUSPENDED;
@@ -86,7 +87,7 @@ void proc_resume(proc_t *proc)
 #if NHART > 1
 	__atomic_fetch_and(&proc->state, ~PSF_SUSPENDED, __ATOMIC_RELAXED);
 #else
-    proc->state &= ~PSF_SUSPENDED;
+	proc->state &= ~PSF_SUSPENDED;
 #endif
 }
 

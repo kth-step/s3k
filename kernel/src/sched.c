@@ -2,8 +2,8 @@
 
 #include "sched.h"
 
-#include "csr.h"
 #include "altc/time.h"
+#include "csr.h"
 #include "kassert.h"
 #include "kernel.h"
 #include "kprintf.h"

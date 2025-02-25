@@ -1,10 +1,10 @@
 #include "cap/ipc.h"
 
 #include "altc/string.h"
+#include "altc/time.h"
 #include "cap/ops.h"
 #include "cap/table.h"
 #include "csr.h"
-#include "altc/time.h"
 #include "error.h"
 #include "kassert.h"
 #include "kernel.h"

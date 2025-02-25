@@ -24,14 +24,16 @@ struct uart_ns16550a_regs {
 
 void uart_ns16550a_init(ALTFILE *f)
 {
-	volatile struct uart_ns16550a_regs *base = ((struct uart_ns16550a*)f)->base; 
+	volatile struct uart_ns16550a_regs *base
+	    = ((struct uart_ns16550a *)f)->base;
 	base->lcr = 0x3;
 	base->fcr = 0x1;
 }
 
 int uart_ns16550a_fputchar(int c, ALTFILE *f)
 {
-	volatile struct uart_ns16550a_regs *base = ((struct uart_ns16550a*)f)->base;
+	volatile struct uart_ns16550a_regs *base
+	    = ((struct uart_ns16550a *)f)->base;
 	while (!(base->lsr & LSR_TX_READY))
 		;
 	base->thr = (unsigned char)c;
@@ -40,7 +42,8 @@ int uart_ns16550a_fputchar(int c, ALTFILE *f)
 
 int uart_ns16550a_fgetchar(ALTFILE *f)
 {
-	volatile struct uart_ns16550a_regs *base = ((struct uart_ns16550a*)f)->base;
+	volatile struct uart_ns16550a_regs *base
+	    = ((struct uart_ns16550a *)f)->base;
 	while (!(base->lsr & LSR_RX_READY))
 		;
 	return base->rbr;
