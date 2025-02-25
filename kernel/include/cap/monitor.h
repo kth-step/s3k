@@ -138,11 +138,11 @@ err_t cap_monitor_cap_read(cte_t mon, cte_t src, cap_t *cap);
  * @param src The source CTE.
  * @param dst The destination CTE.
  * @return SUCCESS if the capability is moved.
- *         ERR_EMPTY if the CTE is empty.
+ *         ERR_EMPTY if the source CTE is empty.
  *         ERR_INVALID_MONITOR if unauthorized or wrong capability type.
  *         ERR_INVALID_STATE if the process is not suspended.
  */
-err_t cap_monitor_cap_move(cte_t mon, cte_t src, cte_t dst);
+err_t cap_monitor_cap_send(cte_t mon, cte_t src, cte_t dst);
 
 /**
  * Loads a PMP configuration into a specified slot of a suspended process.

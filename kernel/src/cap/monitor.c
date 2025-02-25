@@ -15,19 +15,6 @@ static err_t check_monitor(cte_t mon, pid_t pid, bool check_suspended)
 	return SUCCESS;
 }
 
-static err_t check_monitor_move(cte_t mon, cte_t src, cte_t dst)
-{
-	uint64_t mon_pid = cte_pid(mon);
-	uint64_t src_pid = cte_pid(src);
-	uint64_t dst_pid = cte_pid(dst);
-	err_t err;
-	if (mon_pid != src_pid && (err = check_monitor(mon, src_pid, true)))
-		return err;
-	if (mon_pid != dst_pid && (err = check_monitor(mon, dst_pid, true)))
-		return err;
-	return SUCCESS;
-}
-
 err_t cap_monitor_suspend(cte_t mon, pid_t pid)
 {
 	err_t err = check_monitor(mon, pid, false);
@@ -91,9 +78,9 @@ err_t cap_monitor_cap_read(cte_t mon, cte_t src, cap_t *cap)
 	return err;
 }
 
-err_t cap_monitor_cap_move(cte_t mon, cte_t src, cte_t dst)
+err_t cap_monitor_cap_send(cte_t mon, cte_t src, cte_t dst)
 {
-	err_t err = check_monitor_move(mon, src, dst);
+	err_t err = check_monitor(mon, cte_pid(dst), true);
 	if (!err)
 		err = cap_move(src, dst);
 	return err;

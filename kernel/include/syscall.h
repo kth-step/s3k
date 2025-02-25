@@ -127,11 +127,10 @@ typedef union {
 
 	struct {
 		uint64_t mon_idx;
-		uint64_t src_pid;
 		uint64_t src_idx;
 		uint64_t dst_pid;
 		uint64_t dst_idx;
-	} mon_cap_move;
+	} mon_cap_send;
 
 	struct {
 		uint64_t mon_idx;

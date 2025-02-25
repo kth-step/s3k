@@ -27,7 +27,7 @@ typedef enum {
 	S3K_SYS_MON_REG_READ,
 	S3K_SYS_MON_REG_WRITE,
 	S3K_SYS_MON_CAP_READ,
-	S3K_SYS_MON_CAP_MOVE,
+	S3K_SYS_MON_CAP_SEND,
 	S3K_SYS_MON_PMP_LOAD,
 	S3K_SYS_MON_PMP_UNLOAD,
 
@@ -121,11 +121,10 @@ typedef union {
 
 	struct {
 		uint64_t mon_idx;
-		uint64_t src_pid;
 		uint64_t src_idx;
 		uint64_t dst_pid;
 		uint64_t dst_idx;
-	} mon_cap_move;
+	} mon_cap_send;
 
 	struct {
 		uint64_t mon_idx;
@@ -395,14 +394,12 @@ s3k_err_t s3k_mon_cap_read(s3k_cidx_t mon_idx, s3k_pid_t pid, s3k_cidx_t idx,
 	return err;
 }
 
-s3k_err_t s3k_mon_cap_move(s3k_cidx_t mon_idx, s3k_pid_t src_pid,
-			   s3k_cidx_t src_idx, s3k_pid_t dst_pid,
-			   s3k_cidx_t dst_idx)
+s3k_err_t s3k_mon_cap_send(s3k_cidx_t mon_idx, s3k_cidx_t src_idx,
+			   s3k_pid_t dst_pid, s3k_cidx_t dst_idx)
 {
 	s3k_err_t err;
 	do {
-		err = s3k_try_mon_cap_move(mon_idx, src_pid, src_idx, dst_pid,
-					   dst_idx);
+		err = s3k_try_mon_cap_send(mon_idx, src_idx, dst_pid, dst_idx);
 	} while (err == S3K_ERR_PREEMPTED);
 	return err;
 }
@@ -568,14 +565,13 @@ s3k_err_t s3k_try_mon_cap_read(s3k_cidx_t mon_idx, s3k_pid_t pid,
 	return ret.err;
 }
 
-s3k_err_t s3k_try_mon_cap_move(s3k_cidx_t mon_idx, s3k_pid_t src_pid,
-			       s3k_cidx_t src_idx, s3k_pid_t dst_pid,
-			       s3k_cidx_t dst_idx)
+s3k_err_t s3k_try_mon_cap_send(s3k_cidx_t mon_idx, s3k_cidx_t src_idx,
+			       s3k_pid_t dst_pid, s3k_cidx_t dst_idx)
 {
 	sys_args_t args = {
-	    .mon_cap_move = {mon_idx, src_pid, src_idx, dst_pid, dst_idx}
-	 };
-	return DO_ECALL(S3K_SYS_MON_CAP_MOVE, args, sizeof(args.mon_cap_move))
+	    .mon_cap_send = {mon_idx, src_idx, dst_pid, dst_idx}
+	};
+	return DO_ECALL(S3K_SYS_MON_CAP_SEND, args, sizeof(args.mon_cap_send))
 	    .err;
 }
 

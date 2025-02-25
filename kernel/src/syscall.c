@@ -39,7 +39,7 @@ static inline err_t validate_mon_yield(const sys_args_t *);
 static inline err_t validate_mon_reg_read(const sys_args_t *);
 static inline err_t validate_mon_reg_write(const sys_args_t *);
 static inline err_t validate_mon_cap_read(const sys_args_t *);
-static inline err_t validate_mon_cap_move(const sys_args_t *);
+static inline err_t validate_mon_cap_send(const sys_args_t *);
 static inline err_t validate_mon_pmp_load(const sys_args_t *);
 static inline err_t validate_mon_pmp_unload(const sys_args_t *);
 static inline err_t validate_sock_send(const sys_args_t *);
@@ -65,7 +65,7 @@ static proc_t *handle_mon_yield(proc_t *const, const sys_args_t *);
 static proc_t *handle_mon_reg_read(proc_t *const, const sys_args_t *);
 static proc_t *handle_mon_reg_write(proc_t *const, const sys_args_t *);
 static proc_t *handle_mon_cap_read(proc_t *const, const sys_args_t *);
-static proc_t *handle_mon_cap_move(proc_t *const, const sys_args_t *);
+static proc_t *handle_mon_cap_send(proc_t *const, const sys_args_t *);
 static proc_t *handle_mon_pmp_load(proc_t *const, const sys_args_t *);
 static proc_t *handle_mon_pmp_unload(proc_t *const, const sys_args_t *);
 static proc_t *handle_sock_send(proc_t *const, const sys_args_t *);
@@ -82,7 +82,7 @@ handler_t handlers[] = {
     handle_cap_derive,	   handle_pmp_load,	handle_pmp_unload,
     handle_mon_suspend,	   handle_mon_resume,	handle_mon_state_get,
     handle_mon_yield,	   handle_mon_reg_read, handle_mon_reg_write,
-    handle_mon_cap_read,   handle_mon_cap_move, handle_mon_pmp_load,
+    handle_mon_cap_read,   handle_mon_cap_send, handle_mon_pmp_load,
     handle_mon_pmp_unload, handle_sock_send,	handle_sock_recv,
     handle_sock_sendrecv,
 };
@@ -94,7 +94,7 @@ validator_t validators[] = {
     validate_cap_derive,     validate_pmp_load,	    validate_pmp_unload,
     validate_mon_suspend,    validate_mon_resume,   validate_mon_state_get,
     validate_mon_yield,	     validate_mon_reg_read, validate_mon_reg_write,
-    validate_mon_cap_read,   validate_mon_cap_move, validate_mon_pmp_load,
+    validate_mon_cap_read,   validate_mon_cap_send, validate_mon_pmp_load,
     validate_mon_pmp_unload, validate_sock_send,    validate_sock_recv,
     validate_sock_sendrecv,
 };
@@ -487,29 +487,26 @@ proc_t *handle_mon_cap_read(proc_t *const p, const sys_args_t *args)
 	return p;
 }
 
-err_t validate_mon_cap_move(const sys_args_t *args)
+err_t validate_mon_cap_send(const sys_args_t *args)
 {
-	if (!valid_idx(args->mon_cap_move.mon_idx))
+	if (!valid_idx(args->mon_cap_send.mon_idx))
 		return ERR_INVALID_INDEX;
-	if (!valid_pid(args->mon_cap_move.src_pid))
-		return ERR_INVALID_PID;
-	if (!valid_idx(args->mon_cap_move.src_idx))
+	if (!valid_idx(args->mon_cap_send.src_idx))
 		return ERR_INVALID_INDEX;
-	if (!valid_pid(args->mon_cap_move.dst_pid))
+	if (!valid_pid(args->mon_cap_send.dst_pid))
 		return ERR_INVALID_PID;
-	if (!valid_idx(args->mon_cap_move.dst_idx))
+	if (!valid_idx(args->mon_cap_send.dst_idx))
 		return ERR_INVALID_INDEX;
 	return SUCCESS;
 }
 
-proc_t *handle_mon_cap_move(proc_t *const p, const sys_args_t *args)
+proc_t *handle_mon_cap_send(proc_t *const p, const sys_args_t *args)
 {
-	cte_t mon = ctable_get(p->pid, args->mon_cap_move.mon_idx);
-	cte_t src = ctable_get(args->mon_cap_move.src_pid,
-			       args->mon_cap_move.src_idx);
-	cte_t dst = ctable_get(args->mon_cap_move.dst_pid,
-			       args->mon_cap_move.dst_idx);
-	p->regs[REG_T0] = cap_monitor_cap_move(mon, src, dst);
+	cte_t mon = ctable_get(p->pid, args->mon_cap_send.mon_idx);
+	cte_t src = ctable_get(p->pid, args->mon_cap_send.src_idx);
+	cte_t dst = ctable_get(args->mon_cap_send.dst_pid,
+			       args->mon_cap_send.dst_idx);
+	p->regs[REG_T0] = cap_monitor_cap_send(mon, src, dst);
 	return p;
 }
 
