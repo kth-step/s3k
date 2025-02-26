@@ -10,5 +10,4 @@ sources = files(
   'getchar.c',
   'getstr.c',
   'putchar.c',
-  'putstr.c',
-  'time.c')
+  'putstr.c')

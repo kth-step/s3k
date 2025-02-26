@@ -2,7 +2,7 @@
 
 #include "sched.h"
 
-#include "altc/time.h"
+#include "rtc.h"
 #include "csr.h"
 #include "kassert.h"
 #include "kernel.h"
@@ -145,15 +145,15 @@ proc_t *sched(void)
 	uint64_t slot;
 	// Process to schedule
 	proc_t *proc;
-	timeout_set(hart, (uint64_t)-1);
+	rtc_timeout_set(hart, (uint64_t)-1);
 
 	do {
-		slot = time_get() / NTICK;
-		while (time_get() < slot * NTICK)
+		slot = rtc_time_get() / NTICK;
+		while (rtc_time_get() < slot * NTICK)
 			;
 		// Try schedule process
 		proc = sched_fetch(hart, slot);
 	} while (!proc);
-	timeout_set(hart, proc->timeout);
+	rtc_timeout_set(hart, proc->timeout);
 	return proc;
 }
