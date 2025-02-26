@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 #include "proc.h"
 
-#include "altc/time.h"
+#include "rtc.h"
 #include "cap/pmp.h"
 #include "csr.h"
 #include "kassert.h"
@@ -30,7 +30,7 @@ proc_t *proc_get(pid_t pid)
 proc_state_t proc_get_state(proc_t *proc)
 {
 	proc_state_t state = proc->state;
-	if ((state == PSF_BLOCKED) && time_get() >= proc->timeout)
+	if ((state == PSF_BLOCKED) && rtc_time_get() >= proc->timeout)
 		return 0;
 	return state;
 }
@@ -43,7 +43,7 @@ bool proc_acquire(proc_t *proc)
 	if (expected & (PSF_BUSY | PSF_SUSPENDED))
 		return false;
 
-	if (time_get() < proc->timeout)
+	if (rtc_time_get() < proc->timeout)
 		return false;
 #if NHART > 1
 	return __atomic_compare_exchange(&proc->state, &expected, &desired,
@@ -104,7 +104,7 @@ bool proc_ipc_acquire(proc_t *proc, chan_t chan)
 
 	if (proc->state != expected)
 		return false;
-	if (time_get() >= proc->timeout)
+	if (rtc_time_get() >= proc->timeout)
 		return false;
 #if NHART > 1
 	return __atomic_compare_exchange_n(&proc->state, &expected, desired,

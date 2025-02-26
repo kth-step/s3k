@@ -1,7 +1,7 @@
 #include "cap/ipc.h"
 
 #include "altc/string.h"
-#include "altc/time.h"
+#include "rtc.h"
 #include "cap/ops.h"
 #include "cap/table.h"
 #include "csr.h"
@@ -27,8 +27,8 @@ static err_t do_send(cap_t cap, const ipc_msg_t *msg, proc_t **next)
 	bool is_server = (cap.sock.tag == 0);
 	cte_t cap_buf = channels[cap.sock.chan].cap_buf;
 
-	uint64_t curr_time = time_get();
-	uint64_t timeout = timeout_get(csrr(mhartid));
+	uint64_t curr_time = rtc_time_get();
+	uint64_t timeout = rtc_timeout_get(csrr(mhartid));
 
 	if (curr_time >= timeout) {
 		return ERR_PREEMPTED;

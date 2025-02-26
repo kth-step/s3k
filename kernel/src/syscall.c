@@ -1,7 +1,7 @@
 /* See LICENSE file for copyright and license details. */
 #include "syscall.h"
 
-#include "altc/time.h"
+#include "rtc.h"
 #include "cap/ipc.h"
 #include "cap/lock.h"
 #include "cap/monitor.h"
@@ -180,10 +180,10 @@ proc_t *handle_get_info(proc_t *const p, const sys_args_t *args)
 		p->regs[REG_A0] = p->pid;
 		break;
 	case 1:
-		p->regs[REG_A0] = time_get();
+		p->regs[REG_A0] = rtc_time_get();
 		break;
 	case 2:
-		p->regs[REG_A0] = timeout_get(csrr(mhartid));
+		p->regs[REG_A0] = rtc_timeout_get(csrr(mhartid));
 		break;
 	default:
 		p->regs[REG_A0] = 0;
