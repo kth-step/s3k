@@ -18,8 +18,8 @@ void kprintf(int verb, const char *restrict fmt, ...)
 		return;
 
 #if NHART > 1
-	while (__atomic_fetch_or(&lock, 1, __ATOMIC_ACQUIRE))
-		;
+	while (__atomic_fetch_or(&lock, 1, __ATOMIC_ACQUIRE)) {
+	}
 #endif
 	va_list ap;
 	va_start(ap, fmt);

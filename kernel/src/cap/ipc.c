@@ -1,7 +1,6 @@
 #include "cap/ipc.h"
 
 #include "altc/string.h"
-#include "rtc.h"
 #include "cap/ops.h"
 #include "cap/table.h"
 #include "csr.h"
@@ -10,6 +9,7 @@
 #include "kernel.h"
 #include "macro.h"
 #include "proc.h"
+#include "rtc.h"
 
 #include <stdint.h>
 
