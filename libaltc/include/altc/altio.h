@@ -12,7 +12,7 @@ struct altfile {
 extern ALTFILE *const altin;
 extern ALTFILE *const altout;
 
-//void alt_finit(ALTFILE *f);
+// void alt_finit(ALTFILE *f);
 
 int alt_fputchar(int c, ALTFILE *f);
 int alt_fputstr(const char *s, ALTFILE *f);

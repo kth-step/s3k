@@ -77,7 +77,7 @@ typedef struct {
 	/** Process state. */
 	proc_state_t state;
 	/** The registers of the process (RISC-V registers and virtual
-	 * registers). */
+     * registers). */
 	uint64_t regs[REG_CNT];
 	/** PMP registers */
 	uint8_t pmpcfg[NPMP];
@@ -89,10 +89,10 @@ typedef struct {
 	/** Scheduling information */
 	uint64_t timeout;
 	/**
-	 * Minimum remaining time required for receiving messages.
-	 * If a client does not have sufficient execution time,
-	 * it is not allowed to send the message.
-	 */
+     * Minimum remaining time required for receiving messages.
+     * If a client does not have sufficient execution time,
+     * it is not allowed to send the message.
+     */
 	uint64_t serv_time;
 } proc_t;
 

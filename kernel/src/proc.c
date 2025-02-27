@@ -1,10 +1,10 @@
 /* See LICENSE file for copyright and license details. */
 #include "proc.h"
 
-#include "rtc.h"
 #include "cap/pmp.h"
 #include "csr.h"
 #include "kassert.h"
+#include "rtc.h"
 
 static proc_t procs[NPROC];
 extern unsigned char _payload[];

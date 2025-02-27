@@ -2,12 +2,12 @@
 
 #include "sched.h"
 
-#include "rtc.h"
 #include "csr.h"
 #include "kassert.h"
 #include "kernel.h"
 #include "kprintf.h"
 #include "proc.h"
+#include "rtc.h"
 #include "smp/semaphore.h"
 #include "trap.h"
 #include "wfi.h"

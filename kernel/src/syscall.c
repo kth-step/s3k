@@ -1,7 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 #include "syscall.h"
 
-#include "rtc.h"
 #include "cap/ipc.h"
 #include "cap/lock.h"
 #include "cap/monitor.h"
@@ -13,6 +12,7 @@
 #include "csr.h"
 #include "error.h"
 #include "kernel.h"
+#include "rtc.h"
 #include "sched.h"
 #include "trap.h"
 
@@ -187,6 +187,7 @@ proc_t *handle_get_info(proc_t *const p, const sys_args_t *args)
 		break;
 	default:
 		p->regs[REG_A0] = 0;
+		break;
 	}
 	p->regs[REG_T0] = SUCCESS;
 	return p;
