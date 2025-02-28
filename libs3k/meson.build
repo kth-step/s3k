@@ -9,5 +9,5 @@ s3k_lib = static_library(
   include_directories : incdirs)
 
 s3k_dep = declare_dependency(
-  link_with : altc_lib,
+  link_with : s3k_lib,
   include_directories : incdirs)
