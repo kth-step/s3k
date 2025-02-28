@@ -9,6 +9,9 @@ project('app0', 'c',
 altc = subproject('libaltc')
 altc_dep = altc.get_variable('altc_dep')
 
+s3k = subproject('libs3k')
+s3k_dep = s3k.get_variable('s3k_dep')
+
 subdir('src')
 incdir = include_directories('include')
 
@@ -37,7 +40,7 @@ elf = executable('app0.elf',
   include_directories : incdir,
   c_args : cross_c_args + c_args,
   link_args : cross_c_link_args + c_link_args,
-  dependencies : [altc_dep]
+  dependencies : [altc_dep, s3k_dep]
 )
 
 hex = custom_target(
