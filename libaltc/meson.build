@@ -1,4 +1,4 @@
-project('libaltc', 'c', version : '0.1')
+project('libaltc', 'c', version : '1.0')
 
 subdir('src')
 incdirs = include_directories('include')
