@@ -1,6 +1,5 @@
 #include "cap/ipc.h"
 
-#include "altc/string.h"
 #include "cap/ops.h"
 #include "cap/table.h"
 #include "csr.h"

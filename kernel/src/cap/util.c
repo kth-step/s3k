@@ -1,6 +1,5 @@
 #include "cap/util.h"
 
-#include "altc/altio.h"
 #include "kassert.h"
 
 cap_t cap_mk_time(hart_t hart, time_slot_t bgn, time_slot_t end)
@@ -79,6 +78,7 @@ cap_t cap_mk_socket(chan_t chan, ipc_mode_t mode, ipc_perm_t perm, uint32_t tag)
 	return cap;
 }
 
+/*
 void cap_snprint(char *restrict buf, size_t size, cap_t cap)
 {
 	switch (cap.type) {
@@ -124,6 +124,7 @@ void cap_snprint(char *restrict buf, size_t size, cap_t cap)
 		alt_snprintf(buf, size, "UNKNOWN{raw=0x%X}", cap.raw);
 	}
 }
+*/
 
 bool cap_is_valid(const cap_t cap)
 {

@@ -1,4 +1,4 @@
 #pragma once
 #include <stdbool.h>
 
-void kprintf(int verb, const char *restrict fmt, ...);
+void kprintf(const char *restrict fmt, ...);

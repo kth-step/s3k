@@ -28,9 +28,10 @@ void ctable_init(void)
 			continue;
 		cte_insert(&ctable[i], init_caps[i], prev);
 
+		/*
 		char buf[128];
-		cap_snprint(buf, 128, init_caps[i]);
-		kprintf(0, "#\t0x%x: %s\n", i, buf);
+		cap_snprint(buf, 128, init_caps[i]); */
+		kprintf(0, "#\t0x%x: %X\n", i, init_caps[i].raw);
 	}
 }
 
