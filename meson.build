@@ -34,16 +34,3 @@ elf = executable('s3k.elf',
   c_args : cross_c_args + c_args,
   link_args : cross_c_link_args + c_link_args,
 )
-
-hex = custom_target(
-  's3k.hex',
-  input : elf,
-  output : 's3k.hex',
-  command : [
-    find_program('riscv64-unknown-elf-objcopy'), 
-    '--output-target=ihex',
-    '@INPUT@', 
-    '@OUTPUT@'
-  ],
-  build_by_default : true
-)
