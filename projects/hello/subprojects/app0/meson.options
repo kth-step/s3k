@@ -1,8 +1,0 @@
-option('nproc', type : 'integer', min : 1, max : 64, value : 2, yield : true)
-option('nhart', type : 'integer', min : 1, max : 64, value : 1, yield : true)
-option('nslot', type : 'integer', min : 1, value : 32, yield : true)
-option('ntick', type : 'integer', min : 1, value : 1000, yield : true)
-option('npmp', type : 'integer', min : 1, value : 8, yield : true)
-option('nchan', type : 'integer', min : 1, value : 8, yield : true)
-option('ncap', type : 'integer', min : 1, value : 32, yield : true)
-option('platform', type : 'combo', choices : ['qemu_virt'], value : 'qemu_virt', yield : true)
