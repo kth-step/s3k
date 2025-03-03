@@ -24,7 +24,6 @@ c_args = [
 
 cross_c_link_args = get_option('c_link_args')
 c_link_args = [
-  '-nostdlib',
   '-nostartfiles',
   '-T', linker_script
 ]

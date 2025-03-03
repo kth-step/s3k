@@ -1,6 +1,5 @@
 #include "cap/table.h"
 
-#include "cap/init.h"
 #include "cap/util.h"
 #include "kassert.h"
 
@@ -18,20 +17,20 @@ static uint32_t offset(cte_t c)
 	return (uint32_t)(c - ctable);
 }
 
+extern cap_t cap_init(int i);
+
 void ctable_init(void)
 {
-	const cap_t init_caps[] = INIT_CAPS;
 	cte_t prev = ctable;
-	kprintf(0, "# Initial capabilities:\n");
-	for (unsigned int i = 0; i < ARRAY_SIZE(init_caps); ++i) {
-		if (init_caps[i].type == CAPTY_NONE)
-			continue;
-		cte_insert(&ctable[i], init_caps[i], prev);
-
-		/*
-		char buf[128];
-		cap_snprint(buf, 128, init_caps[i]); */
-		kprintf(0, "#\t0x%x: %X\n", i, init_caps[i].raw);
+	kprintf("# Initial capabilities:\n");
+	int i = 0;
+	while (true) {
+		cap_t cap = cap_init(i);
+		if (cap.raw == 0)
+			break;
+		cte_insert(&ctable[i], cap, prev);
+		kprintf("#\t0x%x: %X\n", i, cap.raw);
+		i++;
 	}
 }
 
