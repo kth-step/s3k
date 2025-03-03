@@ -1,31 +1,84 @@
 #include "kprintf.h"
 
-#include <altc/altio.h>
+#include "drivers/uart.h"
+
 #include <stdarg.h>
 
-#if defined(NDEBUG) || !defined(VERBOSITY)
-#undef VERBOSITY
-#define VERBOSITY 0
-#endif
+extern struct uart *const kout;
 
-#if NHART > 1
-static int lock = 0;
-#endif
-
-void kprintf(int verb, const char *restrict fmt, ...)
+static void _putchar(char c, struct uart *uart)
 {
-	if (verb > VERBOSITY)
-		return;
+	uart->putchar(c, uart);
+}
 
-#if NHART > 1
-	while (__atomic_fetch_or(&lock, 1, __ATOMIC_ACQUIRE)) {
+static void _putstr(char *s, struct uart *f)
+{
+	while (*s != '\0') {
+		_putchar(*s++, f);
 	}
-#endif
+}
+
+static void _puthex(unsigned long long x, struct uart *f)
+{
+	if (!x) {
+		_putchar('0', f);
+		return;
+	}
+
+	char hex[16];
+	int i = 0;
+	while (x) {
+		unsigned int h = x % 16;
+		if (h < 10)
+			hex[i++] = '0' + h;
+		else
+			hex[i++] = 'A' + h - 10;
+		x >>= 4;
+	}
+	while (i) {
+		_putchar(hex[--i], f);
+	}
+}
+
+static void _kprintf(const char *fmt, va_list ap, struct uart *f)
+{
+	while (*fmt != '\0') {
+		if (*fmt != '%') {
+			_putchar(*fmt, f);
+			fmt++;
+			continue;
+		}
+		fmt++;
+		if (*fmt == '\0')
+			break;
+		switch (*fmt) {
+		case 'x': {
+			unsigned int x = va_arg(ap, unsigned int);
+			_puthex(x, f);
+		} break;
+		case 'X': {
+			unsigned long long x = va_arg(ap, unsigned long long);
+			_puthex(x, f);
+		} break;
+		case 'c': {
+			char c = va_arg(ap, int);
+			_putchar(c, f);
+		} break;
+		case 's': {
+			char *s = va_arg(ap, char *);
+			_putstr(s, f);
+		} break;
+		default:
+			_putchar(*fmt, f);
+		}
+		fmt++;
+	}
+}
+
+void kprintf(const char *fmt, ...)
+{
 	va_list ap;
 	va_start(ap, fmt);
-	alt_vprintf(fmt, ap);
+	_kprintf(fmt, ap, kout);
 	va_end(ap);
-#if NHART > 1
-	__atomic_store_n(&lock, 0, __ATOMIC_RELEASE);
-#endif
 }

@@ -48,7 +48,7 @@ void sched_init(void)
 void sched_update(uint64_t pid, uint64_t end, uint64_t hart, uint64_t from,
 		  uint64_t to)
 {
-	kprintf(1, "# sched_update(pid=%D,end=%D,hart=%D,from=%D,to=%D)\n", pid,
+	kprintf("# sched_update(pid=%D,end=%D,hart=%D,from=%D,to=%D)\n", pid,
 		end, hart, from, to);
 #if NHART > 1
 	semaphore_acquire_n(&sched_semaphore, NHART);
@@ -66,7 +66,7 @@ void sched_update(uint64_t pid, uint64_t end, uint64_t hart, uint64_t from,
 
 void sched_delete(uint64_t hart, uint64_t from, uint64_t to)
 {
-	kprintf(1, "# sched_delete(hart=%D,from=%D,to=%D)\n", hart, from, to);
+	kprintf("# sched_delete(hart=%D,from=%D,to=%D)\n", hart, from, to);
 #if NHART > 1
 	semaphore_acquire_n(&sched_semaphore, NHART);
 #endif
@@ -127,7 +127,7 @@ static proc_t *sched_fetch(uint64_t hart, uint64_t slot)
 	}
 
 	// Get the process.
-	kprintf(2, "# sched(hart=%d,pid=%d,slot=%D)\n", hart, si.pid,
+	kprintf("# sched(hart=%d,pid=%d,slot=%D)\n", hart, si.pid,
 		slot % NSLOT);
 	proc->timeout = (slot + si.length) * NTICK;
 fail:
