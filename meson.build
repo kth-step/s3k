@@ -12,7 +12,6 @@ incdir = include_directories('include')
 
 subdir('platform' / get_option('platform'))
 
-cross_c_args = get_option('c_args')
 c_args = [
   '-DNPROC=' + get_option('nproc').to_string(),
   '-DNHART=' + get_option('nhart').to_string(),
@@ -23,8 +22,7 @@ c_args = [
   '-DNCAP=' + get_option('ncap').to_string(),
 ]
 
-cross_c_link_args = get_option('c_link_args')
-c_link_args = [
+link_args = [
   '-nostartfiles',
   '-T', linker_script
 ]
@@ -32,6 +30,6 @@ c_link_args = [
 elf = executable('s3k.elf', 
   sources : sources,
   include_directories : incdir,
-  c_args : cross_c_args + c_args,
-  link_args : cross_c_link_args + c_link_args,
+  c_args : c_args,
+  link_args : link_args,
 )
