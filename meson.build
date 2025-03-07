@@ -13,6 +13,7 @@ incdir = include_directories('include')
 subdir('platform' / get_option('platform'))
 
 c_args = [
+  '-ffreestanding',
   '-DNPROC=' + get_option('nproc').to_string(),
   '-DNHART=' + get_option('nhart').to_string(),
   '-DNSLOT=' + get_option('nslot').to_string(),
@@ -23,7 +24,9 @@ c_args = [
 ]
 
 link_args = [
-  '-nostartfiles',
+  '-ffreestanding',
+  '-nostdlib',
+  '-lgcc',
   '-T', linker_script
 ]
 
