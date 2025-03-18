@@ -55,7 +55,7 @@ void sched_update(uint64_t pid, uint64_t end, uint64_t hart, uint64_t from,
 	uint64_t mask = 0xFFFFull << offset;
 	for (uint64_t i = from; i < to; i++) {
 		slots[i] &= ~mask;
-		slots[i] |= ((pid << 8) | (end - i)) << offset;
+		slots[i] |= ((pid << 8) | end) << offset;
 	}
 #if NHART > 1
 	semaphore_release_n(&sched_semaphore, NHART);
@@ -78,9 +78,10 @@ void sched_delete(uint64_t hart, uint64_t from, uint64_t to)
 
 static slot_info_t slot_info_get(uint64_t hart, uint64_t slot)
 {
-	uint64_t entry = slots[slot % NSLOT] >> hart * 16;
+	slot = slot % NSLOT;
+	uint64_t entry = slots[slot] >> hart * 16;
 	uint64_t pid = (entry >> 8) & 0xFF;
-	uint64_t length = entry & 0xFF;
+	uint64_t length = (entry & 0xFF) - slot;
 	return (slot_info_t){.pid = pid, .length = length};
 }
 
@@ -143,8 +144,6 @@ proc_t *sched(void)
 
 	do {
 		slot = rtc_time_get() / NTICK;
-		while (rtc_time_get() < slot * NTICK)
-			;
 		// Try schedule process
 		proc = sched_fetch(hart, slot);
 	} while (!proc);
