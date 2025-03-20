@@ -18,8 +18,6 @@ sources = files(
   'cap/pmp.c',
   'cap/table.c',
   'cap/util.c',
-  'drivers/uart_ns16550a.c',
-  'drivers/uart_sifive.c',
   'smp/semaphore.c',
   'smp/taslock.c'
 )

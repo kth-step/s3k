@@ -1,10 +1,11 @@
 #include "cap/types.h"
 #include "cap/util.h"
-#include "drivers/uart.h"
+#include "serio/uart/ns16550a.h"
 
-const struct uart uart = UART_NS16550A(0x10000000);
+SERIOFILE _uartfile = SERIO_UART_NS16550A(0x10000000);
 
-struct uart *const kout = (struct uart *const)&uart;
+SERIOFILE *const _serio_out = &_uartfile;
+SERIOFILE *const _serio_in = &_uartfile;
 
 cap_t cap_init(int i)
 {

@@ -7,6 +7,8 @@ project('s3k', 'c',
     'optimization=s']
 )
 
+libserio_dep = subproject('libserio').get_variable('dep')
+
 subdir('src')
 incdir = include_directories('include')
 
@@ -35,4 +37,5 @@ elf = executable('s3k.elf',
   include_directories : incdir,
   c_args : c_args,
   link_args : link_args,
+  dependencies : [libserio_dep],
 )
