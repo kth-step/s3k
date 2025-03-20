@@ -1,27 +1,34 @@
 #include "rtc.h"
 
-#define MTIME_BASE_ADDR 0x200bff8ull
-#define MTIMECMP_BASE_ADDR 0x2004000ull
+// Define the base address of the CLINT peripheral
+extern uint64_t __base_clint[];
 
-static volatile uint64_t *const MTIME = (uint64_t *)MTIME_BASE_ADDR;
-static volatile uint64_t *const MTIMECMP = (uint64_t *)MTIMECMP_BASE_ADDR;
+// Define offsets for the mtime and mtimecmp registers
+#define CLINT_MTIME_OFFSET 0xBFF8
+#define CLINT_MTIMECMP_OFFSET 0x4000
+
+// Calculate the addresses of the mtime and mtimecmp registers
+static volatile uint64_t *const mtime
+    = (volatile uint64_t *)((uintptr_t)__base_clint + CLINT_MTIME_OFFSET);
+static volatile uint64_t *const mtimecmp
+    = (volatile uint64_t *)((uintptr_t)__base_clint + CLINT_MTIMECMP_OFFSET);
 
 uint64_t rtc_time_get(void)
 {
-	return MTIME[0];
+	return mtime[0];
 }
 
 void rtc_time_set(uint64_t time)
 {
-	MTIME[0] = time;
+	mtime[0] = time;
 }
 
 uint64_t rtc_timeout_get(uint64_t hartid)
 {
-	return MTIMECMP[hartid];
+	return mtimecmp[hartid];
 }
 
 void rtc_timeout_set(uint64_t hartid, uint64_t timeout)
 {
-	MTIMECMP[hartid] = timeout;
+	mtimecmp[hartid] = timeout;
 }

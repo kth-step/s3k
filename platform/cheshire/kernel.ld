@@ -6,13 +6,12 @@ _payload = ORIGIN(RAM) + LENGTH(RAM);
 
 __global_pointer$ = MIN(_sdata + 0x800, MAX(_data + 0x800, _end - 0x800));
 
-__base_uart = 0x10000000;
-__base_clint = 0x02000000;
+__base_uart  = 0x03002000;
+__base_clint = 0x02040000;
 
 MEMORY {
 	RAM (rwx) : ORIGIN = 0x80000000, LENGTH = 64K
 }
-
 
 SECTIONS {
 	.text : {
