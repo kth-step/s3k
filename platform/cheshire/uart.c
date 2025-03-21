@@ -1,4 +1,4 @@
-#include "serio/uart/ti16750.h"
+#include "serio/ti16750.h"
 
 extern void *__base_uart;
 
