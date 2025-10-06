@@ -1,0 +1,14 @@
+{
+    "name" : "riscv-picolibc",
+    "image" : "docker.io/hakarlsson/riscv-picolibc",
+    "customizations": {
+      "vscode": {
+        "extensions": [
+          "ms-vscode.cpptools",
+          "ms-vscode.cpptools-extension-pack",
+          "ms-vscode.makefile-tools",
+          "mesonbuild.mesonbuild"
+        ]
+      }
+    }
+}
