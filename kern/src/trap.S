@@ -19,29 +19,44 @@
 trap_entry:
 	csrrw	tp,mscratch,tp		// Swap the current PCB pointer with mscratch.
 
-	// Save caller-saved registers and process context into the PCB.
-	SREG	ra,PROC_RA(tp)	// Save return address.
-	SREG	sp,PROC_SP(tp)	// Save stack pointer.
-	SREG	gp,PROC_GP(tp)	// Save global pointer.
-	SREG	a0,PROC_A0(tp)	// Save register a0.
-	SREG	a1,PROC_A1(tp)	// Save register a1.
-	SREG	a2,PROC_A2(tp)	// Save register a2.
-	SREG	a3,PROC_A3(tp)	// Save register a3.
-	SREG	a4,PROC_A4(tp)	// Save register a4.
-	SREG	a5,PROC_A5(tp)	// Save register a5.
-	SREG	a6,PROC_A6(tp)	// Save register a6.
-	SREG	a7,PROC_A7(tp)	// Save register a7.
-	SREG	t0,PROC_T0(tp)	// Save register t0.
-	SREG	t1,PROC_T1(tp)	// Save register t1.
-	SREG	t2,PROC_T2(tp)	// Save register t2.
-	SREG	t3,PROC_T3(tp)	// Save register t3.
-	SREG	t4,PROC_T4(tp)	// Save register t4.
-	SREG	t5,PROC_T5(tp)	// Save register t5.
-	SREG	t6,PROC_T6(tp)	// Save register t6.
+	SREG	ra,PROC_RA(tp)		// Save return address.
+	SREG	sp,PROC_SP(tp)		// Save stack pointer.
+	SREG	gp,PROC_GP(tp)		// Save global pointer.
+	SREG	a0,PROC_A0(tp)		// Save register a0.
+	SREG	a1,PROC_A1(tp)		// Save register a1.
+	SREG	a2,PROC_A2(tp)		// Save register a2.
+	SREG	a3,PROC_A3(tp)		// Save register a3.
+	SREG	a4,PROC_A4(tp)		// Save register a4.
+	SREG	a5,PROC_A5(tp)		// Save register a5.
+	SREG	a6,PROC_A6(tp)		// Save register a6.
+	SREG	a7,PROC_A7(tp)		// Save register a7.
+	SREG	t0,PROC_T0(tp)		// Save register t0.
+	SREG	t1,PROC_T1(tp)		// Save register t1.
+	SREG	t2,PROC_T2(tp)		// Save register t2.
+	SREG	t3,PROC_T3(tp)		// Save register t3.
+	SREG	t4,PROC_T4(tp)		// Save register t4.
+	SREG	t5,PROC_T5(tp)		// Save register t5.
+	SREG	t6,PROC_T6(tp)		// Save register t6.
+	SREG	s0,PROC_S0(tp)		// Save register s0.
+	SREG	s1,PROC_S1(tp)		// Save register s1.
+	SREG	s2,PROC_S2(tp)		// Save register s2.
+	SREG	s3,PROC_S3(tp)		// Save register s3.
+	SREG	s4,PROC_S4(tp)		// Save register s4.
+	SREG	s5,PROC_S5(tp)		// Save register s5.
+	SREG	s6,PROC_S6(tp)		// Save register s6.
+	SREG	s7,PROC_S7(tp)		// Save register s7.
+	SREG	s8,PROC_S8(tp)		// Save register s8.
+	SREG	s9,PROC_S9(tp)		// Save register s9.
+	SREG	s10,PROC_S10(tp)	// Save register s10.
+	SREG	s11,PROC_S11(tp)	// Save register s11.
 
-	// Save trap cause and program counter into the PCB.
-	csrr	t0,mepc		// Load the program counter of the trapped instruction.
-	SREG	t0,PROC_PC(tp)	// Save program counter.
+	// Save program counter into the PCB.
+	csrr	t0,mepc			// Load the program counter of the trapped instruction.
+	SREG	t0,PROC_PC(tp)		// Save program counter.
+
+	csrr	t0,mscratch		// Get user tp.
+	SREG	t0,PROC_TP(tp)		// Save register tp.
+
 
 	// Set up global and stack pointers for the kernel.
 	.option push
@@ -75,22 +90,6 @@ _trap_switch:
 	// If the current process (a0) is the same as the next process (tp),
 	// jump directly to `trap_exit` without performing a context switch.
 	beq	a0,tp,trap_exit
-
-	// Save callee-saved registers into the Process Control Block (PCB) of the current process.
-	SREG	s0,PROC_S0(tp)		// Save register s0.
-	SREG	s1,PROC_S1(tp)		// Save register s1.
-	SREG	s2,PROC_S2(tp)		// Save register s2.
-	SREG	s3,PROC_S3(tp)		// Save register s3.
-	SREG	s4,PROC_S4(tp)		// Save register s4.
-	SREG	s5,PROC_S5(tp)		// Save register s5.
-	SREG	s6,PROC_S6(tp)		// Save register s6.
-	SREG	s7,PROC_S7(tp)		// Save register s7.
-	SREG	s8,PROC_S8(tp)		// Save register s8.
-	SREG	s9,PROC_S9(tp)		// Save register s9.
-	SREG	s10,PROC_S10(tp)	// Save register s10.
-	SREG	s11,PROC_S11(tp)	// Save register s11.
-	csrr	t0,mscratch
-	SREG	t0,PROC_TP(tp)		// Save register tp.
 
 	// Atomically update the process state to indicate it is no longer running.
 	// This ensures that the process state is updated safely in a multi-core environment.
@@ -128,29 +127,14 @@ trap_resume:
 	csrw	pmpaddr6,s6		// Write PMP address to pmpaddr6.
 	csrw	pmpaddr7,s7		// Write PMP address to pmpaddr7.
 
-	// Load user tp
-	LREG	t0,PROC_TP(tp)
-	csrw	mscratch,t0
-	// Restore callee-saved registers from the PCB.
-	LREG	s0,PROC_S0(tp)		// Restore register s0.
-	LREG	s1,PROC_S1(tp)		// Restore register s1.
-	LREG	s2,PROC_S2(tp)		// Restore register s2.
-	LREG	s3,PROC_S3(tp)		// Restore register s3.
-	LREG	s4,PROC_S4(tp)		// Restore register s4.
-	LREG	s5,PROC_S5(tp)		// Restore register s5.
-	LREG	s6,PROC_S6(tp)		// Restore register s6.
-	LREG	s7,PROC_S7(tp)		// Restore register s7.
-	LREG	s8,PROC_S8(tp)		// Restore register s8.
-	LREG	s9,PROC_S9(tp)		// Restore register s9.
-	LREG	s10,PROC_S10(tp)	// Restore register s10.
-	LREG	s11,PROC_S11(tp)	// Restore register s11.
 
 trap_exit:
 	// Restore trap context and return to the next instruction.
 	LREG	t0,PROC_PC(tp)		// Restore program counter.
 	csrw	mepc,t0			// Write program counter back to mepc.
 
-	// Restore caller-registers.
+	LREG	t0,PROC_TP(tp)		// Save user TP to mscratch.
+	csrw	mscratch,t0
 	LREG	ra,PROC_RA(tp)		// Restore return address.
 	LREG	sp,PROC_SP(tp)		// Restore stack pointer.
 	LREG	gp,PROC_GP(tp)		// Restore global pointer.
@@ -169,6 +153,18 @@ trap_exit:
 	LREG	t4,PROC_T4(tp)		// Restore register t4.
 	LREG	t5,PROC_T5(tp)		// Restore register t5.
 	LREG	t6,PROC_T6(tp)		// Restore register t6.
+	LREG	s0,PROC_S0(tp)		// Restore register s0.
+	LREG	s1,PROC_S1(tp)		// Restore register s1.
+	LREG	s2,PROC_S2(tp)		// Restore register s2.
+	LREG	s3,PROC_S3(tp)		// Restore register s3.
+	LREG	s4,PROC_S4(tp)		// Restore register s4.
+	LREG	s5,PROC_S5(tp)		// Restore register s5.
+	LREG	s6,PROC_S6(tp)		// Restore register s6.
+	LREG	s7,PROC_S7(tp)		// Restore register s7.
+	LREG	s8,PROC_S8(tp)		// Restore register s8.
+	LREG	s9,PROC_S9(tp)		// Restore register s9.
+	LREG	s10,PROC_S10(tp)	// Restore register s10.
+	LREG	s11,PROC_S11(tp)	// Restore register s11.
 
-	csrrw	tp,mscratch,tp		// Swap PCB pointer back with mscratch.
+	csrrw	tp,mscratch,tp		// Swap PCB pointer with mscratch (user tp).
 	mret				// Return from trap.
