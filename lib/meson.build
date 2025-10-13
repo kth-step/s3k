@@ -1,4 +1,4 @@
-lib_sources = files('src/syscall.c')
+lib_sources = files()
 
 lib_includes = include_directories('include')
 
