@@ -4,9 +4,9 @@ project(
     version: '0.1',
     meson_version: '>= 1.1.0',
     default_options: [
-        'warning_level=2',
-        'werror=true',  # Treat warnings as errors.
-        'c_std=gnu11',  # Use GNU11 standard for C.
+        'warning_level=2',      # -Wall -Wextra
+        'werror=true',          # -Werror
+        'c_std=gnu11',          # Use GNU11 standard for C.
         'b_ndebug=if-release',  # Disable assertions in release builds.
     ],
 )

@@ -18,20 +18,12 @@ kern_sources = files(
 kern_incdir = include_directories('include')
 
 kern_c_args = [
-    '-ffreestanding',  # Required for bare-metal environments.
-    '-flto',  # Enable link-time optimization.
-    '-fno-stack-protector',  # Disable stack protection for kernel code.
-    '-Wall',  # Enable all common warnings.
-    '-Wextra',  # Enable extra warnings.
-    '-Werror',  # Treat warnings as errors.
+    '-ffreestanding',   # Required for bare-metal environments.
 ]
 
 kern_link_args = [
-    '-ffreestanding',  # Required for bare-metal environments.
-    '-flto',  # Enable link-time optimization.
-    '-nostartfiles',  # Do not use standard startup files.
-    '-mrelax',  # Relax the architecture constraints.
-    '-lgcc',  # Link against GCC's runtime library.
+    '-nostdlib',        # Do not use standard startup or library files.
+    '-lgcc',            # Link against GCC's runtime library.
     '-Wl,--gc-sections',  # Remove unused sections.
     '-Wl,--no-warn-rwx-segments',  # Suppress RWX segment warnings.
 ]
