@@ -33,8 +33,11 @@ trap_entry:
 	SREG	a7,PROC_A7(tp)	// Save register a7.
 	SREG	t0,PROC_T0(tp)	// Save register t0.
 	SREG	t1,PROC_T1(tp)	// Save register t1.
-	SREG	t2,PROC_T2(tp)		// Save register t2.
-	SREG	t3,PROC_T3(tp)		// Save register t3.
+	SREG	t2,PROC_T2(tp)	// Save register t2.
+	SREG	t3,PROC_T3(tp)	// Save register t3.
+	SREG	t4,PROC_T4(tp)	// Save register t4.
+	SREG	t5,PROC_T5(tp)	// Save register t5.
+	SREG	t6,PROC_T6(tp)	// Save register t6.
 
 	// Save trap cause and program counter into the PCB.
 	csrr	t0,mepc		// Load the program counter of the trapped instruction.
@@ -86,9 +89,6 @@ _trap_switch:
 	SREG	s9,PROC_S9(tp)		// Save register s9.
 	SREG	s10,PROC_S10(tp)	// Save register s10.
 	SREG	s11,PROC_S11(tp)	// Save register s11.
-	SREG	t4,PROC_T4(tp)		// Save register t4.
-	SREG	t5,PROC_T5(tp)		// Save register t5.
-	SREG	t6,PROC_T6(tp)		// Save register t6.
 	csrr	t0,mscratch
 	SREG	t0,PROC_TP(tp)		// Save register tp.
 
@@ -144,9 +144,6 @@ trap_resume:
 	LREG	s9,PROC_S9(tp)		// Restore register s9.
 	LREG	s10,PROC_S10(tp)	// Restore register s10.
 	LREG	s11,PROC_S11(tp)	// Restore register s11.
-	LREG	t4,PROC_T4(tp)		// Restore register t4.
-	LREG	t5,PROC_T5(tp)		// Restore register t5.
-	LREG	t6,PROC_T6(tp)		// Restore register t6.
 
 trap_exit:
 	// Restore trap context and return to the next instruction.
@@ -168,7 +165,10 @@ trap_exit:
 	LREG	t0,PROC_T0(tp)		// Restore register t0.
 	LREG	t1,PROC_T1(tp)		// Restore register t1.
 	LREG	t2,PROC_T2(tp)		// Restore register t2.
-	LREG	t3,PROC_T3(tp)		// Restore register t4.
+	LREG	t3,PROC_T3(tp)		// Restore register t3.
+	LREG	t4,PROC_T4(tp)		// Restore register t4.
+	LREG	t5,PROC_T5(tp)		// Restore register t5.
+	LREG	t6,PROC_T6(tp)		// Restore register t6.
 
 	csrrw	tp,mscratch,tp		// Swap PCB pointer back with mscratch.
 	mret				// Return from trap.

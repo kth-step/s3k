@@ -24,9 +24,6 @@ kern_c_args = [
     '-Wall',  # Enable all common warnings.
     '-Wextra',  # Enable extra warnings.
     '-Werror',  # Treat warnings as errors.
-    '-fcall-saved-t4',
-    '-fcall-saved-t5',
-    '-fcall-saved-t6',
 ]
 
 kern_link_args = [
@@ -37,7 +34,4 @@ kern_link_args = [
     '-lgcc',  # Link against GCC's runtime library.
     '-Wl,--gc-sections',  # Remove unused sections.
     '-Wl,--no-warn-rwx-segments',  # Suppress RWX segment warnings.
-    '-fcall-saved-t4',
-    '-fcall-saved-t5',
-    '-fcall-saved-t6',
 ]
