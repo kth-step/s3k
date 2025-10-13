@@ -26,7 +26,6 @@ elf = executable(
     build_by_default: true,
 )
 
-
 lib = static_library(
     's3k',
     sources: lib_sources,
