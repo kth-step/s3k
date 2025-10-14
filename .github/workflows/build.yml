@@ -1,0 +1,21 @@
+name: CI Build 
+
+on: 
+  schedule:
+    - cron: "0 3 * * 0"
+  push:
+    branches: [ '**' ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    container:
+      image: hakarlsson/riscv-picolibc:latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup build environment
+        run: meson setup builddir --cross-file=build/rv64imac.ini
+      - name: Compile code
+        run: meson compile -C builddir -j 4
