@@ -16,6 +16,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Setup build environment
-        run: meson setup builddir --cross-file=build/rv64imac.ini
+        run: meson setup builddir --cross-file=cross/rv64imac.ini
       - name: Compile code
         run: meson compile -C builddir -j 4
