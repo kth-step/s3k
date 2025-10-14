@@ -1,9 +1,11 @@
 #include "s3k.h"
+
 #include <stdio.h>
 
 extern char __uart_base[]; // UART base address
 
-void mem_init(s3k_word_t mon_idx, s3k_word_t idx, s3k_word_t slot, s3k_word_t cfree, s3k_word_t perm, s3k_word_t base, s3k_word_t size)
+void mem_init(s3k_word_t mon_idx, s3k_word_t idx, s3k_word_t slot, s3k_word_t cfree, s3k_word_t perm, s3k_word_t base,
+	      s3k_word_t size)
 {
 	idx = s3k_mon_mem_derive(mon_idx, idx, cfree, perm, base, size);
 	if (idx < 0) {
@@ -21,8 +23,8 @@ void mem_init(s3k_word_t mon_idx, s3k_word_t idx, s3k_word_t slot, s3k_word_t cf
 
 void app2_init(void)
 {
-	int mon_idx = 8; // Monitor index
-	int ram_idx = 0; // RAM index
+	int mon_idx = 8;   // Monitor index
+	int ram_idx = 0;   // RAM index
 	int uart_idx = 16; // UART index
 
 	// RAM configuration

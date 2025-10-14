@@ -52,7 +52,7 @@ static proc_t *syscall_sleep_until(pid_t pid, word_t args[8])
  */
 static proc_t *syscall_mem_get(pid_t pid, word_t args[8])
 {
-	args[0] = mem_get(pid, args[1], (mem_t*)&args[1]);
+	args[0] = mem_get(pid, args[1], (mem_t *)&args[1]);
 	return current;
 }
 
@@ -61,7 +61,7 @@ static proc_t *syscall_mem_get(pid_t pid, word_t args[8])
  */
 static proc_t *syscall_tsl_get(pid_t pid, word_t args[8])
 {
-	args[0] = tsl_get(pid, args[1], (tsl_t*)&args[1]);
+	args[0] = tsl_get(pid, args[1], (tsl_t *)&args[1]);
 	return current;
 }
 
@@ -70,7 +70,7 @@ static proc_t *syscall_tsl_get(pid_t pid, word_t args[8])
  */
 static proc_t *syscall_mon_get(pid_t pid, word_t args[8])
 {
-	args[0] = mon_get(pid, args[1], (mon_t*)&args[1]);
+	args[0] = mon_get(pid, args[1], (mon_t *)&args[1]);
 	return current;
 }
 
@@ -79,7 +79,7 @@ static proc_t *syscall_mon_get(pid_t pid, word_t args[8])
  */
 static proc_t *syscall_ipc_get(pid_t pid, word_t args[8])
 {
-	args[0] = ipc_get(pid, args[1], (ipc_t*)&args[1]);
+	args[0] = ipc_get(pid, args[1], (ipc_t *)&args[1]);
 	return current;
 }
 
@@ -261,7 +261,7 @@ static proc_t *syscall_mon_yield(pid_t pid, word_t args[8])
 	return next;
 }
 
-/** 
+/**
  * Set a register of the process being monitored by the specified monitor capability.
  */
 static proc_t *syscall_mon_reg_set(pid_t pid, word_t args[8])
@@ -289,7 +289,7 @@ static proc_t *syscall_mon_tsl_get(pid_t pid, word_t args[8])
 	pid_t target = mon_get_pid(pid, args[1]);
 	args[0] = ERR_INVALID_ACCESS;
 	if (target != INVALID_PID) {
-		args[0] = tsl_get(target, args[2], (tsl_t*)&args[1]);
+		args[0] = tsl_get(target, args[2], (tsl_t *)&args[1]);
 	}
 	return current;
 }
@@ -302,7 +302,7 @@ static proc_t *syscall_mon_mem_get(pid_t pid, word_t args[8])
 	pid_t target = mon_get_pid(pid, args[1]);
 	args[0] = ERR_INVALID_ACCESS;
 	if (target != INVALID_PID) {
-		args[0] = mem_get(target, args[2], (mem_t*)&args[1]);
+		args[0] = mem_get(target, args[2], (mem_t *)&args[1]);
 	}
 	return current;
 }
@@ -315,7 +315,7 @@ static proc_t *syscall_mon_mon_get(pid_t pid, word_t args[8])
 	pid_t target = mon_get_pid(pid, args[1]);
 	args[0] = ERR_INVALID_ACCESS;
 	if (target != INVALID_PID) {
-		args[0] = mon_get(target, args[2], (mon_t*)&args[1]);
+		args[0] = mon_get(target, args[2], (mon_t *)&args[1]);
 	}
 	return current;
 }
@@ -328,7 +328,7 @@ static proc_t *syscall_mon_ipc_get(pid_t pid, word_t args[8])
 	pid_t target = mon_get_pid(pid, args[1]);
 	args[0] = ERR_INVALID_ACCESS;
 	if (target != INVALID_PID) {
-		args[0] = ipc_get(target, args[2], (ipc_t*)&args[1]);
+		args[0] = ipc_get(target, args[2], (ipc_t *)&args[1]);
 	}
 	return current;
 }
@@ -539,7 +539,7 @@ static proc_t *syscall_ipc_reply(pid_t pid, word_t args[8])
 }
 
 /**
- * Send a reply for an IPC call, then atomically wait to receive an IPC message. 
+ * Send a reply for an IPC call, then atomically wait to receive an IPC message.
  */
 static proc_t *syscall_ipc_replyrecv(pid_t pid, word_t args[8])
 {

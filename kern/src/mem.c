@@ -141,10 +141,9 @@ int mem_revoke(pid_t owner, index_t i)
 	if (UNLIKELY(!mem_valid_access(owner, i))) {
 		return ERR_INVALID_ACCESS;
 	}
- 
+
 	// Revoke the child capabilities.
 	while (mem_table[i].cfree < mem_table[i].csize) {
-
 		// Get the next child capability index.
 		index_t j = i + mem_table[i].cfree;
 

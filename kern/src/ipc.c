@@ -376,7 +376,6 @@ int ipc_reply(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, 
  */
 int ipc_replyrecv(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, proc_t **next)
 {
-
 	if (!_ipc_invoke_valid_access(owner, i, IPC_MODE_BSYNC, true)) {
 		return ERR_INVALID_ACCESS;
 	}
@@ -386,7 +385,6 @@ int ipc_replyrecv(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t
 	}
 
 	proc_t *sender = *next;
-
 
 	// Set next to null by default.
 	*next = NULL;

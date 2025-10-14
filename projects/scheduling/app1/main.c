@@ -1,5 +1,6 @@
-#include <stdio.h>
 #include "s3k_inline.h"
+
+#include <stdio.h>
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -21,10 +22,11 @@ volatile uint64_t rdcycle(void)
 
 #ifdef RAND
 
-int rand(void) {
-    static uint32_t prng_state = 123456789; // Seed value
-    prng_state = prng_state * 1103515245 + 12345;
-    return (prng_state >> 16) & 0x7FFF;
+int rand(void)
+{
+	static uint32_t prng_state = 123456789; // Seed value
+	prng_state = prng_state * 1103515245 + 12345;
+	return (prng_state >> 16) & 0x7FFF;
 }
 
 uint64_t test_round(int tsls, int ts)
@@ -89,7 +91,7 @@ void test(int rounds, int tsls, int ts)
 	s3k_sleep_until(0);
 
 	// Do a 10 warm-up rounds first.
-	uint64_t res[ROUNDS+10];
+	uint64_t res[ROUNDS + 10];
 	for (int i = 0; i < ROUNDS + 10; i++) {
 		res[i] = test_round(tsls, ts);
 	}

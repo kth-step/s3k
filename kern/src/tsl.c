@@ -86,7 +86,6 @@ int tsl_get(pid_t owner, index_t i, tsl_t *time_cap)
  */
 int tsl_derive(pid_t owner, index_t i, pid_t target, fuel_t csize, bool enable, time_slot_t size)
 {
-
 	if (UNLIKELY(!tsl_valid_access(owner, i))) {
 		return ERR_INVALID_ACCESS;
 	}

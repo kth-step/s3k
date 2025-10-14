@@ -124,7 +124,8 @@ static inline int s3k_ipc_get(s3k_index_t i, s3k_cap_ipc_t *cap)
 	return a0;
 }
 
-static inline int s3k_mem_derive(s3k_index_t i, s3k_fuel_t csize, s3k_mem_perm_t perm, s3k_mem_addr_t base, s3k_mem_addr_t size)
+static inline int s3k_mem_derive(s3k_index_t i, s3k_fuel_t csize, s3k_mem_perm_t perm, s3k_mem_addr_t base,
+				 s3k_mem_addr_t size)
 {
 	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MEM_DERIVE;
 	register s3k_word_t a1 __asm__("a1") = i;
@@ -399,8 +400,8 @@ static inline int s3k_mon_ipc_grant(s3k_index_t i, s3k_index_t j)
 	return a0;
 }
 
-static inline int s3k_mon_mem_derive(s3k_index_t i, s3k_index_t j, s3k_fuel_t csize, s3k_mem_perm_t perm, s3k_mem_addr_t base,
-		       s3k_mem_addr_t size)
+static inline int s3k_mon_mem_derive(s3k_index_t i, s3k_index_t j, s3k_fuel_t csize, s3k_mem_perm_t perm,
+				     s3k_mem_addr_t base, s3k_mem_addr_t size)
 {
 	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_MEM_DERIVE;
 	register s3k_word_t a1 __asm__("a1") = i;
@@ -435,7 +436,8 @@ static inline int s3k_mon_mon_derive(s3k_index_t i, s3k_index_t j, s3k_fuel_t cs
 	return a0;
 }
 
-static inline int s3k_mon_ipc_derive(s3k_index_t i, s3k_index_t j, s3k_fuel_t csize, s3k_ipc_mode_t mode, s3k_ipc_flag_t flag)
+static inline int s3k_mon_ipc_derive(s3k_index_t i, s3k_index_t j, s3k_fuel_t csize, s3k_ipc_mode_t mode,
+				     s3k_ipc_flag_t flag)
 {
 	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_IPC_DERIVE;
 	register s3k_word_t a1 __asm__("a1") = i;
@@ -447,7 +449,8 @@ static inline int s3k_mon_ipc_derive(s3k_index_t i, s3k_index_t j, s3k_fuel_t cs
 	return a0;
 }
 
-static inline int s3k_mon_mem_pmp_get(s3k_index_t i, s3k_index_t j, s3k_pmp_slot_t *slot, s3k_mem_perm_t *perm, s3k_pmp_addr_t *addr)
+static inline int s3k_mon_mem_pmp_get(s3k_index_t i, s3k_index_t j, s3k_pmp_slot_t *slot, s3k_mem_perm_t *perm,
+				      s3k_pmp_addr_t *addr)
 {
 	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_MEM_PMP_GET;
 	register s3k_word_t a1 __asm__("a1") = i;
@@ -460,7 +463,8 @@ static inline int s3k_mon_mem_pmp_get(s3k_index_t i, s3k_index_t j, s3k_pmp_slot
 	return a0;
 }
 
-static inline int s3k_mon_mem_pmp_set(s3k_index_t i, s3k_index_t j, s3k_pmp_slot_t slot, s3k_mem_perm_t perm, s3k_pmp_addr_t addr)
+static inline int s3k_mon_mem_pmp_set(s3k_index_t i, s3k_index_t j, s3k_pmp_slot_t slot, s3k_mem_perm_t perm,
+				      s3k_pmp_addr_t addr)
 {
 	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_MEM_PMP_SET;
 	register s3k_word_t a1 __asm__("a1") = i;

@@ -1,9 +1,11 @@
 #include "s3k.h"
+
 #include <stdio.h>
 
 extern char __uart_base[]; // UART base address
 
-static bool mem_init(s3k_word_t mon_idx, s3k_word_t idx, s3k_word_t slot, s3k_word_t cfree, s3k_word_t perm, s3k_word_t base, s3k_word_t size)
+static bool mem_init(s3k_word_t mon_idx, s3k_word_t idx, s3k_word_t slot, s3k_word_t cfree, s3k_word_t perm,
+		     s3k_word_t base, s3k_word_t size)
 {
 	// Derive a memory capability
 	idx = s3k_mon_mem_derive(mon_idx, idx, cfree, perm, base, size);
@@ -29,7 +31,7 @@ static bool mem_init(s3k_word_t mon_idx, s3k_word_t idx, s3k_word_t slot, s3k_wo
 void proc_init(s3k_word_t mon_idx, int ram_idx, s3k_word_t ram_base, s3k_word_t ram_size)
 {
 	// Indices for memory regions
-	int uart_idx = 16;  // UART index
+	int uart_idx = 16; // UART index
 
 	// RAM configuration parameters
 	s3k_word_t ram_perm = S3K_MEM_PERM_RWX; // Read/Write/Execute permissions
@@ -60,5 +62,4 @@ void proc_init(s3k_word_t mon_idx, int ram_idx, s3k_word_t ram_base, s3k_word_t 
 		printf("Failed to set program counter to RAM start\n");
 		return;
 	}
-
 }

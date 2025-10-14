@@ -8,7 +8,7 @@ extern void temporal_fence(void);
 
 // Structure representing a scheduling frame (time slot) for a process
 typedef struct frame {
-	uint16_t pid;    // Process ID assigned to this slot
+	uint16_t pid;	 // Process ID assigned to this slot
 	uint16_t length; // Length of the slot in time units
 } frame_t;
 

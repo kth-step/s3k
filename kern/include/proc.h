@@ -33,7 +33,7 @@ typedef struct proc {
 	} trap;
 
 	uint64_t timeout; ///< Timeout for the process, used for scheduling.
-	word_t pid; ///< Process ID.
+	word_t pid;	  ///< Process ID.
 } __attribute__((aligned(sizeof(word_t)))) proc_t;
 
 /**
