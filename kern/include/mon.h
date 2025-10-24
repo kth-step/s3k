@@ -117,13 +117,22 @@ int mon_resume(pid_t owner, index_t i);
 int mon_yield(pid_t owner, index_t i, proc_t **next);
 
 /**
+ * Get the register value for the monitored process.
+ */
+int mon_reg_get(pid_t owner, index_t i, word_t reg, word_t *value);
+/**
  * Set the register value for the monitored process.
  */
 int mon_reg_set(pid_t owner, index_t i, word_t reg, word_t value);
 
 /**
- * Get the register value for the monitored process.
+ * Get the virtual register value for the monitored process.
  */
-int mon_reg_get(pid_t owner, index_t i, word_t reg, word_t *value);
+int mon_vreg_get(pid_t owner, index_t i, vreg_t reg, word_t *value);
+
+/**
+ * Set the virtual register value for the monitored process.
+ */
+int mon_vreg_set(pid_t owner, index_t i, vreg_t reg, word_t value);
 
 #endif // CAP_MON_H

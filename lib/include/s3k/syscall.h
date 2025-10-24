@@ -32,8 +32,10 @@ enum {
 	S3K_SYSCALL_MON_SUSPEND,
 	S3K_SYSCALL_MON_RESUME,
 	S3K_SYSCALL_MON_YIELD,
-	S3K_SYSCALL_MON_REG_SET,
 	S3K_SYSCALL_MON_REG_GET,
+	S3K_SYSCALL_MON_REG_SET,
+	S3K_SYSCALL_MON_VREG_GET,
+	S3K_SYSCALL_MON_VREG_SET,
 	S3K_SYSCALL_MON_MEM_GET,
 	S3K_SYSCALL_MON_TSL_GET,
 	S3K_SYSCALL_MON_MON_GET,
@@ -315,6 +317,16 @@ static inline int s3k_mon_yield(s3k_index_t i)
 	return a0;
 }
 
+static inline int s3k_mon_reg_get(s3k_index_t i, s3k_reg_t reg, s3k_word_t *value)
+{
+	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_REG_GET;
+	register s3k_word_t a1 __asm__("a1") = i;
+	register s3k_word_t a2 __asm__("a2") = reg;
+	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1) : "r"(a2));
+	*value = a1;
+	return a0;
+}
+
 static inline int s3k_mon_reg_set(s3k_index_t i, s3k_reg_t reg, s3k_word_t value)
 {
 	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_REG_SET;
@@ -325,13 +337,23 @@ static inline int s3k_mon_reg_set(s3k_index_t i, s3k_reg_t reg, s3k_word_t value
 	return a0;
 }
 
-static inline int s3k_mon_reg_get(s3k_index_t i, s3k_reg_t reg, s3k_word_t *value)
+static inline int s3k_mon_vreg_get(s3k_index_t i, s3k_vreg_t reg, s3k_word_t *value)
 {
-	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_REG_GET;
+	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_VREG_GET;
 	register s3k_word_t a1 __asm__("a1") = i;
 	register s3k_word_t a2 __asm__("a2") = reg;
 	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1) : "r"(a2));
 	*value = a1;
+	return a0;
+}
+
+static inline int s3k_mon_vreg_set(s3k_index_t i, s3k_vreg_t reg, s3k_word_t value)
+{
+	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_VREG_SET;
+	register s3k_word_t a1 __asm__("a1") = i;
+	register s3k_word_t a2 __asm__("a2") = reg;
+	register s3k_word_t a3 __asm__("a3") = value;
+	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1), "r"(a2), "r"(a3));
 	return a0;
 }
 

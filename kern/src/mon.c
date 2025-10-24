@@ -186,6 +186,26 @@ int mon_yield(pid_t owner, index_t i, proc_t **next)
 }
 
 /**
+ * Gets a register value for the process associated with the monitor capability.
+ */
+
+int mon_reg_get(pid_t owner, index_t i, word_t reg, word_t *value)
+{
+	if (UNLIKELY(!mon_valid_access(owner, i))) {
+		return ERR_INVALID_ACCESS;
+	}
+
+	if (reg >= 32) {
+		return ERR_INVALID_ARGUMENT; // Invalid register index.
+	}
+
+	proc_t *proc = proc_get(mon_table[i].pid);
+	word_t *reg_ptr = (word_t *)&proc->regs;
+	*value = reg_ptr[reg];
+	return ERR_SUCCESS;
+}
+
+/**
  * Sets a register value for the process associated with the monitor capability.
  */
 int mon_reg_set(pid_t owner, index_t i, word_t reg, word_t value)
@@ -205,20 +225,79 @@ int mon_reg_set(pid_t owner, index_t i, word_t reg, word_t value)
 }
 
 /**
- * Gets a register value for the process associated with the monitor capability.
+ * Gets a virtual register value for the process associated with the monitor capability.
  */
-int mon_reg_get(pid_t owner, index_t i, word_t reg, word_t *value)
+int mon_vreg_get(pid_t owner, index_t i, vreg_t reg, word_t *value)
 {
 	if (UNLIKELY(!mon_valid_access(owner, i))) {
 		return ERR_INVALID_ACCESS;
 	}
 
-	if (reg >= 32) {
-		return ERR_INVALID_ARGUMENT; // Invalid register index.
+	proc_t *proc = proc_get(mon_table[i].pid);
+
+	switch (reg) {
+	case VREG_TPC:
+		*value = proc->trap.tpc;
+		return ERR_SUCCESS;
+		break;
+	case VREG_TSP:
+		*value = proc->trap.tsp;
+		return ERR_SUCCESS;
+		break;
+	case VREG_ECAUSE:
+		*value = proc->trap.ecause;
+		return ERR_SUCCESS;
+		break;
+	case VREG_EVAL:
+		*value = proc->trap.eval;
+		;
+		return ERR_SUCCESS;
+		break;
+	case VREG_EPC:
+		*value = proc->trap.epc;
+		return ERR_SUCCESS;
+		break;
+	case VREG_ESP:
+		*value = proc->trap.esp;
+		return ERR_SUCCESS;
+		break;
+	default:
+		*value = 0;
+		return ERR_INVALID_ARGUMENT;
+	}
+}
+
+/**
+ * Sets a virtual register value for the process associated with the monitor capability.
+ */
+int mon_vreg_set(pid_t owner, index_t i, vreg_t reg, word_t value)
+{
+	if (UNLIKELY(!mon_valid_access(owner, i))) {
+		return ERR_INVALID_ACCESS;
 	}
 
 	proc_t *proc = proc_get(mon_table[i].pid);
-	word_t *reg_ptr = (word_t *)&proc->regs;
-	*value = reg_ptr[reg];
-	return ERR_SUCCESS;
+
+	switch (reg) {
+	case VREG_TPC:
+		proc->trap.tpc = value;
+		return ERR_SUCCESS;
+	case VREG_TSP:
+		proc->trap.tsp = value;
+		return ERR_SUCCESS;
+	case VREG_ECAUSE:
+		proc->trap.ecause = value;
+		return ERR_SUCCESS;
+	case VREG_EVAL:
+		proc->trap.eval = value;
+		return ERR_SUCCESS;
+	case VREG_EPC:
+		proc->trap.epc = value;
+		return ERR_SUCCESS;
+	case VREG_ESP:
+		proc->trap.esp = value;
+		return ERR_SUCCESS;
+	default:
+		return ERR_INVALID_ARGUMENT;
+	}
 }

@@ -24,6 +24,9 @@ static proc_t *syscall_get_pid(pid_t pid, word_t args[8])
 	return current;
 }
 
+/**
+ * Get a virtual register of the current process.
+ */
 static proc_t *syscall_get_vreg(pid_t pid, word_t args[8])
 {
 	(void)pid;
@@ -53,6 +56,9 @@ static proc_t *syscall_get_vreg(pid_t pid, word_t args[8])
 	return current;
 }
 
+/**
+ * Set a virtual register of the current process.
+ */
 static proc_t *syscall_set_vreg(pid_t pid, word_t args[8])
 {
 	(void)pid;
@@ -319,6 +325,17 @@ static proc_t *syscall_mon_yield(pid_t pid, word_t args[8])
 }
 
 /**
+ * Get a register value of the process being monitored by the specified monitor capability.
+ */
+static proc_t *syscall_mon_reg_get(pid_t pid, word_t args[8])
+{
+	word_t value;
+	args[0] = mon_reg_get(pid, args[1], args[2], &value);
+	args[1] = value;
+	return current;
+}
+
+/**
  * Set a register of the process being monitored by the specified monitor capability.
  */
 static proc_t *syscall_mon_reg_set(pid_t pid, word_t args[8])
@@ -328,13 +345,22 @@ static proc_t *syscall_mon_reg_set(pid_t pid, word_t args[8])
 }
 
 /**
- * Get a register value of the process being monitored by the specified monitor capability.
+ * Get a virtual register value of the process being monitored by the specified monitor capability.
  */
-static proc_t *syscall_mon_reg_get(pid_t pid, word_t args[8])
+static proc_t *syscall_mon_vreg_get(pid_t pid, word_t args[8])
 {
 	word_t value;
-	args[0] = mon_reg_get(pid, args[1], args[2], &value);
+	args[0] = mon_vreg_get(pid, args[1], args[2], &value);
 	args[1] = value;
+	return current;
+}
+
+/**
+ * Set a virtual register of the process being monitored by the specified monitor capability.
+ */
+static proc_t *syscall_mon_vreg_set(pid_t pid, word_t args[8])
+{
+	args[0] = mon_vreg_set(pid, args[1], args[2], args[3]);
 	return current;
 }
 
@@ -637,20 +663,20 @@ typedef proc_t *(*handler_t)(pid_t pid, word_t args[8]);
  * Handlers for individual system calls.
  */
 handler_t handlers[] = {
-	syscall_get_pid,	   syscall_get_vreg,	   syscall_set_vreg,	    syscall_sync,
-	syscall_sleep_until,	   syscall_mem_get,	   syscall_tsl_get,	    syscall_mon_get,
-	syscall_ipc_get,	   syscall_mem_derive,	   syscall_tsl_derive,	    syscall_mon_derive,
-	syscall_ipc_derive,	   syscall_mem_revoke,	   syscall_tsl_revoke,	    syscall_mon_revoke,
-	syscall_ipc_revoke,	   syscall_mem_delete,	   syscall_tsl_delete,	    syscall_mon_delete,
-	syscall_ipc_delete,	   syscall_mem_pmp_get,	   syscall_mem_pmp_set,	    syscall_mem_pmp_clear,
-	syscall_tsl_set,	   syscall_mon_suspend,	   syscall_mon_resume,	    syscall_mon_yield,
-	syscall_mon_reg_set,	   syscall_mon_reg_get,	   syscall_mon_mem_get,	    syscall_mon_tsl_get,
-	syscall_mon_mon_get,	   syscall_mon_ipc_get,	   syscall_mon_mem_grant,   syscall_mon_tsl_grant,
-	syscall_mon_mon_grant,	   syscall_mon_ipc_grant,  syscall_mon_mem_derive,  syscall_mon_tsl_derive,
-	syscall_mon_mon_derive,	   syscall_mon_ipc_derive, syscall_mon_mem_pmp_get, syscall_mon_mem_pmp_set,
-	syscall_mon_mem_pmp_clear, syscall_mon_tsl_set,	   syscall_ipc_send,	    syscall_ipc_recv,
-	syscall_ipc_call,	   syscall_ipc_reply,	   syscall_ipc_replyrecv,   syscall_ipc_asend,
-	syscall_ipc_arecv,
+	syscall_get_pid,	 syscall_get_vreg,	  syscall_set_vreg,	     syscall_sync,
+	syscall_sleep_until,	 syscall_mem_get,	  syscall_tsl_get,	     syscall_mon_get,
+	syscall_ipc_get,	 syscall_mem_derive,	  syscall_tsl_derive,	     syscall_mon_derive,
+	syscall_ipc_derive,	 syscall_mem_revoke,	  syscall_tsl_revoke,	     syscall_mon_revoke,
+	syscall_ipc_revoke,	 syscall_mem_delete,	  syscall_tsl_delete,	     syscall_mon_delete,
+	syscall_ipc_delete,	 syscall_mem_pmp_get,	  syscall_mem_pmp_set,	     syscall_mem_pmp_clear,
+	syscall_tsl_set,	 syscall_mon_suspend,	  syscall_mon_resume,	     syscall_mon_yield,
+	syscall_mon_vreg_get,	 syscall_mon_vreg_set,	  syscall_mon_reg_get,	     syscall_mon_reg_set,
+	syscall_mon_mem_get,	 syscall_mon_tsl_get,	  syscall_mon_mon_get,	     syscall_mon_ipc_get,
+	syscall_mon_mem_grant,	 syscall_mon_tsl_grant,	  syscall_mon_mon_grant,     syscall_mon_ipc_grant,
+	syscall_mon_mem_derive,	 syscall_mon_tsl_derive,  syscall_mon_mon_derive,    syscall_mon_ipc_derive,
+	syscall_mon_mem_pmp_get, syscall_mon_mem_pmp_set, syscall_mon_mem_pmp_clear, syscall_mon_tsl_set,
+	syscall_ipc_send,	 syscall_ipc_recv,	  syscall_ipc_call,	     syscall_ipc_reply,
+	syscall_ipc_replyrecv,	 syscall_ipc_asend,	  syscall_ipc_arecv,
 };
 
 /**
