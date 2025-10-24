@@ -1,6 +1,8 @@
 {
     "name" : "riscv-picolibc",
-    "image" : "docker.io/hakarlsson/riscv-picolibc",
+    "build" : {
+      "dockerfile": "Dockerfile"
+    },
     "customizations": {
       "vscode": {
         "extensions": [
