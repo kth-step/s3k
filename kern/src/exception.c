@@ -27,10 +27,12 @@ enum exception_cause {
  */
 proc_t *_handle_mret(void)
 {
-	current->regs.pc = current->trap.mepc;
-	current->trap.mcause = 0;
-	current->trap.mtval = 0;
-	current->trap.mepc = 0;
+	current->regs.pc = current->trap.epc;
+	current->regs.sp = current->trap.esp;
+	current->trap.ecause = 0;
+	current->trap.eval = 0;
+	current->trap.epc = 0;
+	current->trap.esp = 0;
 	return current;
 }
 
@@ -39,10 +41,14 @@ proc_t *_handle_mret(void)
  */
 proc_t *_handle_delegate(word_t cause, word_t tval)
 {
-	current->trap.mcause = cause;
-	current->trap.mtval = tval;
-	current->trap.mepc = current->regs.pc;
-	current->regs.pc = current->trap.mtvec;
+	// Records the exception information
+	current->trap.ecause = cause;
+	current->trap.eval = tval;
+	current->trap.epc = current->regs.pc;
+	current->trap.esp = current->regs.sp;
+	// Sets the PC and SP to the trap handler
+	current->regs.pc = current->trap.tpc;
+	current->regs.sp = current->trap.tsp;
 	return current;
 }
 

@@ -24,6 +24,63 @@ static proc_t *syscall_get_pid(pid_t pid, word_t args[8])
 	return current;
 }
 
+static proc_t *syscall_get_vreg(pid_t pid, word_t args[8])
+{
+	(void)pid;
+	switch (args[1]) {
+	case VREG_TPC:
+		args[0] = current->trap.tpc;
+		break;
+	case VREG_TSP:
+		args[0] = current->trap.tsp;
+		break;
+	case VREG_ECAUSE:
+		args[0] = current->trap.ecause;
+		break;
+	case VREG_EVAL:
+		args[0] = current->trap.eval;
+		break;
+	case VREG_EPC:
+		args[0] = current->trap.epc;
+		break;
+	case VREG_ESP:
+		args[0] = current->trap.esp;
+		break;
+	default:
+		args[0] = 0;
+		break;
+	}
+	return current;
+}
+
+static proc_t *syscall_set_vreg(pid_t pid, word_t args[8])
+{
+	(void)pid;
+	switch (args[1]) {
+	case VREG_TPC:
+		current->trap.tpc = args[2];
+		break;
+	case VREG_TSP:
+		current->trap.tsp = args[2];
+		break;
+	case VREG_ECAUSE:
+		current->trap.ecause = args[2];
+		break;
+	case VREG_EVAL:
+		current->trap.eval = args[2];
+		break;
+	case VREG_EPC:
+		current->trap.epc = args[2];
+		break;
+	case VREG_ESP:
+		current->trap.esp = args[2];
+		break;
+	default:
+		break;
+	}
+	return current;
+}
+
 /**
  * Release the process, then call the scheduler.
  */
@@ -580,7 +637,8 @@ typedef proc_t *(*handler_t)(pid_t pid, word_t args[8]);
  * Handlers for individual system calls.
  */
 handler_t handlers[] = {
-	syscall_get_pid,	   syscall_sync,
+	syscall_get_pid,	   syscall_get_vreg,
+	syscall_set_vreg,	   syscall_sync,
 	syscall_sleep_until,	   syscall_mem_get,
 	syscall_tsl_get,	   syscall_mon_get,
 	syscall_ipc_get,	   syscall_mem_derive,

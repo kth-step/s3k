@@ -26,15 +26,23 @@ typedef struct proc {
 	} pmp;			    ///< PMP configuration for the process.
 
 	struct {
-		word_t mcause;
-		word_t mtval;
-		word_t mtvec;
-		word_t mepc;
+		word_t tpc, tsp;
+		word_t ecause, eval;
+		word_t epc, esp;
 	} trap;
 
 	uint64_t timeout; ///< Timeout for the process, used for scheduling.
 	word_t pid;	  ///< Process ID.
 } __attribute__((aligned(sizeof(word_t)))) proc_t;
+
+typedef enum {
+	VREG_TPC = 0,
+	VREG_TSP = 1,
+	VREG_ECAUSE = 2,
+	VREG_EVAL = 3,
+	VREG_EPC = 4,
+	VREG_ESP = 5,
+} vreg_t;
 
 /**
  * @enum proc_state
