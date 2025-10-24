@@ -79,7 +79,7 @@ static inline void s3k_set_vreg(s3k_vreg_t reg, s3k_word_t val)
 	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_SET_VREG;
 	register s3k_word_t a1 __asm__("a1") = reg;
 	register s3k_word_t a2 __asm__("a2") = val;
-	__asm__ volatile("ecall" : "r"(a0) , "r"(a1), "r"(a2));
+	__asm__ volatile("ecall" : "r"(a0), "r"(a1), "r"(a2));
 }
 
 static inline void s3k_sync(void)
