@@ -48,6 +48,9 @@ static bool _valid_rwx(word_t rwx)
  */
 static bool _derivable(mem_t parent, fuel_t csize, word_t rwx, word_t base, word_t size)
 {
+	if (base + size < base) {
+		return false; // Check for overflow.
+	}
 	return (parent.cfree > csize) && (parent.base <= base) && (base + size <= parent.base + parent.size)
 	       && ((parent.rwx & rwx) == rwx) && (csize > 0) && _valid_rwx(rwx);
 }
