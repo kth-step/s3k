@@ -112,6 +112,7 @@ typedef enum capty {
 #define MAX_PMP_SLOT ((pmp_slot_t)_MAX_PMP_SLOT)		       ///< Maximum PMP slot constant.
 #define MAX_MEMORY_FUEL ((fuel_t)_MAX_MEMORY_FUEL)		       ///< Maximum memory capabilities.
 #define MEM_TABLE_SIZE ((index_t)(MAX_MEMORY_FUEL * _NUM_MEMORY_CAPS)) ///< Maximum memory index.
+#define NUM_MEMORY_CAPS ((index_t)_NUM_MEMORY_CAPS)		       ///< Number of memory capability slots.
 #define MAX_TIME_FUEL ((fuel_t)_MAX_TIME_FUEL)			       ///< Maximum time capabilities.
 #define TSL_TABLE_SIZE ((index_t)(_MAX_TIME_FUEL * _NUM_HARTS))	       ///< Maximum time index.
 #define MAX_MONITOR_FUEL ((fuel_t)_MAX_MONITOR_FUEL)		       ///< Maximum monitor capabilities.
@@ -119,5 +120,7 @@ typedef enum capty {
 #define MAX_TIME_SLOT ((time_slot_t)_MAX_TIME_SLOT)		       ///< Maximum time slot constant.
 #define MAX_IPC_FUEL ((fuel_t)_MAX_IPC_FUEL)			       ///< Maximum IPC capabilities.
 #define IPC_TABLE_SIZE ((index_t)(MAX_IPC_FUEL))		       ///< Maximum IPC index.
+#define NUM_HARTS ((hart_t)_NUM_HARTS)				       ///< Number of harts constant.
+#define SMP ((hart_t)_NUM_HARTS > 1)				       ///< Symmetric multiprocessing check.
 
 #endif // TYPES_H

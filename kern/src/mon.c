@@ -239,28 +239,21 @@ int mon_vreg_get(pid_t owner, index_t i, vreg_t reg, word_t *value)
 	case VREG_TPC:
 		*value = proc->trap.tpc;
 		return ERR_SUCCESS;
-		break;
 	case VREG_TSP:
 		*value = proc->trap.tsp;
 		return ERR_SUCCESS;
-		break;
 	case VREG_ECAUSE:
 		*value = proc->trap.ecause;
 		return ERR_SUCCESS;
-		break;
 	case VREG_EVAL:
 		*value = proc->trap.eval;
-		;
 		return ERR_SUCCESS;
-		break;
 	case VREG_EPC:
 		*value = proc->trap.epc;
 		return ERR_SUCCESS;
-		break;
 	case VREG_ESP:
 		*value = proc->trap.esp;
 		return ERR_SUCCESS;
-		break;
 	default:
 		*value = 0;
 		return ERR_INVALID_ARGUMENT;

@@ -12,7 +12,6 @@ project(
 )
 
 
-subdir('platform' / get_option('platform'))
 subdir('kern')
 subdir('lib')
 
@@ -22,7 +21,6 @@ elf = executable(
     include_directories: kern_incdir,
     c_args: kern_c_args,
     link_args: kern_link_args,
-    dependencies: [kern_dep],
     build_by_default: true,
 )
 

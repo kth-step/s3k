@@ -16,7 +16,7 @@ static tsl_t tsl_table[TSL_TABLE_SIZE];
 void tsl_init()
 {
 	// Create an initial time slice capability for each hardware thread.
-	for (int i = 0; i < _NUM_HARTS; ++i) {
+	for (int i = 0; i < NUM_HARTS; ++i) {
 		tsl_table[i * MAX_TIME_FUEL] = (tsl_t){
 			.owner = 1,
 			.base = 0,

@@ -15,7 +15,7 @@ static mem_t mem_table[MEM_TABLE_SIZE];
  */
 void mem_init(mem_t init_mems[])
 {
-	for (int i = 0; i < _NUM_MEMORY_CAPS; ++i) {
+	for (index_t i = 0; i < NUM_MEMORY_CAPS; ++i) {
 		mem_table[i * MAX_MEMORY_FUEL] = (mem_t){
 			.owner = 1,
 			.base = init_mems[i].base,
@@ -48,11 +48,9 @@ static bool _valid_rwx(word_t rwx)
  */
 static bool _derivable(mem_t parent, fuel_t csize, word_t rwx, word_t base, word_t size)
 {
-	if (base + size < base) {
-		return false; // Check for overflow.
-	}
-	return (parent.cfree > csize) && (parent.base <= base) && (base + size <= parent.base + parent.size)
-	       && ((parent.rwx & rwx) == rwx) && (csize > 0) && _valid_rwx(rwx);
+	return (base + size > base) && (parent.cfree > csize) && (parent.base <= base)
+	       && (base + size <= parent.base + parent.size) && ((parent.rwx & rwx) == rwx) && (csize > 0)
+	       && _valid_rwx(rwx);
 }
 
 /**
