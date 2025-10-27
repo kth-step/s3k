@@ -12,7 +12,7 @@ kern_dep = declare_dependency(
 	sources: files('config.c'),
 	compile_args: [
 		'-D_MAX_PMP_SLOT=8',
-		'-D_NUM_MEMORY_CAPS=3',
+		'-D_NUM_MEMORY_CAPS=2',
 		'-D_NUM_HARTS=1',
     		'-D_MAX_PID=' + kernel_opts['nproc'],
     		'-D_MAX_TIME_SLOT=' + kernel_opts['ntimeslot'],
