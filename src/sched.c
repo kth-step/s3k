@@ -23,7 +23,7 @@ uint64_t curr[_NUM_HARTS];
  */
 uint64_t sched_rtc_slot()
 {
-	return (rtc_get_time() >> 10);
+	return (rtc_get_time() / TIME_SLOT_TICKS);
 }
 
 /**
@@ -31,7 +31,7 @@ uint64_t sched_rtc_slot()
  */
 uint64_t slot2time(uint64_t slot)
 {
-	return (slot << 10);
+	return (slot * TIME_SLOT_TICKS);
 }
 
 /**

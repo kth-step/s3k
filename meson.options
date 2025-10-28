@@ -14,3 +14,5 @@ option('nipcfuel', type : 'integer', min : 1, max : 256, value : 16, yield : tru
 option('platform', type : 'combo', choices : ['qemu_virt', 'cheshire', 'cheshire2'], yield : true)
 # Context switch padding 
 option('cspad', type : 'integer', value : 0, yield : true)
+# Microseconds per time slot
+option('timeslotus', type : 'integer', min : 1, max : 1000000, value : 1000, yield : true)

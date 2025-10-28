@@ -54,6 +54,7 @@ system_args = [
     '-D_MAX_MONITOR_FUEL=' + opts['nmonitorfuel'],
     '-D_MAX_IPC_FUEL=' + opts['nipcfuel'],
     '-D_CSPAD=' + opts['cspad'],
+    '-D_TIME_SLOT_US=' + get_option('timeslotus').to_string(),
 ]
 
 # Platform configuration arguments  
@@ -61,6 +62,7 @@ platform_args = [
     '-D_MAX_PMP_SLOT=' + platform_opts['npmp'],
     '-D_NUM_MEMORY_CAPS=' + platform_opts['nmemcaps'],
     '-D_NUM_HARTS=' + platform_opts['nharts'],
+    '-D_RTC_HZ=' + platform_opts['rtchz'],
 ]
 
 c_args = ['-ffreestanding'] + system_args + platform_args
