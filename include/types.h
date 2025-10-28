@@ -15,7 +15,7 @@ typedef uint16_t fuel_t; ///< Fuel type for capabilities.
 typedef uint16_t time_slot_t; ///< Slot type for scheduling.
 typedef uint8_t hart_t;	      ///< Hart ID type for hardware threads.
 
-typedef uint32_t index_t; ///< Index type for various tables.
+typedef uint16_t index_t; ///< Index type for various tables.
 
 typedef uint8_t pmp_slot_t; ///< PMP slot type for memory protection.
 
@@ -124,3 +124,7 @@ typedef enum capty {
 #if _NUM_HARTS > 1
 #define SMP
 #endif
+#define RTC_HZ ((uint32_t)_RTC_HZ)				      ///< RTC frequency constant.
+#define TICKS_PER_US ((uint32_t)(RTC_HZ / 1000000))		      ///< RTC ticks per microsecond constant.
+#define TIME_SLOT_US ((uint32_t)_TIME_SLOT_US)			      ///< Time slot duration constant in microseconds.
+#define TIME_SLOT_TICKS ((uint32_t)(RTC_HZ * TIME_SLOT_US / 1000000)) ///< Time slot duration in ticks.

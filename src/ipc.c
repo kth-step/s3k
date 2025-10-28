@@ -1,9 +1,11 @@
 #include "ipc.h"
 
+#include "current.h"
 #include "macro.h"
 #include "mem.h"
 #include "mon.h"
 #include "preempt.h"
+#include "rtc.h"
 #include "tsl.h"
 
 /**
@@ -131,7 +133,8 @@ int ipc_derive(pid_t owner, index_t i, pid_t target, fuel_t csize, ipc_mode_t mo
 		.mode = mode,
 		.flag = flag,
 		.sink = (ipc_table[i].mode == IPC_MODE_NONE) ? j : ipc_table[i].sink,
-		.source = 0,
+		.source = j,
+		.opt = 0,
 	};
 
 	// Return the index of the new capability.
@@ -266,14 +269,31 @@ int ipc_send(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, p
 
 	// Get the receiver process.
 	pid_t receiver = ipc_table[sink].owner;
+	if (receiver == INVALID_PID) {
+		return ERR_INVALID_STATE;
+	}
+
+	uint32_t servtime = ipc_table[sink].opt;
+	bool is_yield = (ipc_table[i].flag & IPC_FLAG_YIELD) != 0;
+
+	if (is_yield) {
+		// Update the timeout for the call.
+		uint64_t curr_time = rtc_get_time();
+		uint64_t timeout = current->timeout;
+		if (curr_time + ((uint64_t)servtime) * TICKS_PER_US >= timeout) {
+			// If the service time exceeds the current timeout, return timeout error.
+			return ERR_INVALID_STATE;
+		}
+	}
 
 	// Check if the receiver is ready.
-	if (receiver == INVALID_PID || !proc_ipc_acquire(receiver, sink)) {
+	if (!proc_ipc_acquire(receiver, sink)) {
 		return ERR_INVALID_STATE;
 	}
 
 	// Send the data to the target process.
 	do_send(receiver, data, owner, capty, j);
+	ipc_table[sink].source = i;
 
 	proc_t *sender = *next;
 	if (ipc_table[i].flag & IPC_FLAG_YIELD) {
@@ -292,7 +312,7 @@ int ipc_send(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, p
  * Receive data and potentially a capability from the sender.
  * For synchronous IPC only!
  */
-int ipc_recv(pid_t owner, index_t i, proc_t **next)
+int ipc_recv(pid_t owner, index_t i, proc_t **next, uint32_t servtime)
 {
 	if (!_ipc_invoke_valid_access(owner, i, IPC_MODE_USYNC, true)
 	    && _ipc_invoke_valid_access(owner, i, IPC_MODE_BSYNC, true)) {
@@ -300,6 +320,9 @@ int ipc_recv(pid_t owner, index_t i, proc_t **next)
 	}
 	// Go to a receiver state.
 	proc_ipc_block(owner, i);
+	ipc_table[i].source = i;
+	ipc_table[i].opt = servtime;
+
 	(*next)->timeout = UINT64_MAX;
 	*next = NULL;
 	return ERR_SUCCESS;
@@ -320,8 +343,25 @@ int ipc_call(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, p
 	index_t sink = ipc_table[i].sink;
 	pid_t receiver = ipc_table[sink].owner;
 
+	if (receiver == INVALID_PID) {
+		return ERR_INVALID_STATE;
+	}
+
+	uint32_t servtime = ipc_table[sink].opt;
+	bool is_yield = (ipc_table[sink].flag & IPC_FLAG_YIELD) != 0;
+
+	if (is_yield) {
+		// Update the timeout for the call.
+		uint64_t curr_time = rtc_get_time();
+		uint64_t timeout = current->timeout;
+		if (curr_time + ((uint64_t)servtime) * TICKS_PER_US >= timeout) {
+			// If the service time exceeds the current timeout, return timeout error.
+			return ERR_INVALID_STATE;
+		}
+	}
+
 	// If receiver is invalid or not ready, return invalid state error.
-	if (receiver == INVALID_PID || !proc_ipc_acquire(receiver, sink)) {
+	if (!proc_ipc_acquire(receiver, sink)) {
 		return ERR_INVALID_STATE;
 	}
 
@@ -330,6 +370,7 @@ int ipc_call(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, p
 
 	// Set the receiver's source capability.
 	ipc_table[sink].source = i;
+	ipc_table[sink].opt = 0;
 
 	// Wait for reply.
 	proc_ipc_block(owner, i);
@@ -364,13 +405,13 @@ int ipc_reply(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, 
 	pid_t receiver_pid = ipc_table[source].owner;
 
 	// Check if the client is valid and ready.
-	if (receiver_pid == INVALID_PID || !proc_ipc_acquire(receiver_pid, source)) {
+	if ((source == i) || (receiver_pid == INVALID_PID) || !proc_ipc_acquire(receiver_pid, source)) {
 		return ERR_INVALID_STATE;
 	}
 
 	// Send the operation.
 	do_send(receiver_pid, data, owner, capty, j);
-	ipc_table[i].source = 0; // Clear the source capability.
+	ipc_table[i].source = i; // Clear the source capability.
 
 	proc_t *sender = *next;
 	proc_t *receiver = proc_get(receiver_pid);
@@ -392,7 +433,7 @@ int ipc_reply(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, 
 /**
  * Reply and receive in a single IPC operation.
  */
-int ipc_replyrecv(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, proc_t **next)
+int ipc_replyrecv(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, proc_t **next, uint32_t servtime)
 {
 	if (!_ipc_invoke_valid_access(owner, i, IPC_MODE_BSYNC, true)) {
 		return ERR_INVALID_ACCESS;
@@ -411,9 +452,10 @@ int ipc_replyrecv(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t
 	index_t source = ipc_table[i].source;
 	pid_t recv_pid = ipc_table[source].owner;
 
-	if (recv_pid != INVALID_PID && proc_ipc_acquire(recv_pid, source)) {
+	if ((source != i) && (recv_pid != INVALID_PID) && proc_ipc_acquire(recv_pid, source)) {
 		// Do send operation.
 		do_send(recv_pid, data, owner, capty, j);
+		ipc_table[i].source = i; // Clear the source capability.
 
 		proc_t *receiver = proc_get(recv_pid);
 
@@ -432,6 +474,7 @@ int ipc_replyrecv(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t
 
 	// Perform receive operation.
 	proc_ipc_block(owner, i);
+	ipc_table[i].opt = servtime; // Store service time in opt field.
 	sender->timeout = UINT64_MAX;
 
 	return ERR_SUCCESS;
@@ -449,8 +492,9 @@ int ipc_asend(pid_t owner, index_t i, word_t data, proc_t **next)
 	index_t sink = ipc_table[i].sink;
 	pid_t recv_pid = ipc_table[sink].owner;
 
-	// Data stored in the source field.
-	ipc_table[sink].source = data;
+	// Data stored in the opt field.
+	ipc_table[sink].source = i;
+	ipc_table[sink].opt = data;
 
 	if ((ipc_table[i].flag & IPC_FLAG_YIELD) && recv_pid != INVALID_PID && proc_acquire(recv_pid)) {
 		proc_t *sender = *next;
@@ -469,7 +513,7 @@ int ipc_arecv(pid_t owner, index_t i, word_t *data)
 	if (!_ipc_invoke_valid_access(owner, i, IPC_MODE_ASYNC, true)) {
 		return ERR_INVALID_ACCESS;
 	}
-	// Read data from the source field.
-	*data = ipc_table[i].source;
+	// Read data from the opt field.
+	*data = ipc_table[i].opt;
 	return ERR_SUCCESS;
 }

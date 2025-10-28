@@ -5,7 +5,7 @@ if get_option('platform') == 'qemu_virt'
 	    'npmp': '8',
 	    'nmemcaps': '2',
 	    'nharts': '1',
-	    'rtchz': '100000',
+	    'rtchz': '10000000',
 	}
 	platform_ld = meson.current_source_dir() / 'qemu_virt.ld'
 	platform_sources = files('qemu_virt.c')

@@ -595,7 +595,7 @@ static proc_t *syscall_ipc_send(pid_t pid, word_t args[8])
 static proc_t *syscall_ipc_recv(pid_t pid, word_t args[8])
 {
 	proc_t *next = current;
-	args[0] = ipc_recv(pid, args[1], &next);
+	args[0] = ipc_recv(pid, args[1], &next, args[2]);
 	return next;
 }
 
@@ -628,7 +628,7 @@ static proc_t *syscall_ipc_replyrecv(pid_t pid, word_t args[8])
 {
 	proc_t *next = current;
 	word_t data[2] = {args[2], args[3]};
-	args[0] = ipc_replyrecv(pid, args[1], data, args[4], args[5], &next);
+	args[0] = ipc_replyrecv(pid, args[1], data, args[4], args[5], &next, args[6]);
 	return next;
 }
 

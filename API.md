@@ -69,6 +69,10 @@ Puts the process to sleep until the specified absolute time (in system ticks).
 	- Set a register value for the process monitored by the monitor capability at index `i`.
 - `int s3k_mon_reg_get(s3k_index_t i, s3k_reg_t reg, s3k_word_t *val)`
 	- Get a register value for the process monitored by the monitor capability at index `i`.
+- `int s3k_mon_vreg_set(s3k_index_t i, s3k_vreg_t reg, s3k_word_t val)`
+	- Set a virtual register value for the process monitored by the monitor capability at index `i`.
+- `int s3k_mon_vreg_get(s3k_index_t i, s3k_vreg_t reg, s3k_word_t *val)`
+	- Get a virtual register value for the process monitored by the monitor capability at index `i.
 
 ### IPC Capabilities
 
@@ -128,13 +132,13 @@ These functions implement inter-process communication (IPC) using capabilities.
 
 - `int s3k_ipc_send(s3k_index_t i, s3k_word_t msg[2], s3k_capty_t capty, s3k_index_t j)`
 	- Send a synchronous IPC message (optionally transferring a capability) to another process.
-- `int s3k_ipc_recv(s3k_index_t i, s3k_word_t msg[2], s3k_capty_t *capty, s3k_index_t *j)`
+- `int s3k_ipc_recv(s3k_index_t i, s3k_word_t msg[2], s3k_capty_t *capty, s3k_index_t *j, uint32_t servtime)`
 	- Wait to receive a synchronous IPC message.
 - `int s3k_ipc_call(s3k_index_t i, s3k_word_t msg[2], s3k_capty_t *capty, s3k_index_t *j)`
 	- Make a synchronous IPC call and wait for a reply.
 - `int s3k_ipc_reply(s3k_index_t i, s3k_word_t msg[2], s3k_capty_t capty, s3k_index_t j)`
 	- Send a reply to a synchronous IPC call.
-- `int s3k_ipc_replyrecv(s3k_index_t i, s3k_word_t msg[2], s3k_capty_t *capty, s3k_index_t *j)`
+- `int s3k_ipc_replyrecv(s3k_index_t i, s3k_word_t msg[2], s3k_capty_t *capty, s3k_index_t *j, uint32_t servtime)`
 	- Send a reply and then wait to receive a new IPC message (atomic operation).
 - `int s3k_ipc_asend(s3k_index_t i, s3k_word_t msg)`
 	- Send an asynchronous IPC message.

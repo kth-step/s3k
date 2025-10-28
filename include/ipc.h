@@ -13,8 +13,9 @@ typedef struct {
 	fuel_t csize;
 	ipc_mode_t mode;
 	ipc_flag_t flag;
-	index_t sink : 32;
-	index_t source : 32;
+	index_t sink;
+	index_t source;
+	uint32_t opt;
 } __attribute__((aligned(16))) ipc_t;
 
 _Static_assert(sizeof(ipc_t) == 16, "IPC capability has the wrong size.");
@@ -109,7 +110,7 @@ int ipc_send(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, p
  * @param next Pointer to store the next process to run.
  * @return ERR_SUCCESS on success, or an error code on failure.
  */
-int ipc_recv(pid_t owner, index_t i, proc_t **next);
+int ipc_recv(pid_t owner, index_t i, proc_t **next, uint32_t servtime);
 
 /**
  * @brief Calls a function in another process and waits for a reply.
@@ -145,7 +146,7 @@ int ipc_reply(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, 
  * @param next Pointer to store the next process to run.
  * @return ERR_SUCCESS on success, or an error code on failure.
  */
-int ipc_replyrecv(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, proc_t **next);
+int ipc_replyrecv(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, proc_t **next, uint32_t servtime);
 
 /**
  * @brief Asynchronously sends data to another process.
