@@ -1,7 +1,7 @@
 project(
     's3k',
     'c',
-    version: '0.1',
+    version: '25.10',
     meson_version: '>= 1.1.0',
     default_options: [
         'warning_level=2',      # -Wall -Wextra
