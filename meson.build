@@ -7,6 +7,7 @@ project(
         'warning_level=2',      # -Wall -Wextra
         'werror=true',          # -Werror
         'c_std=gnu11',          # Use GNU11 standard for C.
+        'b_lto=true',           # Enable link-time optimization.
         'b_ndebug=if-release',  # Disable assertions in release builds.
     ],
 )
