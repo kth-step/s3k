@@ -1,5 +1,4 @@
-#ifndef CSR_H
-#define CSR_H
+#pragma once
 
 #include "types.h"
 
@@ -28,5 +27,3 @@ static inline word_t csrr_mhartid(void)
 	__asm__ volatile("csrr %0, mhartid" : "=r"(val));
 	return val;
 }
-
-#endif // CSR_H

@@ -1,5 +1,4 @@
-#ifndef MACRO_H
-#define MACRO_H
+#pragma once
 
 /**
  * @brief Calculates the number of elements in an array.
@@ -62,5 +61,3 @@
  * @return The value in megabytes.
  */
 #define BYTES_TO_MB(bytes) ((bytes) / (1024 * 1024))
-
-#endif // MACRO_H

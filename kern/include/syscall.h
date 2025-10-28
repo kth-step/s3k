@@ -1,5 +1,4 @@
-#ifndef SYSCALL_H
-#define SYSCALL_H
+#pragma once
 
 #include "proc.h"
 #include "types.h"
@@ -10,5 +9,3 @@
  * Returns NULL if the scheduler should be invoked.
  */
 proc_t *syscall_handler(void);
-
-#endif // SYSCALL_H

@@ -1,5 +1,4 @@
-#ifndef INTERRUPT_H
-#define INTERRUPT_H
+#pragma once
 
 #include "proc.h"
 #include "types.h"
@@ -15,5 +14,3 @@
  * @return The updated process control block.
  */
 proc_t *interrupt_handler(word_t cause, word_t tval);
-
-#endif // INTERRUPT_H

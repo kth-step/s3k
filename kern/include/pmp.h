@@ -1,5 +1,4 @@
-#ifndef PMP_H
-#define PMP_H
+#pragma once
 
 #include "types.h"
 
@@ -36,5 +35,3 @@ static inline word_t pmp_napot_encode(word_t base, word_t size)
 {
 	return (base | (size / 2 - 1)) >> 2; // Combine base and size into NAPOT format.
 }
-
-#endif // PMP_H

@@ -1,5 +1,4 @@
-#ifndef CAP_MON_H
-#define CAP_MON_H
+#pragma once
 #include "proc.h"
 #include "types.h"
 
@@ -134,5 +133,3 @@ int mon_vreg_get(pid_t owner, index_t i, vreg_t reg, word_t *value);
  * Set the virtual register value for the monitored process.
  */
 int mon_vreg_set(pid_t owner, index_t i, vreg_t reg, word_t value);
-
-#endif // CAP_MON_H

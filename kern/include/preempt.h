@@ -1,5 +1,4 @@
-#ifndef PREEMPT_H
-#define PREEMPT_H
+#pragma once
 
 #include "csr.h"
 
@@ -12,5 +11,3 @@ static inline bool preempt(void)
 {
 	return csrr_mip() & CSR_MIP_MTIP;
 }
-
-#endif

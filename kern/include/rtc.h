@@ -1,5 +1,4 @@
-#ifndef RTC_H
-#define RTC_H
+#pragma once
 
 #include "types.h"
 
@@ -34,5 +33,3 @@ uint64_t rtc_get_timeout(word_t hartid);
  * @param time Timeout value to set, as a 64-bit unsigned integer.
  */
 void rtc_set_timeout(word_t hartid, uint64_t time);
-
-#endif // RTC_H

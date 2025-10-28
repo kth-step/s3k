@@ -1,5 +1,4 @@
-#ifndef TYPES_H
-#define TYPES_H
+#pragma once
 
 #include <limits.h>  ///< For limits of integer types.
 #include <stdbool.h> ///< For boolean type.
@@ -122,5 +121,3 @@ typedef enum capty {
 #define IPC_TABLE_SIZE ((index_t)(MAX_IPC_FUEL))		       ///< Maximum IPC index.
 #define NUM_HARTS ((hart_t)_NUM_HARTS)				       ///< Number of harts constant.
 #define SMP ((hart_t)_NUM_HARTS > 1)				       ///< Symmetric multiprocessing check.
-
-#endif // TYPES_H

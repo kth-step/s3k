@@ -1,5 +1,4 @@
-#ifndef CAP_IPC_H
-#define CAP_IPC_H
+#pragma once
 
 #include "proc.h"
 #include "types.h"
@@ -169,5 +168,3 @@ int ipc_asend(pid_t owner, index_t i, word_t data, proc_t **next);
  * @return ERR_SUCCESS on success, or an error code on failure.
  */
 int ipc_arecv(pid_t owner, index_t i, word_t *data);
-
-#endif // CAP_IPC_H

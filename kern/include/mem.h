@@ -1,5 +1,4 @@
-#ifndef CAP_MEM_H
-#define CAP_MEM_H
+#pragma once
 
 #include "types.h"
 
@@ -128,5 +127,3 @@ int mem_pmp_get(pid_t owner, index_t i, pmp_slot_t *slot, mem_perm_t *rwx, pmp_a
  *         ERR_INVALID_ACCESS if the owner does not match the entry in the memory table.
  */
 int mem_pmp_clear(pid_t owner, index_t i);
-
-#endif // CAP_MEM_H

@@ -1,5 +1,4 @@
-#ifndef PROC_H
-#define PROC_H
+#pragma once
 
 #include "types.h"
 
@@ -178,5 +177,3 @@ void proc_resume(pid_t pid);
 bool proc_ipc_acquire(pid_t pid, index_t i);
 bool proc_ipc_block(pid_t pid, index_t i);
 void proc_release(pid_t pid);
-
-#endif // PROC_H

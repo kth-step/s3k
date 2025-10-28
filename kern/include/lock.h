@@ -1,5 +1,4 @@
-#ifndef LOCK_H
-#define LOCK_H
+#pragma once
 
 #include "types.h"
 
@@ -17,5 +16,3 @@ bool lock_acquire(bool preemptable);
  * Releases the lock.
  */
 void lock_release(void);
-
-#endif

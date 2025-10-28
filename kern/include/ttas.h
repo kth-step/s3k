@@ -1,5 +1,4 @@
-#ifndef TTAS_H
-#define TTAS_H
+#pragma once
 
 #include "types.h"
 
@@ -21,5 +20,3 @@ bool ttas_acquire(ttas_t *ttas, bool preemptable);
  * Releases the TTAS lock.
  */
 void ttas_release(ttas_t *ttas);
-
-#endif

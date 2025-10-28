@@ -1,5 +1,4 @@
-#ifndef OFFSETS_H
-#define OFFSETS_H
+#pragma once
 
 #if __riscv_xlen == 32
 #define _X(x, y) x
@@ -59,5 +58,3 @@
 #define PROC_PMPADDR7 (OFFSET_SIZE * 40) ///< Offset for the eighth PMP address register.
 #define PROC_PMPCFG0 (OFFSET_SIZE * 41)	 ///< Offset for the first PMP configuration register.
 #define PROC_PMPCFG1 (OFFSET_SIZE * 42)	 ///< Offset for the second PMP configuration register.
-
-#endif // OFFSETS_H

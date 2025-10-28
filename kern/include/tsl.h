@@ -1,5 +1,4 @@
-#ifndef TSL_H
-#define TSL_H
+#pragma once
 
 #include "types.h"
 
@@ -102,5 +101,3 @@ int tsl_delete(pid_t owner, index_t i);
  *         ERR_INVALID_ACCESS if the owner does not match the entry in the time table.
  */
 int tsl_set(pid_t owner, index_t i, bool enable);
-
-#endif // TSL_H

@@ -1,5 +1,4 @@
-#ifndef EXCEPTION_H
-#define EXCEPTION_H
+#pragma once
 
 #include "proc.h"
 #include "types.h"
@@ -15,5 +14,3 @@
  * @return The updated process control block.
  */
 proc_t *exception_handler(word_t cause, word_t tval);
-
-#endif // EXCEPTION_H

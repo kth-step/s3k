@@ -1,5 +1,4 @@
-#ifndef SCHED_H
-#define SCHED_H
+#pragma once
 
 #include "proc.h"
 #include "types.h"
@@ -55,5 +54,3 @@ void sched_set_pid(hart_t hart, pid_t pid, time_slot_t begin);
  * @return A pointer to the next process to run.
  */
 proc_t *sched(void);
-
-#endif // SCHED_H
