@@ -17,18 +17,33 @@ Lastly, IPC capabilities allow processes to communicate with each other, sending
 - `include/` : Kernel header files.
 - `platform/` : Platform specific kernel configuration files.
 - `src/` : Kernel source files.
+- `lib/` : Kernel API library.
+- `projects/` : Example projects.
 - `Doxygen` : Doxygen configuration file.
 - `LICENSE` : License file.
 - `meson.build` : Meson build configuration.
 - `README.md` : This README file.
+- `API.md` : Kernel API description.
 - `meson.options` : Kernel configuration file.
 
 ## Compilation instructions
 
 Requirements: Docker (rootless).
 
+### Compiling only the kernel
+
 ```bash
 ./docker.sh
 meson setup builddir --cross-file=cross/rv64imac.toml
 ninja -C builddir
+```
+
+## Compilation instructions for hello project
+
+```bash
+./docker.sh
+cd projects/hello
+meson setup builddir --cross-file=../../cross/rv64imac.toml
+ninja -C builddir
+ninja -C builddir qemu-run
 ```
