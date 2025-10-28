@@ -5,7 +5,7 @@ __mtime      = 0x0200bff8; /* Address for the machine timer. */
 __mtimecmp   = 0x02004000; /* Address for the machine timer compare. */
 
 MEMORY {
-    RAM (rwx) : ORIGIN = 0x8FFF0000, LENGTH = 0x10000 /* Define the RAM region. */
+    RAM (rwx) : ORIGIN = 0x90000000, LENGTH = 0x10000 /* Define the RAM region. */
 }
 
 SECTIONS {

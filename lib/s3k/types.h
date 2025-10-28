@@ -19,8 +19,8 @@ typedef uint32_t s3k_mem_addr_t;   ///< Memory address type for capabilities.
 typedef uint8_t s3k_pmp_slot_t;	   ///< PMP slot type for capabilities.
 typedef uint8_t s3k_cap_slot_t;	   ///< Capability slot type for capabilities.
 typedef uint8_t s3k_mem_perm_t;	   ///< Memory permission type for capabilities.
-typedef uint8_t s3k_ipc_mode_t;   ///< IPC mode type for capabilities.
-typedef uint8_t s3k_ipc_flag_t;   ///< IPC flag type for capabilities.
+typedef uint8_t s3k_ipc_mode_t;	   ///< IPC mode type for capabilities.
+typedef uint8_t s3k_ipc_flag_t;	   ///< IPC flag type for capabilities.
 typedef s3k_word_t s3k_pmp_addr_t; ///< PMP address type for capabilities.
 
 /**
@@ -42,11 +42,11 @@ typedef enum s3k_err {
 } s3k_err_t;
 
 enum s3k_ipc_mode {
-	S3K_IPC_MODE_NONE = 0,	///< No IPC mode.
-	S3K_IPC_MODE_USYNC = 1, ///< Unidirectional synchronous IPC mode.
-	S3K_IPC_MODE_BSYNC = 2, ///< Bidirectional synchronous IPC mode.
-	S3K_IPC_MODE_ASYNC = 3, ///< Asynchronous IPC mode.
-	S3K_IPC_MODE_REVOKE = 4,///< Revoke flag for IPC.
+	S3K_IPC_MODE_NONE = 0,	 ///< No IPC mode.
+	S3K_IPC_MODE_USYNC = 1,	 ///< Unidirectional synchronous IPC mode.
+	S3K_IPC_MODE_BSYNC = 2,	 ///< Bidirectional synchronous IPC mode.
+	S3K_IPC_MODE_ASYNC = 3,	 ///< Asynchronous IPC mode.
+	S3K_IPC_MODE_REVOKE = 4, ///< Revoke flag for IPC.
 };
 
 enum s3k_ipc_flag {
@@ -77,11 +77,11 @@ typedef enum s3k_vreg {
  * - Read-write-execute (RWX)
  */
 enum mem_perm {
-	S3K_MEM_PERM_NONE = 0x0,  ///< No permission.
-	S3K_MEM_PERM_R = 0x1,	///< Read-only permission.
-	S3K_MEM_PERM_RW = 0x3,	///< Read-write permission.
-	S3K_MEM_PERM_RX = 0x5,	///< Read-execute permission.
-	S3K_MEM_PERM_RWX = 0x7, ///< Read-write-execute permission.
+	S3K_MEM_PERM_NONE = 0x0, ///< No permission.
+	S3K_MEM_PERM_R = 0x1,	 ///< Read-only permission.
+	S3K_MEM_PERM_RW = 0x3,	 ///< Read-write permission.
+	S3K_MEM_PERM_RX = 0x5,	 ///< Read-execute permission.
+	S3K_MEM_PERM_RWX = 0x7,	 ///< Read-write-execute permission.
 };
 
 typedef enum s3k_capty {

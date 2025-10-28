@@ -670,7 +670,7 @@ handler_t handlers[] = {
 	syscall_ipc_revoke,	 syscall_mem_delete,	  syscall_tsl_delete,	     syscall_mon_delete,
 	syscall_ipc_delete,	 syscall_mem_pmp_get,	  syscall_mem_pmp_set,	     syscall_mem_pmp_clear,
 	syscall_tsl_set,	 syscall_mon_suspend,	  syscall_mon_resume,	     syscall_mon_yield,
-	syscall_mon_vreg_get,	 syscall_mon_vreg_set,	  syscall_mon_reg_get,	     syscall_mon_reg_set,
+	syscall_mon_reg_get,	 syscall_mon_reg_set,	  syscall_mon_vreg_get,	     syscall_mon_vreg_set,
 	syscall_mon_mem_get,	 syscall_mon_tsl_get,	  syscall_mon_mon_get,	     syscall_mon_ipc_get,
 	syscall_mon_mem_grant,	 syscall_mon_tsl_grant,	  syscall_mon_mon_grant,     syscall_mon_ipc_grant,
 	syscall_mon_mem_derive,	 syscall_mon_tsl_derive,  syscall_mon_mon_derive,    syscall_mon_ipc_derive,

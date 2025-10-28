@@ -71,16 +71,14 @@ trap_entry:
 #endif
 
 _trap_dispatch:
-
 	// Prepare for trap dispatch.
 	la	ra,_trap_switch		// Set return address to trap_switch.
 
 	// Determine the type of trap and dispatch to the appropriate handler.
-	csrr	t0,mcause		// Load the trap cause.
-	addi	t0,t0,-8		// Check if the cause is a system call.
-	beqz	t0,syscall_handler	// If system call, jump to syscall_handler.
-
 	csrr	a0,mcause		// Load the trap cause.
+	li	t0,8
+	beq	a0,t0,syscall_handler	// If system call, jump to syscall_handler.
+
 	csrr	a1,mtval		// Load trap value for exception handling.
 	bltz	a0,interrupt_handler	// If negative, it's an interrupt; jump to interrupt_handler.
 	j	exception_handler	// Otherwise, jump to exception_handler.
@@ -94,9 +92,7 @@ _trap_switch:
 	// Atomically update the process state to indicate it is no longer running.
 	// This ensures that the process state is updated safely in a multi-core environment.
 	li	t0,~1				// Load the bitmask to clear the "busy" state.
-	LREG	t1,PROC_STATE(tp)	// Load the current process state.
-	and	t0,t1,t0		// Clear the "busy" state.
-	SREG	t0,PROC_STATE(tp)	// Save the updated process state.
+	amoand.d.rl x0,t0,(tp)
 
 	// If the next process (a0) is NULL, jump to `sched`.
 	bnez	a0,trap_resume

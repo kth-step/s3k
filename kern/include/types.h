@@ -71,11 +71,11 @@ typedef enum err {
  * Enumerates the modes of IPC, including synchronous and asynchronous options.
  */
 enum ipc_mode {
-	IPC_MODE_NONE = 0,   ///< No IPC mode.
-	IPC_MODE_USYNC = 1,  ///< Unidirectional synchronous IPC.
-	IPC_MODE_BSYNC = 2,  ///< Bidirectional synchronous IPC.
-	IPC_MODE_ASYNC = 3,  ///< Asynchronous IPC.
-	IPC_MODE_MASK = 0x3, ///< Mask for IPC modes.
+	IPC_MODE_NONE = 0,     ///< No IPC mode.
+	IPC_MODE_USYNC = 1,    ///< Unidirectional synchronous IPC.
+	IPC_MODE_BSYNC = 2,    ///< Bidirectional synchronous IPC.
+	IPC_MODE_ASYNC = 3,    ///< Asynchronous IPC.
+	IPC_MODE_MASK = 0x3,   ///< Mask for IPC modes.
 	IPC_MODE_REVOKE = 0x4, ///< Revoke flag for IPC.
 };
 
@@ -121,4 +121,6 @@ typedef enum capty {
 #define MAX_IPC_FUEL ((fuel_t)_MAX_IPC_FUEL)			       ///< Maximum IPC capabilities.
 #define IPC_TABLE_SIZE ((index_t)(MAX_IPC_FUEL))		       ///< Maximum IPC index.
 #define NUM_HARTS ((hart_t)_NUM_HARTS)				       ///< Number of harts constant.
-#define SMP ((hart_t)_NUM_HARTS > 1)				       ///< Symmetric multiprocessing check.
+#if _NUM_HARTS > 1
+#define SMP
+#endif

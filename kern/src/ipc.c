@@ -42,7 +42,7 @@ static bool _valid_derivation(ipc_t *cap, fuel_t csize, ipc_mode_t mode, ipc_fla
 	}
 
 	if ((cap->mode & IPC_MODE_REVOKE) != 0) {
-		// Cannot derive if revoke flag is set. 
+		// Cannot derive if revoke flag is set.
 		return false;
 	}
 
