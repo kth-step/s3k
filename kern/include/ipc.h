@@ -11,8 +11,8 @@ typedef struct {
 	pid_t owner;
 	fuel_t cfree;
 	fuel_t csize;
-	ipc_mode_t mode : 2;
-	ipc_flag_t flag : 5;
+	ipc_mode_t mode;
+	ipc_flag_t flag;
 	index_t sink : 32;
 	index_t source : 32;
 } __attribute__((aligned(16))) ipc_t;

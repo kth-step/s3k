@@ -41,12 +41,17 @@ static bool _valid_derivation(ipc_t *cap, fuel_t csize, ipc_mode_t mode, ipc_fla
 		return false;
 	}
 
+	if ((cap->mode & IPC_MODE_REVOKE) != 0) {
+		// Cannot derive if revoke flag is set. 
+		return false;
+	}
+
 	if (cap->mode == IPC_MODE_NONE) {
 		// If deriving a sink IPC capability or NULL IPC capability.
 		return mode != IPC_MODE_NONE || flag == 0;
 	}
 	// If deriving a source IPC capability
-	return (cap->mode == mode && cap->flag == flag);
+	return (cap->mode == mode && cap->flag == flag && csize == 1);
 }
 
 /**
@@ -142,6 +147,11 @@ int ipc_revoke(pid_t owner, index_t i)
 		return ERR_INVALID_ACCESS;
 	}
 
+	// Only non-endpoint IPC capabilities can revoke children.
+	if ((ipc_table[i].mode & IPC_MODE_MASK) != IPC_MODE_NONE) {
+		return ERR_INVALID_ARGUMENT;
+	}
+
 	// Revoke children of IPC capability.
 	while (ipc_table[i].cfree < ipc_table[i].csize) {
 		// Get the next child index.
@@ -153,9 +163,17 @@ int ipc_revoke(pid_t owner, index_t i)
 		// Reclaim the child's capability table.
 		ipc_table[i].cfree += ipc_table[j].cfree;
 
+		// Set revoke flag to prevent further derivations.
+		ipc_table[i].mode = IPC_MODE_REVOKE;
+
 		// Check for preemption.
 		if (UNLIKELY(preempt()))
 			break;
+	}
+
+	if (ipc_table[i].cfree == ipc_table[i].csize) {
+		// Unset revoke flag if all children are revoked.
+		ipc_table[i].mode = IPC_MODE_NONE;
 	}
 
 	// Return number of unrevoked capability slots.

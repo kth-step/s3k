@@ -19,8 +19,8 @@ typedef uint32_t s3k_mem_addr_t;   ///< Memory address type for capabilities.
 typedef uint8_t s3k_pmp_slot_t;	   ///< PMP slot type for capabilities.
 typedef uint8_t s3k_cap_slot_t;	   ///< Capability slot type for capabilities.
 typedef uint8_t s3k_mem_perm_t;	   ///< Memory permission type for capabilities.
-typedef uint16_t s3k_ipc_mode_t;   ///< IPC mode type for capabilities.
-typedef uint16_t s3k_ipc_flag_t;   ///< IPC flag type for capabilities.
+typedef uint8_t s3k_ipc_mode_t;   ///< IPC mode type for capabilities.
+typedef uint8_t s3k_ipc_flag_t;   ///< IPC flag type for capabilities.
 typedef s3k_word_t s3k_pmp_addr_t; ///< PMP address type for capabilities.
 
 /**
@@ -46,6 +46,7 @@ enum s3k_ipc_mode {
 	S3K_IPC_MODE_USYNC = 1, ///< Unidirectional synchronous IPC mode.
 	S3K_IPC_MODE_BSYNC = 2, ///< Bidirectional synchronous IPC mode.
 	S3K_IPC_MODE_ASYNC = 3, ///< Asynchronous IPC mode.
+	S3K_IPC_MODE_REVOKE = 4,///< Revoke flag for IPC.
 };
 
 enum s3k_ipc_flag {
@@ -76,6 +77,7 @@ typedef enum s3k_vreg {
  * - Read-write-execute (RWX)
  */
 enum mem_perm {
+	S3K_MEM_PERM_NONE = 0x0,  ///< No permission.
 	S3K_MEM_PERM_R = 0x1,	///< Read-only permission.
 	S3K_MEM_PERM_RW = 0x3,	///< Read-write permission.
 	S3K_MEM_PERM_RX = 0x5,	///< Read-execute permission.
@@ -182,6 +184,7 @@ typedef struct s3k_cap_ipc {
 	s3k_fuel_t cfree; ///< Remaining cfree for the capability.
 	s3k_fuel_t csize; ///< Initial cfree allocated to the capability.
 	s3k_ipc_mode_t mode;
+	s3k_ipc_flag_t flag;
 	s3k_index_t sink;
 	s3k_index_t source;
 } __attribute__((aligned(16))) s3k_cap_ipc_t;

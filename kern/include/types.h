@@ -76,9 +76,10 @@ enum ipc_mode {
 	IPC_MODE_BSYNC = 2,  ///< Bidirectional synchronous IPC.
 	IPC_MODE_ASYNC = 3,  ///< Asynchronous IPC.
 	IPC_MODE_MASK = 0x3, ///< Mask for IPC modes.
+	IPC_MODE_REVOKE = 0x4, ///< Revoke flag for IPC.
 };
 
-typedef uint16_t ipc_mode_t;
+typedef uint8_t ipc_mode_t;
 
 enum ipc_flag {
 	IPC_FLAG_YIELD = 1,   ///< Yield flag for IPC.
@@ -89,7 +90,7 @@ enum ipc_flag {
 	IPC_FLAG_MASK = 0x1F, ///< Mask for IPC flags.
 };
 
-typedef uint16_t ipc_flag_t;
+typedef uint8_t ipc_flag_t;
 
 /**
  * @enum capty
