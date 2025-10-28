@@ -26,7 +26,7 @@ struct uart_regs {
 int __uart_putc(char c, FILE *f)
 {
 	(void)f;
-	volatile struct uart_regs *regs = (struct uart_regs*)__uart_base;
+	volatile struct uart_regs *regs = (struct uart_regs *)__uart_base;
 	while (!(regs->lsr & LSR_TX_READY))
 		;
 	regs->thr = (unsigned char)c;

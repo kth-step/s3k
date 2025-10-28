@@ -20,9 +20,9 @@ void temporal_fence(void)
 // Receives a server endpoint as argument
 int main(s3k_word_t server)
 {
-	s3k_capty_t capty = 0; // Capability type (unused in this example)
-	s3k_index_t j = 0;     // Index for capability (unused in this example)
-	s3k_word_t msg[2] = {};     // Message buffer for IPC
+	s3k_capty_t capty = 0;	// Capability type (unused in this example)
+	s3k_index_t j = 0;	// Index for capability (unused in this example)
+	s3k_word_t msg[2] = {}; // Message buffer for IPC
 
 	while (1) {
 		msg[1] = rdcycle();			    // Record cycle count before receiving

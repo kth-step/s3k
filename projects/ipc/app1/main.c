@@ -36,6 +36,7 @@ void run_test(int client, uint64_t res[3], s3k_capty_t capty, s3k_index_t j)
 
 int main(void)
 {
+	s3k_sync();
 	printf("IPC Application \n");
 	app2_init(); // Initialize the server application
 

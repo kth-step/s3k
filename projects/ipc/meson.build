@@ -49,10 +49,11 @@ run_target(
 		'-bios', 'none',
 		'-kernel', s3k_elf.full_path(),
 		'-nographic',
-		'-smp', '1',
 		'-m', '1G',
+		'-icount', '1',
 		'-device', 'loader,file=' + app1_elf.full_path(),
 		'-device', 'loader,file=' + app2_elf.full_path(),
+		'-device', 'loader,addr=0x90000000,cpu-num=0',
 	],
 	depends : [s3k_elf, app1_elf, app2_elf],
 )
