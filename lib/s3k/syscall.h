@@ -1,6 +1,4 @@
-#ifndef S3K_SYSCALL_INLINE_H
-#define S3K_SYSCALL_INLINE_H
-
+#pragma once
 #include "s3k/types.h"
 
 enum {
@@ -623,5 +621,3 @@ static inline int s3k_ipc_arecv(s3k_index_t i, s3k_word_t *msg)
 	*msg = a1;
 	return a0;
 }
-
-#endif /* SYSCALL_INLINE_H */

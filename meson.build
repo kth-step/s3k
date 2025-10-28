@@ -24,12 +24,4 @@ elf = executable(
     build_by_default: true,
 )
 
-lib = static_library(
-    's3k',
-    sources: lib_sources,
-    include_directories: lib_includes,
-    c_args: lib_c_args,
-    build_by_default: true,
-)
-
-lib_dep = declare_dependency(link_with: lib, include_directories: lib_includes)
+lib_dep = declare_dependency(include_directories: lib_includes)

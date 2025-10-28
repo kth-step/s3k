@@ -1,5 +1,4 @@
-#ifndef S3K_UTIL_H
-#define S3K_UTIL_H
+#pragma once
 
 #include "s3k/types.h"
 
@@ -17,5 +16,3 @@ static inline s3k_word_t s3k_pmp_napot_decode_size(uint64_t addr)
 {
 	return (((addr + 1) ^ addr) + 1) << 2;
 }
-
-#endif // S3K_UTIL_H

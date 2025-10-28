@@ -1,5 +1,4 @@
-#ifndef S3K_TYPES_H
-#define S3K_TYPES_H
+#pragma once
 
 #include <stdbool.h>
 #include <stddef.h>
@@ -191,4 +190,3 @@ _Static_assert(sizeof(s3k_cap_mem_t) == 16, "Memory capability has the wrong siz
 _Static_assert(sizeof(s3k_cap_tsl_t) == 16, "Time capability has the wrong size.");
 _Static_assert(sizeof(s3k_cap_mon_t) == 8, "Monitor capability has the wrong size.");
 _Static_assert(sizeof(s3k_cap_ipc_t) == 16, "IPC capability has the wrong size.");
-#endif // S3K_TYPES_H
