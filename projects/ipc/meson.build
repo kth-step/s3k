@@ -11,15 +11,6 @@ s3k = subproject('s3k')
 libs3k_dep = s3k.get_variable('lib_dep')
 s3k_elf = s3k.get_variable('elf')
 
-config = []
-if get_option('cold') 
-	config += ['-DCOLD']
-endif
-
-if get_option('send_cap') 
-	config += ['-DSEND_CAP']
-endif
-
 subdir('app1')
 subdir('app2')
 
@@ -44,6 +35,24 @@ run_target(
 		'-ex', 't 1',
 		'-ex', 'set $pc=0x10000000',
 		'-ex', 'continue',
+	],
+	depends : [s3k_elf, app1_elf, app2_elf],
+)
+
+
+qemu_system_riscv64 = find_program('qemu-system-riscv64', required: false)
+run_target(
+	'qemu-run',
+	command: [
+		qemu_system_riscv64,
+		'-machine', 'virt',
+		'-bios', 'none',
+		'-kernel', s3k_elf.full_path(),
+		'-nographic',
+		'-smp', '1',
+		'-m', '1G',
+		'-device', 'loader,file=' + app1_elf.full_path(),
+		'-device', 'loader,file=' + app2_elf.full_path(),
 	],
 	depends : [s3k_elf, app1_elf, app2_elf],
 )

@@ -1,10 +1,10 @@
 OUTPUT_ARCH(riscv) /* Specify the target architecture. */
 ENTRY(_start)      /* Define the entry point of the kernel. */
 
-__uart_base  = 0x03002000; /* Base address for UART. */
+__uart_base  = 0x10000000; /* Base address for UART. */
 
 MEMORY {
-    RAM (rwx) : ORIGIN = 0x80100000, LENGTH = 512K /* Define the RAM region. */
+    RAM (rwx) : ORIGIN = 0x80000000, LENGTH = 64K /* Define the RAM region. */
 }
 
 SECTIONS {
@@ -33,4 +33,6 @@ SECTIONS {
 
     /* Global pointer and stack */
     __global_pointer$ = MIN(_sdata + 0x800, MAX(_sdata + 0x800, _end - 0x800));
+    __stack_top = ORIGIN(RAM) + LENGTH(RAM); /* Define the top of the stack. */
+    __payload   = ORIGIN(RAM) + LENGTH(RAM); /* Define the payload location. */
 }

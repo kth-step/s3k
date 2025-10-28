@@ -29,3 +29,19 @@ run_target(
 	],
 	depends : [s3k_elf, app1_elf],
 )
+
+qemu_system_riscv64 = find_program('qemu-system-riscv64', required: false)
+run_target(
+	'qemu-run',
+	command: [
+		qemu_system_riscv64,
+		'-machine', 'virt',
+		'-bios', 'none',
+		'-kernel', s3k_elf.full_path(),
+		'-nographic',
+		'-smp', '1',
+		'-m', '1G',
+		'-device', 'loader,file=' + app1_elf.full_path()
+	],
+	depends : [s3k_elf, app1_elf],
+)

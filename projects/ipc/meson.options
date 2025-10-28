@@ -11,10 +11,6 @@ option('nmonitorfuel', type : 'integer', value : 8)
 # Amount of fuel for initial ipc capability
 option('nipcfuel', type : 'integer', value : 16)
 # Execution platform
-option('platform', type : 'combo', choices : ['cheshire', 'cheshire2'], value : 'cheshire')
+option('platform', type : 'combo', choices : ['qemu_virt', 'cheshire', 'cheshire2'], value : 'qemu_virt')
 # Context switch padding
 option('cspad', type : 'integer', value : 18000)
-# cold cache
-option('cold', type : 'boolean', value : false)
-# with send_capability
-option('send_cap', type : 'boolean', value : false)

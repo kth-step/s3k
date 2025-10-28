@@ -1,10 +1,10 @@
 OUTPUT_ARCH(riscv) /* Specify the target architecture. */
 ENTRY(_start)      /* Define the entry point of the kernel. */
 
-__uart_base  = 0x03002000; /* Base address for UART. */
+__uart_base  = 0x10000000; /* Base address for UART. */
 
 MEMORY {
-    RAM (rwx) : ORIGIN = 0x80010000, LENGTH = 64K /* Define the RAM region. */
+    RAM (rwx) : ORIGIN = 0x80000000, LENGTH = 64K /* Define the RAM region. */
 }
 
 SECTIONS {

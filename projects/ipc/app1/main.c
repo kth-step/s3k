@@ -16,25 +16,14 @@ uint64_t rdcycle(void)
 	return cycle;
 }
 
-// Issue a temporal fence (barrier) instruction
-void temporal_fence(void)
-{
-	__asm__ volatile(".word 0xb");
-}
-
 // Run a single IPC test between client and server, measuring timing
-void run_test(int client, uint64_t res[3], s3k_capty_t capty, int j)
+void run_test(int client, uint64_t res[3], s3k_capty_t capty, s3k_index_t j)
 {
-	uint64_t msg[2];
+	uint64_t msg[2] = {};
 
-#ifdef COLD
-	// If COLD is defined, insert a temporal fence before measurement
-	temporal_fence();
-#else
 	// Otherwise, perform 5 warm-up IPC calls before measurement
 	for (int i = 0; i < 5; ++i)
 		s3k_ipc_call(client, msg, &capty, &j);
-#endif
 
 	// Measure the cost of a single IPC call and replyrecv
 	uint64_t start = rdcycle();
@@ -47,6 +36,7 @@ void run_test(int client, uint64_t res[3], s3k_capty_t capty, int j)
 
 int main(void)
 {
+	printf("IPC Application \n");
 	app2_init(); // Initialize the server application
 
 	// Set up IPC endpoints and grant permissions
@@ -62,15 +52,8 @@ int main(void)
 	s3k_mon_yield(8);			// Yield to monitor 8
 	s3k_mon_yield(8);			// Yield to monitor 8
 
-#ifdef SEND_CAP
-	// If SEND_CAP is defined, derive a time-slice capability and set type
-	s3k_index_t j = s3k_tsl_derive(0, 1, true, 4);
-	s3k_capty_t capty = S3K_CAPTY_TSL;
-#else
-	// Otherwise, use no capability
 	s3k_capty_t capty = 0;
-	s3k_index_t j;
-#endif
+	s3k_index_t j = 0;
 
 	uint64_t res[3];
 	printf("call,replyrecv,rtt\n");
