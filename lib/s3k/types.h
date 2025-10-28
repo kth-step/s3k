@@ -57,15 +57,6 @@ enum s3k_ipc_flag {
 	S3K_IPC_FLAG_IPC = 16,	///< Permission to send IPC capability.
 };
 
-typedef enum s3k_vreg {
-	S3K_VREG_TPC = 0,    ///< Trap Program Counter register.
-	S3K_VREG_TSP = 1,    ///< Trap Stack Pointer register.
-	S3K_VREG_ECAUSE = 2, ///< Exception Cause register.
-	S3K_VREG_EVAL = 3,   ///< Exception Value register.
-	S3K_VREG_EPC = 4,    ///< Exception Program Counter register.
-	S3K_VREG_ESP = 5,    ///< Exception Stack Pointer register.
-} s3k_vreg_t;
-
 /**
  * @enum s3k_mem_perm
  * @brief Memory permission values.
