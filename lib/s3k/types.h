@@ -135,6 +135,15 @@ typedef enum s3k_reg_t {
 	S3K_REG_S11, ///< Saved register 11.
 } s3k_reg_t;
 
+typedef enum s3k_vreg {
+	S3K_VREG_TPC = 0,    ///< Trap Program Counter register.
+	S3K_VREG_TSP = 1,    ///< Trap Stack Pointer register.
+	S3K_VREG_ECAUSE = 2, ///< Exception Cause register.
+	S3K_VREG_EVAL = 3,   ///< Exception Value register.
+	S3K_VREG_EPC = 4,    ///< Exception Program Counter register.
+	S3K_VREG_ESP = 5,    ///< Exception Stack Pointer register.
+} s3k_vreg_t;
+
 /**
  * @struct s3k_cap_memory
  * @brief Memory capability structure.
