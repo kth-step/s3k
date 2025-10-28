@@ -1,0 +1,6 @@
+{
+	"mesonbuild.configureOptions": [
+		"--cross-file", "${workspaceFolder}/cross/rv64imac.ini"
+	],
+	"mesonbuild.configureOnOpen": true
+}
