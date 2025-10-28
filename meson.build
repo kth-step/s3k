@@ -13,7 +13,6 @@ project(
 
 
 subdir('kern')
-subdir('lib')
 
 elf = executable(
     's3k.elf',
@@ -24,4 +23,6 @@ elf = executable(
     build_by_default: true,
 )
 
-lib_dep = declare_dependency(include_directories: lib_includes)
+lib_dep = declare_dependency(
+    include_directories: include_directories('lib')
+)
