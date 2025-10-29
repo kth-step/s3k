@@ -44,6 +44,12 @@ make qemu
 Requirements
 ------------
 
+- Docker container
+The ``Dockerfile`` provides the reference to a container with RISC-V compiler
+and qemu installed. If you are using a x64 machine this is the suggestedned
+development environment. If you are using Mac, you can install both the compiler
+and qemu-system via brew.
+
 - [RISC-V GNU Toolchain](https://github.com/riscv-collab/riscv-gnu-toolchain) 
   - We recommend that you clone the repository and build the toolchains as follows:
     ```
