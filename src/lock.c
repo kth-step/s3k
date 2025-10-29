@@ -26,10 +26,7 @@ void lock_init(void)
 
 bool lock_acquire(bool preemptable)
 {
-	if (!preemptable) {
-		return true;
-	}
-	return !preempt();
+	return preemptable || !preempt();
 }
 
 void lock_release(void)
