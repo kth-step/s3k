@@ -6,14 +6,20 @@ This document describes the S3K system call API as provided by the S3K library. 
 
 ## Process and Synchronization
 
-### `s3k_pid_t s3k_get_pid(void)`
-Returns the current process's unique identifier (PID).
+- `s3k_pid_t s3k_get_pid(void)`
+	- Returns the current process's unique identifier (PID).
 
-### `void s3k_sync(void)`
-Releases the process and yields to the scheduler. Use to voluntarily yield CPU time.
+- `s3k_word_t s3k_get_vreg(s3k_vreg_t reg)`
+	- Returns the value of the specified virtual register.
 
-### `void s3k_sleep_until(s3k_time_t time)`
-Puts the process to sleep until the specified absolute time (in system ticks).
+- `void s3k_set_vreg(s3k_vreg_t reg, s3k_word_t val)`
+	- Sets the value of the specified virtual register.
+
+- `void s3k_sync(void)`
+	- Releases the process and yields to the scheduler. Use to voluntarily yield CPU time.
+
+- `void s3k_sleep_until(s3k_time_t time)`
+	- Puts the process to sleep until the specified absolute time (in system ticks).
 
 ---
 
