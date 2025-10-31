@@ -2,9 +2,9 @@
 #include "s3k/types.h"
 
 enum {
-	S3K_SYSCALL_GET_PID,
-	S3K_SYSCALL_GET_VREG,
-	S3K_SYSCALL_SET_VREG,
+	S3K_SYSCALL_PID_GET,
+	S3K_SYSCALL_VREG_GET,
+	S3K_SYSCALL_VREG_SET,
 	S3K_SYSCALL_SYNC,
 	S3K_SYSCALL_SLEEP_UNTIL,
 	S3K_SYSCALL_MEM_GET,
@@ -59,24 +59,24 @@ enum {
 	S3K_SYSCALL_IPC_ARECV,
 };
 
-static inline s3k_pid_t s3k_get_pid(void)
+static inline s3k_pid_t s3k_pid_get(void)
 {
-	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_GET_PID;
+	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_PID_GET;
 	__asm__ volatile("ecall" : "+r"(a0));
 	return a0;
 }
 
-static inline s3k_word_t s3k_get_vreg(s3k_vreg_t reg)
+static inline s3k_word_t s3k_vreg_get(s3k_vreg_t reg)
 {
-	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_GET_VREG;
+	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_VREG_GET;
 	register s3k_word_t a1 __asm__("a1") = reg;
 	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1));
 	return a0;
 }
 
-static inline void s3k_set_vreg(s3k_vreg_t reg, s3k_word_t val)
+static inline void s3k_vreg_set(s3k_vreg_t reg, s3k_word_t val)
 {
-	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_SET_VREG;
+	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_VREG_SET;
 	register s3k_word_t a1 __asm__("a1") = reg;
 	register s3k_word_t a2 __asm__("a2") = val;
 	__asm__ volatile("ecall" ::"r"(a0), "r"(a1), "r"(a2));

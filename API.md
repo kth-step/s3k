@@ -6,13 +6,13 @@ This document describes the S3K system call API as provided by the S3K library. 
 
 ## Process and Synchronization
 
-- `s3k_pid_t s3k_get_pid(void)`
+- `s3k_pid_t s3k_pid_get(void)`
 	- Returns the current process's unique identifier (PID).
 
-- `s3k_word_t s3k_get_vreg(s3k_vreg_t reg)`
+- `s3k_word_t s3k_vreg_get(s3k_vreg_t reg)`
 	- Returns the value of the specified virtual register.
 
-- `void s3k_set_vreg(s3k_vreg_t reg, s3k_word_t val)`
+- `void s3k_vreg_set(s3k_vreg_t reg, s3k_word_t val)`
 	- Sets the value of the specified virtual register.
 
 - `void s3k_sync(void)`

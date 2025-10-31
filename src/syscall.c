@@ -17,7 +17,7 @@
 /**
  * Get the current process's PID.
  */
-static proc_t *syscall_get_pid(pid_t pid, word_t args[8])
+static proc_t *syscall_pid_get(pid_t pid, word_t args[8])
 {
 	(void)args;
 	args[0] = pid;
@@ -27,7 +27,7 @@ static proc_t *syscall_get_pid(pid_t pid, word_t args[8])
 /**
  * Get a virtual register of the current process.
  */
-static proc_t *syscall_get_vreg(pid_t pid, word_t args[8])
+static proc_t *syscall_vreg_get(pid_t pid, word_t args[8])
 {
 	(void)pid;
 	switch (args[1]) {
@@ -59,7 +59,7 @@ static proc_t *syscall_get_vreg(pid_t pid, word_t args[8])
 /**
  * Set a virtual register of the current process.
  */
-static proc_t *syscall_set_vreg(pid_t pid, word_t args[8])
+static proc_t *syscall_vreg_set(pid_t pid, word_t args[8])
 {
 	(void)pid;
 	switch (args[1]) {
@@ -663,7 +663,7 @@ typedef proc_t *(*handler_t)(pid_t pid, word_t args[8]);
  * Handlers for individual system calls.
  */
 handler_t handlers[] = {
-	syscall_get_pid,	 syscall_get_vreg,	  syscall_set_vreg,	     syscall_sync,
+	syscall_pid_get,	 syscall_vreg_get,	  syscall_vreg_set,	     syscall_sync,
 	syscall_sleep_until,	 syscall_mem_get,	  syscall_tsl_get,	     syscall_mon_get,
 	syscall_ipc_get,	 syscall_mem_derive,	  syscall_tsl_derive,	     syscall_mon_derive,
 	syscall_ipc_derive,	 syscall_mem_revoke,	  syscall_tsl_revoke,	     syscall_mon_revoke,
