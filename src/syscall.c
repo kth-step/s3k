@@ -519,8 +519,8 @@ err_t validate_mon_pmp_load(const sys_args_t *args)
 		return ERR_INVALID_PID;
 	if (!valid_idx(args->mon_pmp_load.idx))
 		return ERR_INVALID_INDEX;
-	if (!valid_pid(args->mon_pmp_load.slot))
-		return ERR_INVALID_PID;
+	if (!valid_slot(args->mon_pmp_load.slot))
+		return ERR_INVALID_SLOT;
 	return SUCCESS;
 }
 
