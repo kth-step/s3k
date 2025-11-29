@@ -1,5 +1,7 @@
 # S3K
 
+[![CI Build](https://github.com/HAKarlsson/s3k/actions/workflows/build.yml/badge.svg)](https://github.com/HAKarlsson/s3k/actions/workflows/build.yml)
+
 S3K is an experimental bare-metal capability-based partitioning kernel for RISC-V, targeting safety- and security-critical applications, particularly in the avionics domain.
 The kernel is designed to follow the ARINC 653 standard for avionics in terms of spatial and temporal isolation of partitions.
 Furthermore, S3K incorporates mechanisms for time protection partitions, effectively preventing timing side-channel attacks.
