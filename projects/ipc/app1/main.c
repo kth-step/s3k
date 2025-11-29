@@ -19,19 +19,21 @@ uint64_t rdcycle(void)
 // Run a single IPC test between client and server, measuring timing
 void run_test(int client, uint64_t res[3], s3k_capty_t capty, s3k_index_t j)
 {
-	uint64_t msg[2] = {};
+	s3k_msg_t msg = {};
+	msg.capty = capty;
+	msg.capidx = j;
 
 	// Otherwise, perform 5 warm-up IPC calls before measurement
 	for (int i = 0; i < 5; ++i)
-		s3k_ipc_call(client, msg, &capty, &j);
+		s3k_ipc_call(client, &msg);
 
 	// Measure the cost of a single IPC call and replyrecv
 	uint64_t start = rdcycle();
-	s3k_ipc_call(client, msg, &capty, &j);
+	s3k_ipc_call(client, &msg);
 	uint64_t end = rdcycle();
-	res[0] = msg[0] - start;  // Time from start to server reply
-	res[1] = end - msg[1];	  // Time from server reply to end
-	res[2] = res[0] + res[1]; // Total round-trip time
+	res[0] = msg.data[0] - start; // Time from start to server reply
+	res[1] = end - msg.data[1];   // Time from server reply to end
+	res[2] = res[0] + res[1];     // Total round-trip time
 }
 
 int main(void)

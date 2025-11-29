@@ -135,6 +135,13 @@ typedef enum s3k_vreg {
 	S3K_VREG_ESP = 5,    ///< Exception Stack Pointer register.
 } s3k_vreg_t;
 
+typedef struct s3k_msg {
+	s3k_word_t data[2]; ///< Data payload (4 words).
+	s3k_capty_t capty;  ///< Capability type.
+	s3k_index_t capidx; ///< Capability index.
+	uint32_t servtime;  ///< Service time.
+} __attribute__((aligned(16))) s3k_msg_t;
+
 /**
  * @struct s3k_cap_memory
  * @brief Memory capability structure.
