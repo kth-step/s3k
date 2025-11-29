@@ -15,18 +15,17 @@ Lastly, IPC capabilities allow processes to communicate with each other, sending
 
 ## Repository Organization
 
-- `cross/` : Files related to cross compilation.
-- `include/` : Kernel header files.
-- `platform/` : Platform specific kernel configuration files.
-- `src/` : Kernel source files.
-- `lib/` : Kernel API library.
-- `projects/` : Example projects.
-- `Doxygen` : Doxygen configuration file.
+- `cross/` : Cross-compilation configuration files.
+- `kern/` : Kernel source code and header files.
+- `lib/` : Kernel API library (libs3k).
+- `platform/` : Platform-specific kernel configurations and linker scripts.
+- `projects/` : Example projects demonstrating S3K capabilities.
+- `scripts/` : Build and development scripts (e.g., Docker wrapper).
+- `API.md` : Kernel API documentation.
 - `LICENSE` : License file.
 - `meson.build` : Meson build configuration.
-- `README.md` : This README file.
-- `API.md` : Kernel API description.
-- `meson.options` : Kernel configuration file.
+- `meson.options` : Kernel build options.
+- `README.md` : This file.
 
 ## Compilation instructions
 
