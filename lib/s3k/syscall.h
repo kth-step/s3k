@@ -533,76 +533,81 @@ static inline int s3k_mon_tsl_set(s3k_index_t i, s3k_index_t j, bool enabled)
 	return a0;
 }
 
-static inline int s3k_ipc_send(s3k_index_t i, s3k_word_t msg[2], s3k_capty_t capty, s3k_index_t j)
+static inline int s3k_ipc_send(s3k_index_t i, s3k_msg_t *msg)
 {
 	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_IPC_SEND;
 	register s3k_word_t a1 __asm__("a1") = i;
-	register s3k_word_t a2 __asm__("a2") = msg[0];
-	register s3k_word_t a3 __asm__("a3") = msg[1];
-	register s3k_word_t a4 __asm__("a4") = capty;
-	register s3k_word_t a5 __asm__("a5") = j;
+	register s3k_word_t a2 __asm__("a2") = msg->data[0];
+	register s3k_word_t a3 __asm__("a3") = msg->data[1];
+	register s3k_word_t a4 __asm__("a4") = msg->capty;
+	register s3k_word_t a5 __asm__("a5") = msg->capidx;
 	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1), "r"(a2), "r"(a3), "r"(a4), "r"(a5));
 	return a0;
 }
 
-static inline int s3k_ipc_recv(s3k_index_t i, s3k_word_t msg[2], s3k_capty_t *capty, s3k_index_t *j, uint32_t servtime)
+static inline int s3k_ipc_recv(s3k_index_t i, s3k_msg_t *msg)
 {
 	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_IPC_RECV;
 	register s3k_word_t a1 __asm__("a1") = i;
-	register s3k_word_t a2 __asm__("a2") = servtime;
+	register s3k_word_t a2 __asm__("a2") = msg->servtime;
 	register s3k_word_t a3 __asm__("a3");
 	register s3k_word_t a4 __asm__("a4");
 	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "+r"(a2), "=r"(a3), "=r"(a4));
-	msg[0] = a1;
-	msg[1] = a2;
-	*capty = a3;
-	*j = a4;
+	if (a0 == S3K_SUCCESS) {
+		msg->data[0] = a1;
+		msg->data[1] = a2;
+		msg->capty = (s3k_capty_t)a3;
+		msg->capidx = (s3k_index_t)a4;
+	}
 	return a0;
 }
 
-static inline int s3k_ipc_call(s3k_index_t i, s3k_word_t msg[2], s3k_capty_t *capty, s3k_index_t *j)
+static inline int s3k_ipc_call(s3k_index_t i, s3k_msg_t *msg)
 {
 	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_IPC_CALL;
 	register s3k_word_t a1 __asm__("a1") = i;
-	register s3k_word_t a2 __asm__("a2") = msg[0];
-	register s3k_word_t a3 __asm__("a3") = msg[1];
-	register s3k_word_t a4 __asm__("a4") = *capty;
-	register s3k_word_t a5 __asm__("a5") = *j;
+	register s3k_word_t a2 __asm__("a2") = msg->data[0];
+	register s3k_word_t a3 __asm__("a3") = msg->data[1];
+	register s3k_word_t a4 __asm__("a4") = msg->capty;
+	register s3k_word_t a5 __asm__("a5") = msg->capidx;
 	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "+r"(a2), "+r"(a3), "+r"(a4) : "r"(a5));
-	msg[0] = a1;
-	msg[1] = a2;
-	*capty = a3;
-	*j = a4;
+	if (a0 == S3K_SUCCESS) {
+		msg->data[0] = a1;
+		msg->data[1] = a2;
+		msg->capty = (s3k_capty_t)a3;
+		msg->capidx = (s3k_index_t)a4;
+	}
 	return a0;
 }
 
-static inline int s3k_ipc_reply(s3k_index_t i, s3k_word_t msg[2], s3k_capty_t capty, s3k_index_t j)
+static inline int s3k_ipc_reply(s3k_index_t i, s3k_msg_t *msg)
 {
 	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_IPC_REPLY;
 	register s3k_word_t a1 __asm__("a1") = i;
-	register s3k_word_t a2 __asm__("a2") = msg[0];
-	register s3k_word_t a3 __asm__("a3") = msg[1];
-	register s3k_word_t a4 __asm__("a4") = capty;
-	register s3k_word_t a5 __asm__("a5") = j;
+	register s3k_word_t a2 __asm__("a2") = msg->data[0];
+	register s3k_word_t a3 __asm__("a3") = msg->data[1];
+	register s3k_word_t a4 __asm__("a4") = msg->capty;
+	register s3k_word_t a5 __asm__("a5") = msg->capidx;
 	__asm__ volatile("ecall" : "+r"(a0) : "r"(a1), "r"(a2), "r"(a3), "r"(a4), "r"(a5));
 	return a0;
 }
 
-static inline int s3k_ipc_replyrecv(s3k_index_t i, s3k_word_t msg[2], s3k_capty_t *capty, s3k_index_t *j,
-				    uint32_t servtime)
+static inline int s3k_ipc_replyrecv(s3k_index_t i, s3k_msg_t *msg)
 {
 	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_IPC_REPLYRECV;
 	register s3k_word_t a1 __asm__("a1") = i;
-	register s3k_word_t a2 __asm__("a2") = msg[0];
-	register s3k_word_t a3 __asm__("a3") = msg[1];
-	register s3k_word_t a4 __asm__("a4") = *capty;
-	register s3k_word_t a5 __asm__("a5") = *j;
-	register s3k_word_t a6 __asm__("a6") = servtime;
+	register s3k_word_t a2 __asm__("a2") = msg->data[0];
+	register s3k_word_t a3 __asm__("a3") = msg->data[1];
+	register s3k_word_t a4 __asm__("a4") = msg->capty;
+	register s3k_word_t a5 __asm__("a5") = msg->capidx;
+	register s3k_word_t a6 __asm__("a6") = msg->servtime;
 	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "+r"(a2), "+r"(a3), "+r"(a4) : "r"(a5), "r"(a6));
-	msg[0] = a1;
-	msg[1] = a2;
-	*capty = a3;
-	*j = a4;
+	if (a0 == S3K_SUCCESS) {
+		msg->data[0] = a1;
+		msg->data[1] = a2;
+		msg->capty = (s3k_capty_t)a3;
+		msg->capidx = (s3k_index_t)a4;
+	}
 	return a0;
 }
 
