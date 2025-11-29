@@ -30,3 +30,15 @@ elif get_option('platform') == 'cheshire2'
 else 
 	error('Unknown platform: ' + get_option('platform'))
 endif
+
+# Platform configuration arguments  
+c_platform_args = [
+    '-D_MAX_PMP_SLOT=' + platform_opts['npmp'],
+    '-D_NUM_MEMORY_CAPS=' + platform_opts['nmemcaps'],
+    '-D_NUM_HARTS=' + platform_opts['nharts'],
+    '-D_RTC_HZ=' + platform_opts['rtchz'],
+]
+
+link_platform_args = [
+    '-T' + platform_ld
+]
