@@ -4,6 +4,6 @@
 		"${workspaceFolder}/cross/rv64imac.ini"
 	],
 	"mesonbuild.configureOnOpen": true,
-	"C_Cpp.default.compileCommands": "/workspaces/s3k/builddir/compile_commands.json",
+	"C_Cpp.default.compileCommands": "${workspaceFolder}/builddir/compile_commands.json",
 	"C_Cpp.default.configurationProvider": "mesonbuild.mesonbuild"
 }
