@@ -35,7 +35,7 @@ Requirements: Docker (rootless).
 ### Compiling only the kernel
 
 ```bash
-./docker.sh
+./scripts/docker.sh
 meson setup builddir --cross-file=cross/rv64imac.toml
 ninja -C builddir
 ```
@@ -43,7 +43,7 @@ ninja -C builddir
 ## Compilation instructions for hello project
 
 ```bash
-./docker.sh
+./scripts/docker.sh
 cd projects/hello
 meson setup builddir --cross-file=../../cross/rv64imac.toml
 ninja -C builddir
