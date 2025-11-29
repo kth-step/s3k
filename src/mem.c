@@ -76,7 +76,7 @@ int mem_transfer(pid_t owner, index_t i, pid_t new_owner)
 
 	// If PMP config is set, clear it.
 	if (mem_table[i].slot != 0) {
-		proc_pmp_clear(owner, mem_table[i].slot);
+		proc_pmp_clear(owner, mem_table[i].slot - 1);
 		mem_table[i].slot = 0; // Clear the PMP slot.
 	}
 
