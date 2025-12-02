@@ -54,6 +54,19 @@ int mem_transfer(pid_t owner, index_t index, pid_t new_owner);
 int mem_get(pid_t owner, index_t i, mem_t *mem_t);
 
 /**
+ * Retrieves a memory capability from the memory subtable with an offset.
+ *
+ * @param owner The process ID associated with the memory capability.
+ * @param i The index in the memory table.
+ * @param offset The offset within the capability's range.
+ * @param cap A pointer to store the retrieved memory capability.
+ * @return ERR_SUCCESS if the memory capability is successfully retrieved,
+ *         ERR_INVALID_ACCESS if the owner does not match the entry in the memory table,
+ *         ERR_INVALID_ARGUMENT if the offset is out of range.
+ */
+int mem_introspect(pid_t owner, index_t i, fuel_t offset, mem_t *cap);
+
+/**
  * Derives a new memory capability from an existing one.
  *
  * @param owner The process ID associated with the existing memory capability.

@@ -81,6 +81,20 @@ int tsl_get(pid_t owner, index_t i, tsl_t *time_cap)
 	return ERR_SUCCESS;
 }
 
+int tsl_introspect(pid_t owner, index_t i, fuel_t offset, tsl_t *cap)
+{
+	if (UNLIKELY(!tsl_valid_access(owner, i))) {
+		return ERR_INVALID_ACCESS;
+	}
+
+	if (offset >= tsl_table[i].csize) {
+		return ERR_INVALID_ARGUMENT;
+	}
+
+	*cap = tsl_table[i + offset];
+	return ERR_SUCCESS;
+}
+
 /**
  * Derives a new time slice capability from an existing one.
  */

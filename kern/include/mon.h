@@ -46,6 +46,19 @@ int mon_transfer(pid_t owner, index_t i, pid_t new_owner);
 int mon_get(pid_t owner, index_t i, mon_t *cap_monitor);
 
 /**
+ * Retrieves a monitor capability from the monitor subtable with an offset.
+ *
+ * @param owner The process ID associated with the monitor capability.
+ * @param i The index in the monitor table.
+ * @param offset The offset to apply to the index.
+ * @param cap A pointer to store the retrieved monitor capability.
+ * @return ERR_SUCCESS if the monitor capability is successfully retrieved,
+ *         ERR_INVALID_ACCESS if the owner does not match the entry in the monitor table,
+ *         ERR_INVALID_ARGUMENT if the offset is out of bounds.
+ */
+int mon_introspect(pid_t owner, index_t i, fuel_t offset, mon_t *cap);
+
+/**
  * Derives a new monitor capability from an existing one.
  *
  * @param owner The process ID associated with the existing monitor capability.

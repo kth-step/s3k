@@ -99,6 +99,20 @@ int mem_get(pid_t owner, index_t i, mem_t *cap)
 	return ERR_SUCCESS;
 }
 
+int mem_introspect(pid_t owner, index_t i, fuel_t offset, mem_t *cap)
+{
+	if (UNLIKELY(!mem_valid_access(owner, i))) {
+		return ERR_INVALID_ACCESS;
+	}
+
+	if (offset >= mem_table[i].csize) {
+		return ERR_INVALID_ARGUMENT;
+	}
+
+	*cap = mem_table[i + offset];
+	return ERR_SUCCESS;
+}
+
 /**
  * Derive a memory capability.
  */
