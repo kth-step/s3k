@@ -47,20 +47,6 @@ int mon_transfer(pid_t owner, index_t i, pid_t new_owner)
 	return ERR_SUCCESS;
 }
 
-/**
- * Retrieves a monitor capability.
- */
-int mon_get(pid_t owner, index_t i, mon_t *cap_monitor)
-{
-	if (UNLIKELY(!mon_valid_access(owner, i))) {
-		return ERR_INVALID_ACCESS;
-	}
-
-	// Copy the capability to the output parameter.
-	*cap_monitor = mon_table[i];
-	return ERR_SUCCESS;
-}
-
 int mon_introspect(pid_t owner, index_t i, fuel_t offset, mon_t *cap)
 {
 	if (UNLIKELY(!mon_valid_access(owner, i))) {

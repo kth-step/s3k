@@ -89,18 +89,6 @@ int ipc_transfer(pid_t owner, index_t i, pid_t new_owner)
 	return ERR_SUCCESS;
 }
 
-/**
- * Get an IPC capability for the given owner and index.
- */
-int ipc_get(pid_t owner, index_t i, ipc_t *cap)
-{
-	if (UNLIKELY(!ipc_valid_access(owner, i))) {
-		return ERR_INVALID_ACCESS;
-	}
-	*cap = ipc_table[i];
-	return ERR_SUCCESS;
-}
-
 int ipc_introspect(pid_t owner, index_t i, fuel_t offset, ipc_t *cap)
 {
 	if (UNLIKELY(!ipc_valid_access(owner, i))) {

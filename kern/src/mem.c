@@ -86,19 +86,6 @@ int mem_transfer(pid_t owner, index_t i, pid_t new_owner)
 	return ERR_SUCCESS;
 }
 
-/**
- * Get a memory capability.
- */
-int mem_get(pid_t owner, index_t i, mem_t *cap)
-{
-	if (UNLIKELY(!mem_valid_access(owner, i))) {
-		return ERR_INVALID_ACCESS;
-	}
-
-	*cap = mem_table[i];
-	return ERR_SUCCESS;
-}
-
 int mem_introspect(pid_t owner, index_t i, fuel_t offset, mem_t *cap)
 {
 	if (UNLIKELY(!mem_valid_access(owner, i))) {
