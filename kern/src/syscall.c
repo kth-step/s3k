@@ -113,36 +113,36 @@ static proc_t *syscall_sleep_until(pid_t pid, word_t args[8])
 /**
  * Get a memory capability.
  */
-static proc_t *syscall_mem_get(pid_t pid, word_t args[8])
+static proc_t *syscall_mem_introspect(pid_t pid, word_t args[8])
 {
-	args[0] = mem_get(pid, args[1], (mem_t *)&args[1]);
+	args[0] = mem_introspect(pid, args[1], args[2], (mem_t *)&args[1]);
 	return current;
 }
 
 /**
  * Get a time slice capability.
  */
-static proc_t *syscall_tsl_get(pid_t pid, word_t args[8])
+static proc_t *syscall_tsl_introspect(pid_t pid, word_t args[8])
 {
-	args[0] = tsl_get(pid, args[1], (tsl_t *)&args[1]);
+	args[0] = tsl_introspect(pid, args[1], args[2], (tsl_t *)&args[1]);
 	return current;
 }
 
 /**
  * Get a monitor capability.
  */
-static proc_t *syscall_mon_get(pid_t pid, word_t args[8])
+static proc_t *syscall_mon_introspect(pid_t pid, word_t args[8])
 {
-	args[0] = mon_get(pid, args[1], (mon_t *)&args[1]);
+	args[0] = mon_introspect(pid, args[1], args[2], (mon_t *)&args[1]);
 	return current;
 }
 
 /**
  * Get an IPC capability.
  */
-static proc_t *syscall_ipc_get(pid_t pid, word_t args[8])
+static proc_t *syscall_ipc_introspect(pid_t pid, word_t args[8])
 {
-	args[0] = ipc_get(pid, args[1], (ipc_t *)&args[1]);
+	args[0] = ipc_introspect(pid, args[1], args[2], (ipc_t *)&args[1]);
 	return current;
 }
 
@@ -367,12 +367,12 @@ static proc_t *syscall_mon_vreg_set(pid_t pid, word_t args[8])
 /**
  * Get a time slice capability configuration of the process being monitored by the specified monitor capability.
  */
-static proc_t *syscall_mon_tsl_get(pid_t pid, word_t args[8])
+static proc_t *syscall_mon_tsl_introspect(pid_t pid, word_t args[8])
 {
 	pid_t target = mon_get_pid(pid, args[1]);
 	args[0] = ERR_INVALID_ACCESS;
 	if (target != INVALID_PID) {
-		args[0] = tsl_get(target, args[2], (tsl_t *)&args[1]);
+		args[0] = tsl_introspect(target, args[2], args[3], (tsl_t *)&args[1]);
 	}
 	return current;
 }
@@ -380,12 +380,12 @@ static proc_t *syscall_mon_tsl_get(pid_t pid, word_t args[8])
 /**
  * Get a memory capability configuration of the process being monitored by the specified monitor capability.
  */
-static proc_t *syscall_mon_mem_get(pid_t pid, word_t args[8])
+static proc_t *syscall_mon_mem_introspect(pid_t pid, word_t args[8])
 {
 	pid_t target = mon_get_pid(pid, args[1]);
 	args[0] = ERR_INVALID_ACCESS;
 	if (target != INVALID_PID) {
-		args[0] = mem_get(target, args[2], (mem_t *)&args[1]);
+		args[0] = mem_introspect(target, args[2], args[3], (mem_t *)&args[1]);
 	}
 	return current;
 }
@@ -393,12 +393,12 @@ static proc_t *syscall_mon_mem_get(pid_t pid, word_t args[8])
 /**
  * Get a monitor capability configuration of the process being monitored by the specified monitor capability.
  */
-static proc_t *syscall_mon_mon_get(pid_t pid, word_t args[8])
+static proc_t *syscall_mon_mon_introspect(pid_t pid, word_t args[8])
 {
 	pid_t target = mon_get_pid(pid, args[1]);
 	args[0] = ERR_INVALID_ACCESS;
 	if (target != INVALID_PID) {
-		args[0] = mon_get(target, args[2], (mon_t *)&args[1]);
+		args[0] = mon_introspect(target, args[2], args[3], (mon_t *)&args[1]);
 	}
 	return current;
 }
@@ -406,12 +406,12 @@ static proc_t *syscall_mon_mon_get(pid_t pid, word_t args[8])
 /**
  * Get an IPC capability configuration of the process being monitored by the specified monitor capability.
  */
-static proc_t *syscall_mon_ipc_get(pid_t pid, word_t args[8])
+static proc_t *syscall_mon_ipc_introspect(pid_t pid, word_t args[8])
 {
 	pid_t target = mon_get_pid(pid, args[1]);
 	args[0] = ERR_INVALID_ACCESS;
 	if (target != INVALID_PID) {
-		args[0] = ipc_get(target, args[2], (ipc_t *)&args[1]);
+		args[0] = ipc_introspect(target, args[2], args[3], (ipc_t *)&args[1]);
 	}
 	return current;
 }
@@ -663,20 +663,61 @@ typedef proc_t *(*handler_t)(pid_t pid, word_t args[8]);
  * Handlers for individual system calls.
  */
 handler_t handlers[] = {
-	syscall_pid_get,	 syscall_vreg_get,	  syscall_vreg_set,	     syscall_sync,
-	syscall_sleep_until,	 syscall_mem_get,	  syscall_tsl_get,	     syscall_mon_get,
-	syscall_ipc_get,	 syscall_mem_derive,	  syscall_tsl_derive,	     syscall_mon_derive,
-	syscall_ipc_derive,	 syscall_mem_revoke,	  syscall_tsl_revoke,	     syscall_mon_revoke,
-	syscall_ipc_revoke,	 syscall_mem_delete,	  syscall_tsl_delete,	     syscall_mon_delete,
-	syscall_ipc_delete,	 syscall_mem_pmp_get,	  syscall_mem_pmp_set,	     syscall_mem_pmp_clear,
-	syscall_tsl_set,	 syscall_mon_suspend,	  syscall_mon_resume,	     syscall_mon_yield,
-	syscall_mon_reg_get,	 syscall_mon_reg_set,	  syscall_mon_vreg_get,	     syscall_mon_vreg_set,
-	syscall_mon_mem_get,	 syscall_mon_tsl_get,	  syscall_mon_mon_get,	     syscall_mon_ipc_get,
-	syscall_mon_mem_grant,	 syscall_mon_tsl_grant,	  syscall_mon_mon_grant,     syscall_mon_ipc_grant,
-	syscall_mon_mem_derive,	 syscall_mon_tsl_derive,  syscall_mon_mon_derive,    syscall_mon_ipc_derive,
-	syscall_mon_mem_pmp_get, syscall_mon_mem_pmp_set, syscall_mon_mem_pmp_clear, syscall_mon_tsl_set,
-	syscall_ipc_send,	 syscall_ipc_recv,	  syscall_ipc_call,	     syscall_ipc_reply,
-	syscall_ipc_replyrecv,	 syscall_ipc_asend,	  syscall_ipc_arecv,
+	syscall_pid_get,
+	syscall_vreg_get,
+	syscall_vreg_set,
+	syscall_sync,
+	syscall_sleep_until,
+	syscall_mem_introspect,
+	syscall_tsl_introspect,
+	syscall_mon_introspect,
+	syscall_ipc_introspect,
+	syscall_mem_derive,
+	syscall_tsl_derive,
+	syscall_mon_derive,
+	syscall_ipc_derive,
+	syscall_mem_revoke,
+	syscall_tsl_revoke,
+	syscall_mon_revoke,
+	syscall_ipc_revoke,
+	syscall_mem_delete,
+	syscall_tsl_delete,
+	syscall_mon_delete,
+	syscall_ipc_delete,
+	syscall_mem_pmp_get,
+	syscall_mem_pmp_set,
+	syscall_mem_pmp_clear,
+	syscall_tsl_set,
+	syscall_mon_suspend,
+	syscall_mon_resume,
+	syscall_mon_yield,
+	syscall_mon_reg_get,
+	syscall_mon_reg_set,
+	syscall_mon_vreg_get,
+	syscall_mon_vreg_set,
+	syscall_mon_mem_introspect,
+	syscall_mon_tsl_introspect,
+	syscall_mon_mon_introspect,
+	syscall_mon_ipc_introspect,
+	syscall_mon_mem_grant,
+	syscall_mon_tsl_grant,
+	syscall_mon_mon_grant,
+	syscall_mon_ipc_grant,
+	syscall_mon_mem_derive,
+	syscall_mon_tsl_derive,
+	syscall_mon_mon_derive,
+	syscall_mon_ipc_derive,
+	syscall_mon_mem_pmp_get,
+	syscall_mon_mem_pmp_set,
+	syscall_mon_mem_pmp_clear,
+	syscall_mon_tsl_set,
+	syscall_ipc_send,
+	syscall_ipc_recv,
+	syscall_ipc_call,
+	syscall_ipc_reply,
+	syscall_ipc_replyrecv,
+	syscall_ipc_asend,
+	syscall_ipc_arecv,
 };
 
 /**
