@@ -7,10 +7,10 @@ enum {
 	S3K_SYSCALL_VREG_SET,
 	S3K_SYSCALL_SYNC,
 	S3K_SYSCALL_SLEEP_UNTIL,
-	S3K_SYSCALL_MEM_GET,
-	S3K_SYSCALL_TSL_GET,
-	S3K_SYSCALL_MON_GET,
-	S3K_SYSCALL_IPC_GET,
+	S3K_SYSCALL_MEM_INTROSPECT,
+	S3K_SYSCALL_TSL_INTROSPECT,
+	S3K_SYSCALL_MON_INTROSPECT,
+	S3K_SYSCALL_IPC_INTROSPECT,
 	S3K_SYSCALL_MEM_DERIVE,
 	S3K_SYSCALL_TSL_DERIVE,
 	S3K_SYSCALL_MON_DERIVE,
@@ -34,10 +34,10 @@ enum {
 	S3K_SYSCALL_MON_REG_SET,
 	S3K_SYSCALL_MON_VREG_GET,
 	S3K_SYSCALL_MON_VREG_SET,
-	S3K_SYSCALL_MON_MEM_GET,
-	S3K_SYSCALL_MON_TSL_GET,
-	S3K_SYSCALL_MON_MON_GET,
-	S3K_SYSCALL_MON_IPC_GET,
+	S3K_SYSCALL_MON_MEM_INTROSPECT,
+	S3K_SYSCALL_MON_TSL_INTROSPECT,
+	S3K_SYSCALL_MON_MON_INTROSPECT,
+	S3K_SYSCALL_MON_IPC_INTROSPECT,
 	S3K_SYSCALL_MON_MEM_GRANT,
 	S3K_SYSCALL_MON_TSL_GRANT,
 	S3K_SYSCALL_MON_MON_GRANT,
@@ -97,10 +97,10 @@ static inline void s3k_sleep_until(s3k_time_t time)
 
 static inline int s3k_mem_get(s3k_index_t i, s3k_cap_mem_t *cap)
 {
-	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MEM_GET;
+	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MEM_INTROSPECT;
 	register s3k_word_t a1 __asm__("a1") = i;
-	register s3k_word_t a2 __asm__("a2");
-	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "=r"(a2));
+	register s3k_word_t a2 __asm__("a2") = 0;
+	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "+r"(a2));
 	s3k_word_t *ptr = (s3k_word_t *)cap;
 	ptr[0] = a1;
 	ptr[1] = a2;
@@ -109,10 +109,10 @@ static inline int s3k_mem_get(s3k_index_t i, s3k_cap_mem_t *cap)
 
 static inline int s3k_tsl_get(s3k_index_t i, s3k_cap_tsl_t *cap)
 {
-	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_TSL_GET;
+	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_TSL_INTROSPECT;
 	register s3k_word_t a1 __asm__("a1") = i;
-	register s3k_word_t a2 __asm__("a2");
-	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "=r"(a2));
+	register s3k_word_t a2 __asm__("a2") = 0;
+	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "+r"(a2));
 	s3k_word_t *ptr = (s3k_word_t *)cap;
 	ptr[0] = a1;
 	ptr[1] = a2;
@@ -121,10 +121,10 @@ static inline int s3k_tsl_get(s3k_index_t i, s3k_cap_tsl_t *cap)
 
 static inline int s3k_mon_get(s3k_index_t i, s3k_cap_mon_t *cap)
 {
-	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_GET;
+	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_INTROSPECT;
 	register s3k_word_t a1 __asm__("a1") = i;
-	register s3k_word_t a2 __asm__("a2");
-	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "=r"(a2));
+	register s3k_word_t a2 __asm__("a2") = 0;
+	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "+r"(a2));
 	s3k_word_t *ptr = (s3k_word_t *)cap;
 	ptr[0] = a1;
 	return a0;
@@ -132,10 +132,10 @@ static inline int s3k_mon_get(s3k_index_t i, s3k_cap_mon_t *cap)
 
 static inline int s3k_ipc_get(s3k_index_t i, s3k_cap_ipc_t *cap)
 {
-	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_IPC_GET;
+	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_IPC_INTROSPECT;
 	register s3k_word_t a1 __asm__("a1") = i;
-	register s3k_word_t a2 __asm__("a2");
-	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "=r"(a2));
+	register s3k_word_t a2 __asm__("a2") = 0;
+	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "+r"(a2));
 	s3k_word_t *ptr = (s3k_word_t *)cap;
 	ptr[0] = a1;
 	ptr[1] = a2;
@@ -357,10 +357,11 @@ static inline int s3k_mon_vreg_set(s3k_index_t i, s3k_vreg_t reg, s3k_word_t val
 
 static inline int s3k_mon_mem_get(s3k_index_t i, s3k_index_t j, s3k_cap_mem_t *cap)
 {
-	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_MEM_GET;
+	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_MEM_INTROSPECT;
 	register s3k_word_t a1 __asm__("a1") = i;
 	register s3k_word_t a2 __asm__("a2") = j;
-	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "+r"(a2));
+	register s3k_word_t a3 __asm__("a3") = 0;
+	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "+r"(a2), "+r"(a3));
 	s3k_word_t *ptr = (s3k_word_t *)cap;
 	ptr[0] = a1;
 	ptr[1] = a2;
@@ -369,10 +370,11 @@ static inline int s3k_mon_mem_get(s3k_index_t i, s3k_index_t j, s3k_cap_mem_t *c
 
 static inline int s3k_mon_tsl_get(s3k_index_t i, s3k_index_t j, s3k_cap_tsl_t *cap)
 {
-	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_TSL_GET;
+	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_TSL_INTROSPECT;
 	register s3k_word_t a1 __asm__("a1") = i;
 	register s3k_word_t a2 __asm__("a2") = j;
-	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "+r"(a2));
+	register s3k_word_t a3 __asm__("a3") = 0;
+	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "+r"(a2), "+r"(a3));
 	s3k_word_t *ptr = (s3k_word_t *)cap;
 	ptr[0] = a1;
 	ptr[1] = a2;
@@ -381,10 +383,11 @@ static inline int s3k_mon_tsl_get(s3k_index_t i, s3k_index_t j, s3k_cap_tsl_t *c
 
 static inline int s3k_mon_mon_get(s3k_index_t i, s3k_index_t j, s3k_cap_mon_t *cap)
 {
-	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_MON_GET;
+	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_MON_INTROSPECT;
 	register s3k_word_t a1 __asm__("a1") = i;
 	register s3k_word_t a2 __asm__("a2") = j;
-	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1) : "r"(a2));
+	register s3k_word_t a3 __asm__("a3") = 0;
+	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "+r"(a2), "+r"(a3));
 	s3k_word_t *ptr = (s3k_word_t *)cap;
 	ptr[0] = a1;
 	return a0;
@@ -392,10 +395,11 @@ static inline int s3k_mon_mon_get(s3k_index_t i, s3k_index_t j, s3k_cap_mon_t *c
 
 static inline int s3k_mon_ipc_get(s3k_index_t i, s3k_index_t j, s3k_cap_ipc_t *cap)
 {
-	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_IPC_GET;
+	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_IPC_INTROSPECT;
 	register s3k_word_t a1 __asm__("a1") = i;
 	register s3k_word_t a2 __asm__("a2") = j;
-	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "+r"(a2));
+	register s3k_word_t a3 __asm__("a3") = 0;
+	__asm__ volatile("ecall" : "+r"(a0), "+r"(a1), "+r"(a2), "+r"(a3));
 	s3k_word_t *ptr = (s3k_word_t *)cap;
 	ptr[0] = a1;
 	ptr[1] = a2;
