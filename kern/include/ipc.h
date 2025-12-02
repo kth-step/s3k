@@ -64,6 +64,18 @@ int ipc_transfer(pid_t owner, index_t i, pid_t new_owner);
 int ipc_get(pid_t owner, index_t i, ipc_t *cap);
 
 /**
+ * @brief Retrieves an IPC capability from the subtable with an offset.
+ * @param owner The owner of the capability.
+ * @param i The index of the capability.
+ * @param offset The offset within the capability's range.
+ * @param cap Pointer to store the retrieved capability.
+ * @return ERR_SUCCESS on success, or an error code on failure.
+ *         ERR_INVALID_ACCESS if the owner does not match,
+ *         ERR_INVALID_ARGUMENT if the offset is out of bounds.
+ */
+int ipc_introspect(pid_t owner, index_t i, fuel_t offset, ipc_t *cap);
+
+/**
  * @brief Derives a new IPC capability.
  * @param owner The owner of the parent capability.
  * @param i The index of the parent capability.

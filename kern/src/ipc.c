@@ -101,6 +101,20 @@ int ipc_get(pid_t owner, index_t i, ipc_t *cap)
 	return ERR_SUCCESS;
 }
 
+int ipc_introspect(pid_t owner, index_t i, fuel_t offset, ipc_t *cap)
+{
+	if (UNLIKELY(!ipc_valid_access(owner, i))) {
+		return ERR_INVALID_ACCESS;
+	}
+
+	if (offset >= ipc_table[i].csize) {
+		return ERR_INVALID_ARGUMENT;
+	}
+
+	*cap = ipc_table[i + offset];
+	return ERR_SUCCESS;
+}
+
 /**
  * Derive a new IPC capability.
  */

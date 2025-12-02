@@ -61,6 +61,20 @@ int mon_get(pid_t owner, index_t i, mon_t *cap_monitor)
 	return ERR_SUCCESS;
 }
 
+int mon_introspect(pid_t owner, index_t i, fuel_t offset, mon_t *cap)
+{
+	if (UNLIKELY(!mon_valid_access(owner, i))) {
+		return ERR_INVALID_ACCESS;
+	}
+
+	if (offset >= mon_table[i].csize) {
+		return ERR_INVALID_ARGUMENT;
+	}
+
+	*cap = mon_table[i + offset];
+	return ERR_SUCCESS;
+}
+
 /**
  * Retrieves the process ID associated with a monitor capability.
  */

@@ -57,6 +57,19 @@ int tsl_transfer(pid_t owner, index_t i, pid_t new_owner);
 int tsl_get(pid_t owner, index_t i, tsl_t *cap);
 
 /**
+ * Retrieves a time slice capability from the time subtable with an offset.
+ *
+ * @param owner The process ID associated with the time slice capability.
+ * @param index The index in the time table.
+ * @param offset The offset within the capability's range.
+ * @param cap A pointer to store the retrieved time slice capability.
+ * @return ERR_SUCCESS if the time slice capability is successfully retrieved,
+ *         ERR_INVALID_ACCESS if the owner does not match the entry in the time table,
+ *         ERR_INVALID_ARGUMENT if the offset is out of bounds.
+ */
+int tsl_introspect(pid_t owner, index_t i, fuel_t offset, tsl_t *cap);
+
+/**
  * Derives a new time slice capability from an existing one.
  *
  * @param owner The process ID associated with the existing time slice capability.
