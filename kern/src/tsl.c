@@ -66,21 +66,6 @@ int tsl_transfer(pid_t owner, index_t i, pid_t new_owner)
 	return ERR_SUCCESS;
 }
 
-/**
- * Retrieves a time slice capability from the time table.
- */
-int tsl_get(pid_t owner, index_t i, tsl_t *time_cap)
-{
-	if (UNLIKELY(!tsl_valid_access(owner, i))) {
-		return ERR_INVALID_ACCESS;
-	}
-
-	// Copy the time slice capability to the output parameter.
-	*time_cap = tsl_table[i];
-
-	return ERR_SUCCESS;
-}
-
 int tsl_introspect(pid_t owner, index_t i, fuel_t offset, tsl_t *cap)
 {
 	if (UNLIKELY(!tsl_valid_access(owner, i))) {
