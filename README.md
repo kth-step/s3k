@@ -1,17 +1,13 @@
-# S3K
+# S3K - Safe and Secure Separation Kernel
 
 [![CI Build](https://github.com/HAKarlsson/s3k/actions/workflows/build.yml/badge.svg)](https://github.com/HAKarlsson/s3k/actions/workflows/build.yml)
 
-S3K is an experimental bare-metal capability-based partitioning kernel for RISC-V, targeting safety- and security-critical applications, particularly in the avionics domain.
-The kernel is designed to follow the ARINC 653 standard for avionics in terms of spatial and temporal isolation of partitions.
-Furthermore, S3K incorporates mechanisms for time protection partitions, effectively preventing timing side-channel attacks.
+S3K is an experimental bare-metal capability-based separation kernel for RISC-V, built for safety- and security-critical systems such as avionics.
+It supports dynamic partitioning with strict spatial and temporal isolation. The kernel is implemented in C and assembly with a small trusted computing base (TCB) and minimal hardware requirements (RISC-V PMP, machine mode and user mode).
 
-The capabilities of S3K allow trusted user processes to dynamically create and destroy partitions.
-Time is treated as a first-class capability, allowing processes to precisely specify when they are executed in a time-driven cyclic schedule.
-Memory capabilities allow processes to configure the RISC-V Physical Memory Protection (PMP) unit, enabling dynamic spatial isolation.
-Monitor capabilities allow processes to monitor and configure other processes, enabling the creation of system monitors that oversee the state of the system, boot the system, and reconfigure the system dynamically.
-Lastly, IPC capabilities allow processes to communicate with each other, sending data, capabilities, and even execution time.
+Trusted user processes can dynamically create and destroy partitions. Time is a first-class capability for time-driven cyclic schedules. Memory capabilities configure the RISC-V PMP for dynamic spatial isolation. Monitor capabilities let trusted processes supervise and reconfigure others (boot, health checks, recovery). IPC capabilities move data, capabilities, and execution time donations between partitions.
 
+Using the temporal fence instruction (see [PULP's CVA6 implementation](https://github.com/pulp-platform/cva6)), S3K provides time protection between partitions, reducing covert channels from core-local microarchitectural state. To mitigate off-core channels, pair S3K with hardware or platform measures such as cache partitioning, scratchpad/SRAM usage, or flushing shared resources on partition switches.
 
 ## Repository Organization
 
@@ -48,3 +44,19 @@ meson setup builddir --cross-file=../../cross/rv64imac.toml
 ninja -C builddir
 ninja -C builddir qemu-run
 ```
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgements
+
+This work was supported by KTH CDIS (Centre for Cyber Defence and Information Security) and the Intel Corporation.
+
+## Related Papers
+
+H. Karlsson, and R. Guanciale, "Partitioning Kernel with Capability Controlled Temporal and Spatial Partitioning," in 2025 IEEE 46th Real-Time Systems Symposium (RTSS'25), Dec. 2025.
+
+H. A. Karlsson, “Minimal partitioning kernel with time protection
+and predictability,” in Proc. IEEE European Symposium on Security
+and Privacy Workshops (EuroS&PW’24). IEEE, 2024, pp. 234–241.
