@@ -45,6 +45,32 @@ ninja -C builddir
 ninja -C builddir qemu-run
 ```
 
+## Future Work
+
+S3K is a research prototype under active development. We have many ideas for improvements but cannot guarantee timelines.
+
+- **Formal verification** [Ongoing] 
+  - Formalizing core kernel abstractions and proving security/safety properties using HOL4.
+  - Extending verification to cover the kernel implementation (binary level).
+- **Kernel reimplementation** [Ongoing]
+  - Reimplementing the kernel in a formally-verifiable language designed for safety-critical systems.
+- **Extended platform support**
+  - Add 32-bit RISC-V support and additional boards/SoCs.
+- **Fine-grained monitor capabilities**
+  - Restrict monitor privileges for more granular partition management.
+- **Asynchronous IPC**
+  - Support message queues alongside current synchronous IPC and message buffers.
+- **Interrupt capabilities**
+  - Let partitions handle hardware interrupts with maintained isolation and security.
+- **Performance testing and benchmarking**
+  - Establish benchmark suites and comprehensive test coverage.
+- **Documentation and examples**
+  - Expand API documentation and add example projects.
+- **OS partition support**
+  - Run real-time operating systems and Linux as isolated partitions within S3K.
+- **User-space library**
+  - Provide a higher-level abstraction over the kernel API for application developers.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
@@ -60,3 +86,5 @@ H. Karlsson, and R. Guanciale, "Partitioning Kernel with Capability Controlled T
 H. A. Karlsson, “Minimal partitioning kernel with time protection
 and predictability,” in Proc. IEEE European Symposium on Security
 and Privacy Workshops (EuroS&PW’24). IEEE, 2024, pp. 234–241.
+
+K. Palmskog, et al. "Trustworthy Verification of RISC-V Binaries Using Symbolic Execution in HolBA." arXiv preprint arXiv:2503.14135 (2025).
