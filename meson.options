@@ -16,3 +16,10 @@ option('platform', type : 'combo', choices : ['qemu_virt', 'cheshire', 'cheshire
 option('cspad', type : 'integer', value : 0, yield : true)
 # Microseconds per time slot
 option('timeslotus', type : 'integer', min : 1, max : 1000000, value : 1000, yield : true)
+
+# SBI Version (3.0 specification)
+option('sbi_spec_version', type : 'integer', value : '0x03000000')
+# SBI Implementation ID (S3K implementation)
+option('sbi_impl_id', type : 'integer', value : '0x53334B')
+# SBI Implementation version (S3K version 2.0)
+option('sbi_impl_version', type : 'integer', value : '0x02000000')
