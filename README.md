@@ -31,7 +31,7 @@ Requirements: Docker (rootless).
 
 ```bash
 ./scripts/docker.sh
-meson setup builddir --cross-file=cross/rv64imac.toml
+meson setup builddir --cross-file=cross/rv64imac.ini
 ninja -C builddir
 ```
 
@@ -40,7 +40,7 @@ ninja -C builddir
 ```bash
 ./scripts/docker.sh
 cd projects/hello
-meson setup builddir --cross-file=../../cross/rv64imac.toml
+meson setup builddir --cross-file=../../cross/rv64imac.ini
 ninja -C builddir
 ninja -C builddir qemu-run
 ```
