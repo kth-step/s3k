@@ -111,7 +111,7 @@ static inline int s3k_mem_introspect(s3k_index_t i, s3k_fuel_t offset, s3k_cap_m
 
 static inline int s3k_mem_get(s3k_index_t i, s3k_cap_mem_t *cap)
 {
-	return s3k_mem_get_introspect(i, 0, cap);
+	return s3k_mem_introspect(i, 0, cap);
 }
 
 static inline int s3k_tsl_introspect(s3k_index_t i, s3k_fuel_t offset, s3k_cap_tsl_t *cap)
