@@ -1,55 +1,68 @@
 #include <stdio.h>
 
 extern volatile int __uart_base[]; // UART base address
-/* TI16750 Register Structure Definition */
-struct uart_regs {
-    union {
-        char rbr; // Receiver buffer register (read only)
-        char thr; // Transmitter holding register (write only)
-        char dll; // Divisor latch LSB (when LCR bit 7 = 1)
-    };
 
-    union {
-        char ier; // Interrupt enabler register
-        char dlm; // Divisor latch MSB (when LCR bit 7 = 1)
-    };
+#ifndef UART_REG_STRIDE
+#error "UART_REG_STRIDE must be defined (1 or 4)."
+#endif
 
-    union {
-        char iir; // Interrupt identification register (read only)
-        char fcr; // FIFO control register (write only)
-        char efr; // Enhanced feature register (when LCR = 0xBF)
-    };
+#if (UART_REG_STRIDE != 1) && (UART_REG_STRIDE != 4)
+#error "Unsupported UART_REG_STRIDE. Use 1 or 4."
+#endif
 
-    char lcr;     // Line control register
+struct __attribute__((packed)) uart_reg_t {
+	volatile char val;
+	char __pad[UART_REG_STRIDE - 1];
+};
 
-    union {
-        char mcr; // Modem control register
-        char xon1; // XON1 character (when LCR = 0xBF)
-    };
+struct __attribute__((packed)) uart_regs {
+	union {
+		struct uart_reg_t rbr;
+		struct uart_reg_t thr;
+		struct uart_reg_t dll;
+	};
 
-    union {
-        char lsr; // Line status register
-        char xon2; // XON2 character (when LCR = 0xBF)
-    };
+	union {
+		struct uart_reg_t ier;
+		struct uart_reg_t dlm;
+	};
 
-    union {
-        char msr; // Modem status register
-        char xoff1; // XOFF1 character (when LCR = 0xBF)
-    };
+	union {
+		struct uart_reg_t iir;
+		struct uart_reg_t fcr;
+		struct uart_reg_t efr;
+	};
 
-    union {
-        char spr; // Scratch pad register
-        char xoff2; // XOFF2 character (when LCR = 0xBF)
-    };
+	struct uart_reg_t lcr;
+
+	union {
+		struct uart_reg_t mcr;
+		struct uart_reg_t xon1;
+	};
+
+	union {
+		struct uart_reg_t lsr;
+		struct uart_reg_t xon2;
+	};
+
+	union {
+		struct uart_reg_t msr;
+		struct uart_reg_t xoff1;
+	};
+
+	union {
+		struct uart_reg_t spr;
+		struct uart_reg_t xoff2;
+	};
 };
 
 int __uart_putc(char c, FILE *f)
 {
 	(void)f;
 	volatile struct uart_regs *regs = (struct uart_regs *)__uart_base;
-	while (!(regs->lsr & 0x20)) {
+	while (!(regs->lsr.val & 0x20)) {
 	}
-	regs->thr = (unsigned char)c;
+	regs->thr.val = (unsigned char)c;
 	return c;
 }
 
@@ -63,5 +76,3 @@ static FILE __stdio = FDEV_SETUP_STREAM(__uart_putc, __uart_getc, NULL, _FDEV_SE
 FILE *const stdin = &__stdio;
 __strong_reference(stdin, stdout);
 __strong_reference(stdin, stderr);
-
-

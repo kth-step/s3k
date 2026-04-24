@@ -9,6 +9,7 @@ app1_elf = executable(
 	) + app1_platform_uart,
 	c_args: [
 		'-specs=picolibc.specs',
+		'-DUART_REG_STRIDE=' + get_option('uart_stride'),
 	],
 	link_args: [
 		'-nostartfiles',

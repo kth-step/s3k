@@ -14,5 +14,5 @@ option('nipcfuel', type : 'integer', value : 16)
 option('platform', type : 'combo', choices : ['qemu_virt', 'cheshire', 'cheshire2'], value : 'qemu_virt')
 # Context switch padding
 option('cspad', type : 'integer', value : 18000)
-# Stride of UART registers
-option('uart_stride', type: 'integer', choices : [1, 4], value : 4, yield : true)
+# Stride in bytes between TI16750 UART registers on Cheshire-like platforms.
+option('uart_stride', type : 'combo', choices : ['1', '4'], value : '4', yield : true)
