@@ -27,7 +27,7 @@ Using the temporal fence instruction (see [PULP's CVA6 implementation](https://g
 
 Requirements: Docker (rootless).
 The repo-managed container image installs the extra tooling needed by the filesystem tutorial targets, including `mtools`, and defaults to `linux/amd64` for compatibility with the published toolchain image.
-The Docker wrapper also publishes container port `5555` to the host by default so the networking tutorials can be reached from macOS; override it with `S3K_DOCKER_HOST_PORT_5555`.
+The Docker wrapper also publishes container port `5555` to the host by default so the networking tutorial can be reached from macOS or Linux.
 
 ### Compiling only the kernel
 
@@ -46,6 +46,20 @@ meson setup builddir --cross-file=../../cross/rv64imac.ini
 ninja -C builddir
 ninja -C builddir qemu-run
 ```
+
+## Tutorial index
+
+- [tutorial.01.hello-world](projects/tutorial.01.hello-world/README.md): minimal UART-enabled application that prints a greeting.
+- [tutorial.02.trap-handler](projects/tutorial.02.trap-handler/README.md): install a trap handler and inspect exception state.
+- [tutorial.03.mem-cap](projects/tutorial.03.mem-cap/README.md): derive and configure memory capabilities with PMP.
+- [tutorial.04.yield](projects/tutorial.04.yield/README.md): start a second process and yield execution to it.
+- [tutorial.05.timing](projects/tutorial.05.timing/README.md): derive or grant timing budget between processes.
+- [tutorial.06.ipc](projects/tutorial.06.ipc/README.md): synchronous IPC between a client and server process.
+- [tutorial.07.ipc-noyield](projects/tutorial.07.ipc-noyield/README.md): asynchronous IPC without the yield flag.
+- [tutorial.08.ipc-cap](projects/tutorial.08.ipc-cap/README.md): transfer a memory capability over IPC.
+- [tutorial.09.3.processes](projects/tutorial.09.3.processes/README.md): run three processes and rebalance timing budget dynamically.
+- [tutorial.10.fs](projects/tutorial.10.fs/README.md): create a disk image, run the filesystem demo, then inspect the written file with `ninja -C builddir disk-read`.
+- [tutorial.11.network](projects/tutorial.11.network/README.md): run the telnet-based integer service and connect from the host on port `5555`.
 
 ## Future Work
 

@@ -12,7 +12,7 @@ ninja -C builddir
 ninja -C builddir qemu-run
 ```
 
-With QEMU running, connect from macOS or Linux on the host:
+Keep `ninja -C builddir qemu-run` running in that terminal. Open a second terminal on the host, then connect from macOS or Linux with:
 
 ```bash
 telnet 127.0.0.1 5555
