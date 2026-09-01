@@ -1,4 +1,4 @@
-project('tutorial.06.ipc', 'c',
+project('tutorial.07.ipc-noyield', 'c',
 	version: '0.1', 
 	meson_version: '>=1.1.0', 
 	default_options: [

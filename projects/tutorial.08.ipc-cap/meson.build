@@ -1,4 +1,4 @@
-project('ipc', 'c', 
+project('tutorial.08.ipc-cap', 'c', 
 	version: '0.1', 
 	meson_version: '>=1.1.0', 
 	default_options: [

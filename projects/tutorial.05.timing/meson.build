@@ -1,4 +1,4 @@
-project('tutorial.05.timing_cap', 'c',
+project('tutorial.05.timing', 'c',
 	version: '0.1',
 	meson_version: '>=1.1.0',
 	default_options: [
