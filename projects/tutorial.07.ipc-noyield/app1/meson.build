@@ -1,19 +1,12 @@
-subdir('platform')
-
-app1_elf = executable(
-	'app1.elf',
-	sources: files(
-		'head.S',
-		'main.c',
-		'init2.c'
-	) + app1_platform_uart,
-	c_args: tutorial_app_c_args,
-	link_args: [
-		'-nostartfiles',
-		'-specs=picolibc.specs',
-		'-T', app1_platform_ld,
-	],
-	dependencies: [
-		libs3k_dep,
-	],
+tutorial_app_name = 'app1'
+tutorial_app_ram_origin = '0x80000000'
+tutorial_app_ram_length = '0x10000'
+tutorial_app_sources = files(
+  'head.S',
+  'main.c',
+  'init2.c',
 )
+
+subdir('_mesonlib/tutorial_app')
+
+app1_elf = tutorial_app_elf

@@ -7,11 +7,7 @@ project('tutorial.07.ipc-noyield', 'c',
 	]
 )
 
-s3k = subproject('s3k')
-libs3k_dep = s3k.get_variable('lib_dep')
-s3k_elf = s3k.get_variable('elf')
-
-subdir('subprojects/s3k/projects/_mesonlib/tutorial_options')
+subdir('_mesonlib/tutorial_project')
 subdir('app1')
 subdir('app2')
 
@@ -36,4 +32,4 @@ tutorial_gdb_commands = [
 ]
 tutorial_qemu_loader_cpus = [0]
 
-subdir('subprojects/s3k/projects/_mesonlib/tutorial_targets')
+subdir('_mesonlib/tutorial_targets')
