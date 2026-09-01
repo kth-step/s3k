@@ -27,10 +27,13 @@ if (get_option('platform') == 'qemu_virt') or (get_option('platform') == 'qemu_v
   app_platform_ld_in = files('../tutorial_platform/qemu_virt.ld.in')
   app_uart_base = '0x10000000'
   app_virtio_base = '0x10001000'
+  tutorial_app_ram_origins = ['0x80000000', '0x80020000', '0x80030000']
 elif (get_option('platform') == 'cheshire') or (get_option('platform') == 'cheshire2')
   app_platform_uart = files('../tutorial_platform/ti16750.c')
   app_platform_ld_in = files('../tutorial_platform/cheshire.ld.in')
   app_uart_base = '0x03002000'
+  app_virtio_base = '0x0'
+  tutorial_app_ram_origins = ['0x10000000', '0x10020000', '0x10030000']
 else
   error('Unknown platform: ' + get_option('platform'))
 endif

@@ -1,5 +1,5 @@
 app_platform_conf = configuration_data()
-app_platform_conf.set('APP_RAM_ORIGIN', '0x80030000')
+app_platform_conf.set('APP_RAM_ORIGIN', tutorial_app_ram_origins[2])
 app_platform_conf.set('APP_RAM_LENGTH',    '0x10000')
 app_platform_conf.set('UART_BASE', app_uart_base)
 app_platform_conf.set('APP_LAYOUT_PREFIX', 'APP3')
@@ -14,13 +14,13 @@ configure_file(
 app3_layout_inc = include_directories('.')
 
 tutorial_app_name = 'app3'
-tutorial_app_ram_origin = '0x80030000'
+tutorial_app_index = 3
 tutorial_app_ram_length = '0x10000'
 tutorial_app_sources = files(
   'head.S',
   'main.c',
 )
 
-subdir('_mesonlib/tutorial_app_3')
+subdir('_mesonlib/tutorial_app')
 
 app3_elf = tutorial_app_elf
