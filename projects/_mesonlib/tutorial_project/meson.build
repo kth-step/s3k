@@ -1,6 +1,7 @@
 s3k = subproject('s3k')
 libs3k_dep = s3k.get_variable('lib_dep')
 s3k_elf = s3k.get_variable('elf')
+cc = meson.get_compiler('c')
 
 tutorial_option_macros = {
   'nproc': ['NPROC'],
@@ -13,6 +14,10 @@ tutorial_option_macros = {
   'cspad': ['CSPAD'],
   'uart_stride': ['UART_REG_STRIDE'],
 }
+
+if not cc.has_argument('-specs=picolibc.specs')
+  error('Missing picolibc support in the configured toolchain: riscv64-unknown-elf-gcc must be able to use -specs=picolibc.specs')
+endif
 
 tutorial_app_c_args = ['-specs=picolibc.specs']
 foreach option_name, macro_names : tutorial_option_macros

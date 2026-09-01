@@ -114,9 +114,6 @@ int main(void)
 	}
 	printf("Process 2 is ready to receive\n");
 
-	s3k_capty_t capty = 0;
-	s3k_index_t j = 0;
-
 	s3k_word_t ram_size = REGION_SIZE;
 	s3k_word_t ram_base = align_up((s3k_word_t)APP2_RAM_ORIGIN + APP2_RAM_LENGTH, ram_size);
 	s3k_word_t ram_perm = S3K_MEM_PERM_RWX; // Read/Write/Execute permissions
