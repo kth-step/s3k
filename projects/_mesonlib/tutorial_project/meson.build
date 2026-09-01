@@ -27,21 +27,28 @@ if (get_option('platform') == 'qemu_virt') or (get_option('platform') == 'qemu_v
   app_platform_ld_in = files('../tutorial_platform/qemu_virt.ld.in')
   app_uart_base = '0x10000000'
   app_virtio_base = '0x10001000'
-  tutorial_app_ram_origins = ['0x80000000', '0x80020000', '0x80030000']
+  tutorial_app_layouts = [
+    {'origin': '0x80000000', 'length': '0x10000'},
+    {'origin': '0x80020000', 'length': '0x10000'},
+    {'origin': '0x80030000', 'length': '0x10000'},
+  ]
 elif (get_option('platform') == 'cheshire') or (get_option('platform') == 'cheshire2')
   app_platform_uart = files('../tutorial_platform/ti16750.c')
   app_platform_ld_in = files('../tutorial_platform/cheshire.ld.in')
   app_uart_base = '0x03002000'
   app_virtio_base = '0x0'
-  tutorial_app_ram_origins = ['0x10000000', '0x10020000', '0x10030000']
+  tutorial_app_layouts = [
+    {'origin': '0x10000000', 'length': '0x10000'},
+    {'origin': '0x10020000', 'length': '0x10000'},
+    {'origin': '0x10030000', 'length': '0x10000'},
+  ]
 else
   error('Unknown platform: ' + get_option('platform'))
 endif
 
-tutorial_app_ram_lengths = ['0x10000', '0x10000', '0x10000']
 foreach app_slot : [1, 2, 3]
   tutorial_app_c_args += [
-    '-DAPP@0@_RAM_ORIGIN=@1@'.format(app_slot, tutorial_app_ram_origins[app_slot - 1]),
-    '-DAPP@0@_RAM_LENGTH=@1@'.format(app_slot, tutorial_app_ram_lengths[app_slot - 1]),
+    '-DAPP@0@_RAM_ORIGIN=@1@'.format(app_slot, tutorial_app_layouts[app_slot - 1]['origin']),
+    '-DAPP@0@_RAM_LENGTH=@1@'.format(app_slot, tutorial_app_layouts[app_slot - 1]['length']),
   ]
 endforeach

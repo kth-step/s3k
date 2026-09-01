@@ -2,11 +2,13 @@ if not is_variable('tutorial_app_index')
   error('Set tutorial_app_index for ' + tutorial_app_name)
 endif
 
-resolved_tutorial_app_ram_origin = tutorial_app_ram_origins[tutorial_app_index - 1]
+tutorial_app_layout = tutorial_app_layouts[tutorial_app_index - 1]
+resolved_tutorial_app_ram_origin = tutorial_app_layout['origin']
+resolved_tutorial_app_ram_length = tutorial_app_layout['length']
 
 app_platform_conf = configuration_data()
 app_platform_conf.set('APP_RAM_ORIGIN', resolved_tutorial_app_ram_origin)
-app_platform_conf.set('APP_RAM_LENGTH', tutorial_app_ram_length)
+app_platform_conf.set('APP_RAM_LENGTH', resolved_tutorial_app_ram_length)
 app_platform_conf.set('UART_BASE', app_uart_base)
 app_platform_conf.set('VIRTIO_BASE', app_virtio_base)
 
