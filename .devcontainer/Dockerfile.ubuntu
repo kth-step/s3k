@@ -1,0 +1,22 @@
+FROM ubuntu:26.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        binutils-riscv64-unknown-elf \
+        ca-certificates \
+        gcc-riscv64-unknown-elf \
+        gdb-multiarch \
+        git \
+        inetutils-telnet \
+        make \
+        meson \
+        mtools \
+        ninja-build \
+        picolibc-riscv64-unknown-elf \
+        python3 \
+        qemu-system-riscv \
+        qemu-utils \
+    && ln -sf /usr/bin/gdb-multiarch /usr/local/bin/riscv64-unknown-elf-gdb \
+    && rm -rf /var/lib/apt/lists/*
