@@ -13,8 +13,10 @@ ninja -C builddir disk-image
 ninja -C builddir qemu-run
 ```
 
-To inspect the resulting image from inside the container after the run:
+After the QEMU run finishes, read back the generated file from the disk image with:
 
 ```bash
 ninja -C builddir disk-read
 ```
+
+This prints the directory contents and then extracts `NEWFILE.TXT` so you can verify that the tutorial wrote the file successfully.
