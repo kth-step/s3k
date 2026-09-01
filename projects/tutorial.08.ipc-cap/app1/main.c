@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-#include "app2_layout.h"
 
 extern void app2_init(void); // Function to initialize app2 (the server application)
 

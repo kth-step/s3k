@@ -37,3 +37,11 @@ elif (get_option('platform') == 'cheshire') or (get_option('platform') == 'chesh
 else
   error('Unknown platform: ' + get_option('platform'))
 endif
+
+tutorial_app_ram_lengths = ['0x10000', '0x10000', '0x10000']
+foreach app_slot : [1, 2, 3]
+  tutorial_app_c_args += [
+    '-DAPP@0@_RAM_ORIGIN=@1@'.format(app_slot, tutorial_app_ram_origins[app_slot - 1]),
+    '-DAPP@0@_RAM_LENGTH=@1@'.format(app_slot, tutorial_app_ram_lengths[app_slot - 1]),
+  ]
+endforeach

@@ -6,7 +6,6 @@ tutorial_app_sources = files(
   'main.c',
   'init2.c',
 )
-tutorial_app_include_dirs = [app2_layout_inc]
 
 subdir('_mesonlib/tutorial_app')
 

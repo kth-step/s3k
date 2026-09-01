@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-#include "app2_layout.h"
 
 extern char __uart_base[]; // UART base address.
 

@@ -1,4 +1,0 @@
-#pragma once
-
-#define @APP_LAYOUT_PREFIX@_RAM_ORIGIN ((s3k_word_t)@APP_RAM_ORIGIN@)
-#define @APP_LAYOUT_PREFIX@_RAM_LENGTH ((s3k_word_t)@APP_RAM_LENGTH@)
