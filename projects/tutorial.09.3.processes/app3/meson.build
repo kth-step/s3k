@@ -5,6 +5,6 @@ tutorial_app_sources = files(
   'main.c',
 )
 
-subdir('_mesonlib/tutorial_app')
+subdir('tutorial_app')
 
 app3_elf = tutorial_app_elf

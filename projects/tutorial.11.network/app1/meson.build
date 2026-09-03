@@ -14,6 +14,6 @@ tutorial_app_sources = files(
 )
 tutorial_app_include_dirs = include_directories('.', 'net')
 
-subdir('_mesonlib/tutorial_app')
+subdir('tutorial_app')
 
 app1_elf = tutorial_app_elf

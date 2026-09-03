@@ -6,6 +6,6 @@ tutorial_app_sources = files(
   'init2.c',
 )
 
-subdir('_mesonlib/tutorial_app')
+subdir('tutorial_app')
 
 app1_elf = tutorial_app_elf
