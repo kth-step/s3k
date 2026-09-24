@@ -2,6 +2,7 @@
 
 #include "csr.h"
 #include "lock.h"
+#include "preempt.h"
 #include "rtc.h"
 
 extern void temporal_fence(void);
@@ -159,9 +160,16 @@ proc_t *sched(void)
 			return next; // Return the next ready process
 		}
 
-		// Wait for interrupt if no process is ready
-		while (!(csrr_mip() & 128)) {
+		// Wait for interrupt if no process is ready. Uses preempt()
+		// (not raw mip) so platforms with non-MTIP timer IRQs still wake.
+#ifdef PLATFORM_PREEMPT_STK
+		// QingKe V4F: wfi would never wake (no MTIP), spin instead.
+		while (!preempt()) {
+		}
+#else
+		while (!preempt()) {
 			__asm__ volatile("wfi");
 		}
+#endif
 	}
 }

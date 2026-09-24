@@ -17,7 +17,10 @@ _start:
 	csrw    mie,t0
 	csrw	mcounteren,0xf
 	csrw	mcountinhibit,0x0
+#ifndef PLATFORM_NO_SCOUNTEREN
+	// scounteren does not exist on M-only cores.
 	csrw	scounteren,0xf
+#endif
 
 	// Set the trap vector to the trap entry handler for handling traps.
 	la	t0,trap_entry		// Load the address of the trap entry handler.
@@ -54,6 +57,22 @@ _start:
 	bgeu	t0,t1,_hang
 	bnez	t0,_wait	
 
+#ifdef PLATFORM_PREEMPT_STK
+_copy_data:
+	// Copy .data from its flash LMA to the SRAM VMA (ch32v307 links code
+	// in flash and writable state in SRAM; see ch32v307.ld).
+	la	t0,_data		// SRAM destination (VMA).
+	la	t1,_end			// End of data+bss (VMA).
+	la	t2,_data_lma		// Flash source (LMA).
+1:	bgeu	t0,t1,2f
+	lw	t3,0(t2)
+	sw	t3,0(t0)
+	addi	t0,t0,4
+	addi	t2,t2,4
+	j	1b
+2:
+#endif
+
 _zero_bss:
 	// Zero out the .bss section (uninitialized global variables).
 	la	t0,_bss			// Start address of the .bss section.
@@ -63,6 +82,16 @@ _zero_bss:
 	bne	t0,t1,1b		// Repeat until the .bss section is cleared.
 
 _init:
+#ifdef PLATFORM_PREEMPT_STK
+	// Kernel-stack watermark: fill with 0xA5 before any C frame exists.
+	la	t0,_end
+	la	t1,__stack_top
+	li	t2,0xa5a5a5a5
+1:	sw	t2,0(t0)
+	addi	t0,t0,4
+	bne	t0,t1,1b
+#endif
+
 	// Initialize the kernel environment.
 	call	kernel_init
 

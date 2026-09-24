@@ -11,7 +11,7 @@ option('nmonitorfuel', type : 'integer', min : 1, max : 256, value : 8, yield : 
 # Amount of fuel for initial ipc capability
 option('nipcfuel', type : 'integer', min : 1, max : 256, value : 16, yield : true)
 # Execution platform
-option('platform', type : 'combo', choices : ['qemu_virt', 'qemu_virt4', 'cheshire', 'cheshire2'], yield : true)
+option('platform', type : 'combo', choices : ['qemu_virt', 'qemu_virt4', 'cheshire', 'cheshire2', 'ch32v307'], yield : true)
 # Context switch padding 
 option('cspad', type : 'integer', value : 0, yield : true)
 # Microseconds per time slot

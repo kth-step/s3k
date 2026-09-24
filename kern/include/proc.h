@@ -121,6 +121,14 @@ void proc_pmp_set(pid_t pid, pmp_slot_t slot, mem_perm_t rwx, pmp_addr_t addr);
  */
 void proc_pmp_clear(pid_t pid, pmp_slot_t slot);
 
+#ifdef PLATFORM_PREEMPT_STK
+/* QingKe V4F has no PMP default-deny: unmatched U-mode accesses are allowed,
+ * and pmpcfg1 (entries 4-7) writes are ignored. Isolation therefore requires
+ * an explicit deny-all entry in a slot 0-3 (NAPOT, pmpaddr=0xFFFFFFFF), with
+ * grants in slots 0-2. This hook re-arms that entry after every grant syscall. */
+void platform_proc_pmp_deny(pid_t pid);
+#endif
+
 /**
  * @brief Check if a PMP slot is set for a process.
  *

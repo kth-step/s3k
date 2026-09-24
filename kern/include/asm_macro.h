@@ -11,6 +11,7 @@
 #define OFFSET_SIZE _X(4, 8) ///< Offset size for 32-bit and 64-bit architectures.
 #define LREG _X(lw, ld)	     ///< Load register instruction for 32-bit and 64-bit architectures.
 #define SREG _X(sw, sd)	     ///< Store register instruction for 32-bit and 64-bit architectures.
+#define AMOAND _X(amoand.w.rl, amoand.d.rl) ///< Atomic AND with release ordering, .w on RV32 / .d on RV64.
 
 // Offsets for each register in the PCB.
 #define PROC_STATE (OFFSET_SIZE * 0) ///< Offset for the process state.

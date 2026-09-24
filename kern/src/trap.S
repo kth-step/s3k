@@ -92,7 +92,7 @@ _trap_switch:
 	// Atomically update the process state to indicate it is no longer running.
 	// This ensures that the process state is updated safely in a multi-core environment.
 	li	t0,~1				// Load the bitmask to clear the "busy" state.
-	amoand.d.rl x0,t0,(tp)
+	AMOAND	x0,t0,(tp)
 
 	// If the next process (a0) is NULL, jump to `sched`.
 	bnez	a0,trap_resume
@@ -131,6 +131,15 @@ trap_exit:
 
 	LREG	t0,PROC_TP(tp)		// Save user TP to mscratch.
 	csrw	mscratch,t0
+#ifdef PLATFORM_PREEMPT_STK
+	// Arm async interrupts for the resumed user context: MPIE latched
+	// here, mret promotes MPIE->MIE at the user-mode boundary.
+	li	t0,0x88
+	csrs	mstatus,t0
+	li	t0,0x1800
+	csrc	mstatus,t0
+#endif
+
 	LREG	ra,PROC_RA(tp)		// Restore return address.
 	LREG	sp,PROC_SP(tp)		// Restore stack pointer.
 	LREG	gp,PROC_GP(tp)		// Restore global pointer.

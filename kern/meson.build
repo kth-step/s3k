@@ -5,18 +5,24 @@ sources = files(
     'src/head.S',
     'src/trap.S',
     'src/exception.c',
+    'src/freestanding.c',
     'src/interrupt.c',
     'src/ipc.c',
     'src/lock.c',
     'src/mem.c',
     'src/mon.c',
     'src/proc.c',
-    'src/rtc.c',
     'src/sched.c',
     'src/syscall.c',
     'src/tsl.c',
     'src/ttas.c',
 )
+
+# ch32v307 provides its own rtc_* backend (SysTick) in the platform layer,
+# so the generic CLINT-based rtc.c is excluded for that platform.
+if get_option('platform') != 'ch32v307'
+    sources += files('src/rtc.c')
+endif
 
 incdir = include_directories('include')
 
@@ -46,5 +52,8 @@ elf = executable(
     include_directories: incdir,
     c_args: c_args + c_platform_args,
     link_args: link_args + link_platform_args,
+    # track the platform linker script as a link dependency: -T paths in
+    # link_args alone are invisible to ninja (see demo app meson.builds).
+    link_depends: platform_ld,
     build_by_default: true,
 )
