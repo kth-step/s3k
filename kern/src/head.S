@@ -24,11 +24,11 @@ _start:
 	csrw	mtvec,t0		// Set the machine trap vector.
 
 	// Set the context switch padding.
-	// The context switch padding = CSPAD + (hartid * 16).
-#if CSPAD != 0
+	// The context switch padding = _CSPAD + (hartid * 16).
+#if _CSPAD != 0
 	csrr	t0,mhartid
 	slli	t0,t0,6
-	li	t1,CSPAD
+	li	t1,_CSPAD
 	add	t1,t1,t0
 	csrw	0x7C3,t1
 #endif

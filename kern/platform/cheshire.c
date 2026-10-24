@@ -48,7 +48,7 @@ void kernel_init(void)
 
 void temporal_fence(void)
 {
-#if CSPAD != 0
+#if _CSPAD != 0
 	__asm__ volatile(".word 0xb");
 #endif
 }
