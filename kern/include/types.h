@@ -127,4 +127,4 @@ typedef enum capty {
 #define RTC_HZ ((uint32_t)_RTC_HZ)				      ///< RTC frequency constant.
 #define TICKS_PER_US ((uint32_t)(RTC_HZ / 1000000))		      ///< RTC ticks per microsecond constant.
 #define TIME_SLOT_US ((uint32_t)_TIME_SLOT_US)			      ///< Time slot duration constant in microseconds.
-#define TIME_SLOT_TICKS ((uint32_t)(RTC_HZ * TIME_SLOT_US / 1000000)) ///< Time slot duration in ticks.
+#define TIME_SLOT_TICKS ((uint64_t)_RTC_HZ * _TIME_SLOT_US / 1000000) ///< Time slot duration in ticks.
