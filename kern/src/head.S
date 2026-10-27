@@ -40,10 +40,10 @@ _start:
 	.option pop
 	la	sp,__stack_top		// Load the stack pointer.
 
-#ifdef SMP
+#if _NUM_HARTS > 1
 	csrr	t0,mhartid
 	slli	t0,t0,10
-	add	sp,sp,t0
+	sub	sp,sp,t0
 #endif
 
 	// Mechanism so hart 0 initialize the kernel.
