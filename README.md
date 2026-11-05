@@ -50,8 +50,9 @@ ninja -C builddir qemu-run
 S3K is a research prototype under active development. We have many ideas for improvements but cannot guarantee timelines.
 
 - **Formal verification** [Ongoing] 
-  - Formalizing core kernel abstractions and proving security/safety properties using HOL4.
-  - Extending verification to cover the kernel implementation (binary level).
+  - [x] Formalizing core kernel abstractions and proving security/safety properties using HOL4.
+  - [ ] Rewrite the kernel implementation to follow formal model.
+  - [ ] Extending verification to cover the kernel implementation (binary level).
 - **Kernel reimplementation** [Ongoing]
   - Reimplementing the kernel in a formally-verifiable language designed for safety-critical systems.
 - **Extended platform support**
