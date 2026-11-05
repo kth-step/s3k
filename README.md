@@ -1,6 +1,6 @@
 # S3K - Safe and Secure Separation Kernel
 
-[![CI Build](https://github.com/HAKarlsson/s3k/actions/workflows/build.yml/badge.svg)](https://github.com/HAKarlsson/s3k/actions/workflows/build.yml)
+[![CI Build](https://github.com/kth-step/s3k/actions/workflows/build.yml/badge.svg)](https://github.com/HAKarlsson/s3k/actions/workflows/build.yml)
 
 S3K is an experimental bare-metal capability-based separation kernel for RISC-V, built for safety- and security-critical systems such as avionics.
 It supports dynamic partitioning with strict spatial and temporal isolation. The kernel is implemented in C and assembly with a small trusted computing base (TCB) and minimal hardware requirements (RISC-V PMP, machine mode and user mode).
