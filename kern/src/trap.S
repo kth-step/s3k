@@ -89,10 +89,17 @@ _trap_switch:
 	// jump directly to `trap_exit` without performing a context switch.
 	beq	a0,tp,trap_resume
 
+#if _NUM_HARTS > 1
 	// Atomically update the process state to indicate it is no longer running.
 	// This ensures that the process state is updated safely in a multi-core environment.
 	li	t0,~1				// Load the bitmask to clear the "busy" state.
 	amoand.d.rl x0,t0,(tp)
+#else
+	// Single-core environment: no need for atomic update of process state.
+	LREG	t0,PROC_STATE(tp)	// Load the current process state.
+	andi	t0,t0,-2		// Clear the "busy" state bit.
+	SREG	t0,PROC_STATE(tp)	// Store the updated process state.
+#endif
 
 	// If the next process (a0) is NULL, jump to `sched`.
 	bnez	a0,trap_resume

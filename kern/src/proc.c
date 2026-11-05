@@ -117,8 +117,15 @@ bool proc_acquire(pid_t pid)
  */
 void proc_suspend(pid_t pid)
 {
-	_proc(pid)->state &= PROC_STATE_ACQUIRED;  // Remove all other states but acquired.
-	_proc(pid)->state |= PROC_STATE_SUSPENDED; // Mark the process as suspended.
+	proc_t *proc = _proc(pid);
+	proc_state_t old_state = proc->state;
+	proc->state &= PROC_STATE_ACQUIRED;  // Remove all other states but acquired.
+	proc->state |= PROC_STATE_SUSPENDED; // Mark the process as suspended.
+	if (((old_state & PROC_STATE_BLOCKED) == 0)) {
+		// If old_state is blocked, then it can not be acquired.
+		// If acquired and blocked, the other process must possess the lock.
+		proc->timeout = 0;
+	}
 }
 
 /**
