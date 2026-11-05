@@ -13,7 +13,7 @@
 #define RAM_PERM MEM_PERM_RWX
 #define RAM_BASE 0x80000000
 #define RAM_SIZE 0x10000000
-#define BOOT_RAM_SIZE  0x1000000
+#define BOOT_RAM_SIZE 0x1000000
 
 // Define memory regions and permissions as constants
 #define UART_PERM MEM_PERM_RW

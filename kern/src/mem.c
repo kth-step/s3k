@@ -58,8 +58,8 @@ static bool _derivable(mem_t parent, fuel_t csize, word_t rwx, word_t base, word
  */
 static bool _valid_pmp_args(mem_t cap, word_t slot, word_t rwx, word_t addr)
 {
-    if ((addr >> 56) != 0)
-        return false;
+	if ((addr >> 56) != 0)
+		return false;
 
 	word_t base = pmp_napot_decode_base(addr);
 	word_t size = pmp_napot_decode_size(addr);

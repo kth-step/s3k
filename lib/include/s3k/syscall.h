@@ -383,7 +383,6 @@ static inline int s3k_mon_state_get(s3k_index_t i, s3k_word_t *value)
 	return a0;
 }
 
-
 static inline int s3k_mon_vreg_set(s3k_index_t i, s3k_vreg_t reg, s3k_word_t value)
 {
 	register s3k_word_t a0 __asm__("a0") = S3K_SYSCALL_MON_VREG_SET;

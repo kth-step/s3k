@@ -316,8 +316,8 @@ int ipc_send(pid_t owner, index_t i, word_t data[2], capty_t capty, index_t j, p
  */
 int ipc_recv(pid_t owner, index_t i, proc_t **next, uint32_t servtime)
 {
-	if (!_ipc_invoke_valid_access(owner, i, IPC_MODE_USYNC, true) && 
-		!_ipc_invoke_valid_access(owner, i, IPC_MODE_BSYNC, true)) {
+	if (!_ipc_invoke_valid_access(owner, i, IPC_MODE_USYNC, true)
+	    && !_ipc_invoke_valid_access(owner, i, IPC_MODE_BSYNC, true)) {
 		return ERR_INVALID_ACCESS;
 	}
 	// Go to a receiver state.

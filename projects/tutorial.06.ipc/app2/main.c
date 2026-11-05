@@ -13,6 +13,6 @@ int main(s3k_word_t server)
 		// Record cycle count before receiving
 		s3k_ipc_replyrecv(server, &msg);
 		printf("2> received %d\n", msg.data[0]);
-		msg.data[0] = msg.data[0]*msg.data[0];
+		msg.data[0] = msg.data[0] * msg.data[0];
 	}
 }

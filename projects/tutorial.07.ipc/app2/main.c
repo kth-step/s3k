@@ -45,7 +45,7 @@ int main(s3k_word_t server)
 		msg.capty = 0;
 		msg.data[0] = *((uint64_t *)(ram_base));
 		printf("Successfully read in random memory 0x%lx\n", *((uint64_t *)(ram_base)));
-	// Record cycle count after reply
+		// Record cycle count after reply
 		// The message buffer can be used to communicate timing information back to the
 		// caller, if needed.
 	}

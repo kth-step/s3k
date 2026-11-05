@@ -7,20 +7,21 @@ extern void app2_init(void); // Function to initialize app2 (the server applicat
 extern char __uart_base[]; // UART base address
 
 // Enable memory at mem capability idx
-void setup_uart(int idx) {
-    s3k_word_t base = (s3k_word_t)__uart_base;
+void setup_uart(int idx)
+{
+	s3k_word_t base = (s3k_word_t)__uart_base;
 	s3k_word_t size = 0x20;
 	s3k_word_t slot = 2;
 	s3k_word_t perm = S3K_MEM_PERM_RW; // Read/Write permissions
 	s3k_word_t addr = s3k_pmp_napot_encode(base, size);
 	s3k_mem_pmp_set(idx, slot, perm, addr);
-    s3k_sync();
-    puts("uart set up!");
-    return;
+	s3k_sync();
+	puts("uart set up!");
+	return;
 }
 
-
 #define PROC_STATE_BLOCKED 2
+
 int main(void)
 {
 	setup_uart(MAX_MEMORY_FUEL);
@@ -39,7 +40,7 @@ int main(void)
 	s3k_mon_resume(8);			// Resume monitor 8 (server)
 
 	while (true) {
-		s3k_mon_yield(8);			// Yield to monitor 8
+		s3k_mon_yield(8); // Yield to monitor 8
 		uint64_t state;
 		s3k_mon_state_get(8, &state);
 		if (state & PROC_STATE_BLOCKED)
@@ -49,7 +50,7 @@ int main(void)
 
 	printf("call,replyrecv\n");
 	for (int i = 0; i < 100; ++i) {
-		s3k_sleep_until(0);				         // Synchronize to the next time slot
+		s3k_sleep_until(0); // Synchronize to the next time slot
 
 		s3k_msg_t msg = {};
 		msg.capty = 0;

@@ -22,11 +22,10 @@ static void dump_timing_cap(int idx)
 	s3k_cap_tsl_t cap = {};
 	int rc = s3k_tsl_get(idx, &cap);
 
-	printf("tsl[%d] get rc=%d owner=%u cfree=%u csize=%u hart=%u enabled=%u mark=%u begin=%u end=%u\n",
-	       idx, rc, (unsigned)cap.owner, (unsigned)cap.cfree, (unsigned)cap.csize, (unsigned)cap.hart,
-	       (unsigned)cap.enabled, (unsigned)cap.mark, (unsigned)cap.begin, (unsigned)cap.end);
+	printf("tsl[%d] get rc=%d owner=%u cfree=%u csize=%u hart=%u enabled=%u mark=%u begin=%u end=%u\n", idx, rc,
+	       (unsigned)cap.owner, (unsigned)cap.cfree, (unsigned)cap.csize, (unsigned)cap.hart, (unsigned)cap.enabled,
+	       (unsigned)cap.mark, (unsigned)cap.begin, (unsigned)cap.end);
 }
-
 
 void mem_init(s3k_word_t mon_idx, s3k_word_t idx, s3k_word_t slot, s3k_word_t cfree, s3k_word_t perm, s3k_word_t base,
 	      s3k_word_t size)
@@ -47,8 +46,8 @@ void mem_init(s3k_word_t mon_idx, s3k_word_t idx, s3k_word_t slot, s3k_word_t cf
 
 void app2_init(void)
 {
-	int mon_idx = 8;   // Monitor index
-	int ram_idx = 0;   // RAM index
+	int mon_idx = 8;		// Monitor index
+	int ram_idx = 0;		// RAM index
 	int uart_idx = MAX_MEMORY_FUEL; // UART index
 
 	// RAM configuration
@@ -70,7 +69,7 @@ void app2_init(void)
 		printf("Failed to set program counter to RAM start\n");
 		return;
 	}
-	if 	(s3k_mon_resume(8) != 0) {
+	if (s3k_mon_resume(8) != 0) {
 		printf("Failed to resume\n");
 		return;
 	}
@@ -88,7 +87,7 @@ int main(void)
 	s3k_sync();
 	while (true) {
 		puts("yield to second process\n");
-		int err = s3k_mon_yield(8);			// Yield to monitor 8
+		int err = s3k_mon_yield(8); // Yield to monitor 8
 		if (err < 0) {
 			printf("Failed to yield, err=%d\n", err);
 			return 0;

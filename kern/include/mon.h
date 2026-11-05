@@ -150,4 +150,4 @@ int mon_vreg_set(pid_t owner, index_t i, vreg_t reg, word_t value);
 /**
  * Get the state for the monitored process.
  */
-int mon_state_get(pid_t owner, index_t i, word_t * value);
+int mon_state_get(pid_t owner, index_t i, word_t *value);
